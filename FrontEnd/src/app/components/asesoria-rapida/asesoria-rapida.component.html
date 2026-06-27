@@ -1,0 +1,32 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     AsesoriaRapidaComponent
+     ─ Panel izquierdo: fotos 246×368 en secuencia continua (video simulado).
+     ─ Panel derecho: texto fijo proveniente de tbl_asesoria_rapida.texto_html.
+     ─ Sin controles de navegación manual.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div
+  class="rapida-container"
+  aria-label="Reproducción rápida de asesoría"
+  role="region"
+  *ngIf="fotos.length > 0">
+
+  <!-- Panel izquierdo: reproductor de fotos -->
+  <div class="rapida-imagen-panel">
+    <img
+      *ngFor="let foto of fotos; let i = index"
+      [src]="foto.imagen_url"
+      [alt]="'Foto de asesoría ' + (i + 1)"
+      class="rapida-foto"
+      [class.active]="currentIndex === i"
+      loading="lazy">
+  </div>
+
+  <!-- Panel derecho: texto fijo -->
+  <div class="rapida-texto-panel">
+    <div
+      class="rapida-texto-inner html-content"
+      [innerHTML]="textoHtml">
+    </div>
+  </div>
+
+</div>

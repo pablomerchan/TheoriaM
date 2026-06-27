@@ -1,0 +1,18 @@
+# Set default behavior, normalize line endings
+* text=auto
+
+# Ensure common binary formats are treated as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.gz binary
+*.jar binary
+*.exe binary
+
+# Ensure shell scripts keep LF
+*.sh text eol=lf

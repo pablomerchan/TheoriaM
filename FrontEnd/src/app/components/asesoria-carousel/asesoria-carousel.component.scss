@@ -1,0 +1,1081 @@
+// ═══════════════════════════════════════════════════════════════════════════
+//  Variables de diseño — centralizadas para facilitar cambios futuros
+// ═══════════════════════════════════════════════════════════════════════════
+$accent           : #B8860B;        // dorado, coherente con el tema de la app
+$accent-light     : #D4AF37;
+$surface          : #FAFAFA;
+$surface-border   : rgba(0, 0, 0, 0.08);
+$text-primary     : #111111;
+$text-secondary   : #3C3C3C;
+$text-muted       : #555555;
+$radius-card      : 16px;
+$radius-btn       : 50%;
+$shadow-card      : 0 4px 6px -1px rgba(0,0,0,.05), 0 10px 30px -5px rgba(0,0,0,.10);
+$transition-std   : 0.25s ease;
+$transition-slide : 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+$scale          : 0.8;         // reducción uniforme del 20%
+
+// Breakpoints responsivos
+$bp-md : 768px;   // tablet
+$bp-sm : 480px;   // móvil grande
+$bp-xs : 360px;   // móvil pequeño
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Alinear el control al lado derecho, junto al menú principal.
+// Se comporta como bloque inline para que el flujo del padre lo ubique a la derecha.
+:host {
+  display        : block;
+  width          : 100%;       // fluido, se adapta al contenedor padre
+  max-width      : 492px * $scale * 1.2;      // 410px × 120% × 1.2 — ancho aumentado un 20%
+  box-sizing     : border-box;
+  margin-left    : 0;
+  margin-right   : auto;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CONTENEDOR PRINCIPAL
+//  Fondo claro explícito para evitar herencia del tema oscuro del padre.
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-container {
+  position     : relative;
+  width        : 100%;
+  max-width    : 100%;
+  box-sizing   : border-box;
+  margin       : 0;
+  overflow     : visible;  // el viewport hijo es el único que recorta
+  border-radius: $radius-card;
+  background   : $surface;
+  color        : $text-primary;
+  border       : 1px solid $surface-border;
+  box-shadow   : $shadow-card;
+  display      : flex;  // Flexbox para controlar altura del contenido
+  flex-direction: column;  // Alinea contenedor y footer verticalmente
+  min-height   : 0;  // Crítico para que flex funcione con children
+  transition: max-height 0.36s ease, height 0.36s ease;
+  will-change: max-height, height;
+
+  &.is-speaking { cursor: wait; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  VIEWPORT — única capa con overflow:hidden para recorte horizontal
+//  flex: 1 permite que ocupe espacio disponible después de la imagen
+// ─────────────────────────────────────────────────────────────────────────────
+.carousel-viewport {
+  overflow     : hidden;  // Recorta slides adyacentes horizontalmente
+  width        : 100%;
+  box-sizing   : border-box;
+  border-radius: $radius-card $radius-card 0 0;
+  display      : flex;  // Flexbox para los hijos
+  flex-direction: column;  // Expande verticalmente
+  flex         : 1 1 auto;  // Se expande para llenar espacio disponible
+  min-height   : 0;  // Crítico para que flex funcione correctamente
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  PISTA DESLIZANTE
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-track {
+  display   : flex;
+  flex      : 1 1 auto;  // Se expande verticalmente
+  min-height: 0;  // Crítico para que flex funcione con children
+  transition: transform $transition-slide;
+  will-change: transform;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SLIDES
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-slide {
+  flex          : 0 0 100%;  // Ancho 100% de la pista, sin encogerse
+  width         : 100%;
+  box-sizing    : border-box;
+  display       : flex;
+  flex-direction: column;  // Imagen arriba, texto abajo
+  opacity       : 0.35;
+  transition    : opacity 0.5s ease-in-out;
+  min-height    : 100%;  // Ocupa toda la altura disponible del viewport
+
+  &.active { opacity: 1; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  IMAGEN
+// ═══════════════════════════════════════════════════════════════════════════
+.slide-image-container {
+  position     : relative; /* Posicionamiento relativo necesario para el overlay absoluto */
+  width        : 100%;
+  box-sizing   : border-box;
+  aspect-ratio : 4 / 3;
+  max-width    : 100%;
+  max-height   : clamp(180px, 42vh, 260px);
+  height       : auto;
+  flex-shrink  : 0;
+  overflow     : hidden;
+  border-bottom: 1px solid rgba(0,0,0,.07);
+  background   : transparent;
+
+  .slide-image {
+    width          : 100%;
+    height         : 100%;
+    object-fit     : cover;    // recorta sin deformar
+    object-position: center center;
+    display        : block;
+    max-width      : 100%;
+  }
+
+  .slide-video {
+    width          : 100%;
+    height         : 100%;
+    object-fit     : contain;  // muestra todo el video sin recortar
+    object-position: center center;
+    display        : block;
+    max-width      : 100%;
+  }
+
+  // ── Progress bar for video (estilo YouTube)
+  .video-progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    z-index: 10;
+    transition: height 0.15s ease;
+
+    &:hover {
+      height: 10px;
+      .video-progress-bar::after {
+        transform: scale(1);
+      }
+    }
+
+    .video-progress-bar {
+      height: 100%;
+      background: #ff0000; // Rojo YouTube
+      position: relative;
+      width: 0%;
+      transition: width 0.1s linear;
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: -6px;
+        top: 50%;
+        transform: translateY(-50%) scale(0);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ff0000;
+        transition: transform 0.15s ease;
+        pointer-events: none;
+      }
+    }
+  }
+
+  // ── Overlay de reproducción para video (YouTube style)
+  .video-play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 8;
+    cursor: pointer;
+    transition: opacity 0.25s ease, background-color 0.25s ease;
+
+    .video-play-icon {
+      width: 54px * $scale;
+      height: 54px * $scale;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+
+      svg {
+        width: 26px * $scale;
+        height: 26px * $scale;
+        margin-left: 2px * $scale; // Pequeño offset para centrar el icono de play
+      }
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+      .video-play-icon {
+        transform: scale(1.1);
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+    }
+
+    &.playing {
+      opacity: 0;
+      pointer-events: none; // Permite clics al video nativo cuando reproduce
+
+      .video-play-icon svg {
+        margin-left: 0; // El icono de pausa está perfectamente centrado
+      }
+    }
+  }
+
+  // Mostrar control al hacer hover en el reproductor reproduciéndose
+  &:hover {
+    .video-play-overlay.playing {
+      opacity: 1;
+      pointer-events: auto;
+      background-color: rgba(0, 0, 0, 0.15);
+    }
+    .video-volume-control {
+      opacity: 1;
+    }
+  }
+
+  // ── Control de volumen (YouTube style)
+  .video-volume-control {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 10px;
+    border-radius: 20px;
+    z-index: 11;
+    opacity: 0;
+    transition: opacity 0.25s ease, width 0.25s ease;
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+
+    &:hover {
+      width: 120px;
+      .video-volume-slider {
+        opacity: 1;
+        width: 70px;
+        pointer-events: auto;
+      }
+    }
+
+    .video-volume-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      svg {
+        width: 18px * $scale;
+        height: 18px * $scale;
+      }
+    }
+
+    .video-volume-slider {
+      -webkit-appearance: none;
+      width: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      outline: none;
+      margin: 0;
+      opacity: 0;
+      transition: opacity 0.2s ease, width 0.2s ease;
+      cursor: pointer;
+      pointer-events: none;
+
+      &::-webkit-slider-runnable-track {
+        background: transparent;
+      }
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ffffff;
+        cursor: pointer;
+        margin-top: -3px;
+      }
+
+      &::-moz-range-thumb {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ffffff;
+        cursor: pointer;
+        border: none;
+      }
+    }
+  }
+
+  // ── Overlay indicador de pausa
+  .pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+    z-index: 5;
+    animation: fadeInOverlay 0.3s ease forwards;
+    cursor: pointer;
+
+    .pause-overlay-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .pause-overlay-icon {
+      width: 48px * $scale;
+      height: 48px * $scale;
+      opacity: 0.9;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+      animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .pause-overlay-text {
+      font-size: 1.1rem * $scale;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      animation: slideUpIn 0.3s ease forwards;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+//  ÁREA DE TEXTO — flexbox dinámico con scroll dorado cuando el texto desborda
+//  Se expande para llenar espacio disponible después de la imagen.
+// ═══════════════════════════════════════════════════════════════════════════
+.slide-content-container {
+  width         : 100%;
+  // box-sizing: border-box es crítico: el padding se descuenta del 100% de ancho,
+  // evitando que el texto se salga por la derecha.
+  box-sizing    : border-box;
+  min-width     : 0;  // Permite que flex-shrink funcione en children
+  padding       : 1.25rem * $scale 1.25rem * $scale 1rem * $scale;
+  background    : $surface;
+  color         : $text-primary;
+  display       : flex;
+  flex-direction: column;  // Alinea content-inner verticalmente
+  flex          : 1 1 auto;  // Expande para llenar espacio disponible
+  min-height    : 0;  // Crítico para que overflow-y funcione
+  overflow-y    : auto;  // Scroll cuando el contenido desborda
+  font-size     : 0.96rem;
+  line-height   : 1.6;
+
+  // Scrollbar dorada — visualmente diferenciada del scroll principal de la página
+  &::-webkit-scrollbar       { width: 6px; }
+  &::-webkit-scrollbar-track { background: rgba(0,0,0,.04); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.45); border-radius: 3px;
+    &:hover                  { background: rgba(184,134,11,0.7); }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184,134,11,0.45) rgba(0,0,0,.04);
+
+  @media (max-width: $bp-sm)  { 
+    padding: 1rem * $scale; 
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  @media (max-width: $bp-xs)  { 
+    padding: 0.75rem * $scale; 
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
+
+.hide-text-enabled {
+  .slide-content-container {
+    display: none !important;
+  }
+
+  .carousel-slide {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .slide-image-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    aspect-ratio: auto;
+    border-bottom: none;
+  }
+
+  .slide-image,
+  .slide-video {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.35s ease, opacity 0.25s ease;
+  }
+
+  .carousel-viewport {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    min-height: 0;
+  }
+}
+
+/* Botón de ocultar texto: más visible y con estado activo */
+.hide-text-btn {
+  width: 44px;
+  height: 44px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: background $transition-std, transform 0.12s ease;
+  svg { width: 20px; height: 20px; }
+
+  &:hover { transform: translateY(-2px); background: rgba(0,0,0,0.04); }
+
+  &.active {
+    background: $accent;
+    color: white;
+    svg { stroke: white; fill: white; }
+  }
+}
+
+.slide-content-inner {
+  width     : 100%;
+  box-sizing: border-box;
+  min-width : 0;   // permite que el flex child se encoja correctamente
+  min-height: 0;   // Permite que el contenido se encoja cuando hay overflow
+
+  // ── ::ng-deep rompe el encapsulamiento para forzar colores legibles.
+  // El componente padre inyecta reglas via .html-content con colores de
+  // tema oscuro; usamos !important para sobreescribirlos.
+  ::ng-deep {
+    h1, h2, h3, h4 {
+      margin-top   : 0;
+      margin-bottom: 0.75rem;
+      color        : $text-primary !important;
+      font-weight  : 700;
+      line-height  : 1.3;
+      font-size    : 1.1rem;
+
+      @media (max-width: $bp-sm) { font-size: 0.95rem; }
+      @media (max-width: $bp-xs) { font-size: 0.85rem; }
+    }
+
+    p {
+      line-height  : 1.75;
+      margin-bottom: 1rem;
+      color        : $text-secondary !important;
+      font-size    : 0.96rem;
+
+      &:last-child { margin-bottom: 0; }
+
+      @media (max-width: $bp-sm) { font-size: 0.9rem; line-height: 1.6; }
+      @media (max-width: $bp-xs) { font-size: 0.85rem; line-height: 1.5; }
+    }
+
+    strong { font-weight: 700; color: $text-primary !important; }
+    em     { color: $text-muted !important; }
+
+    ul, ol {
+      padding-left : 1.5rem;
+      margin-bottom: 1rem;
+      color        : $text-secondary !important;
+
+      @media (max-width: $bp-sm) { padding-left: 1.25rem; }
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+      line-height  : 1.65;
+      color        : $text-secondary !important;
+    }
+
+    a { color: $accent !important; text-decoration: underline; }
+
+    // Imágenes inline del contenido HTML:
+    // max-width:100% garantiza que no excedan el ancho del contenedor
+    img {
+      max-width    : 100% !important;
+      width        : auto !important;
+      height       : auto !important;
+      box-sizing   : border-box;
+      border-radius: 8px;
+      display      : block;
+      margin       : 0.5rem 0;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  FLECHAS PREV / NEXT
+//  Se posicionan centradas verticalmente sobre la IMAGEN (614px / 2 ≈ 307px),
+//  no sobre el container completo, para no solapar el texto.
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-control {
+  position      : absolute;
+  // top fijo en la mitad de la imagen (614px / 2 = 307px)
+  top           : 307px * $scale;
+  transform     : translateY(-50%);
+  background    : rgba(255, 255, 255, 0.88);
+  color         : #333333;
+  border        : 1px solid rgba(0, 0, 0, 0.12);
+  width         : 38px * $scale;
+  height        : 38px * $scale;
+  border-radius : $radius-btn;
+  font-size     : 1rem * $scale;
+  cursor        : pointer;
+  display       : flex;
+  align-items   : center;
+  justify-content: center;
+  transition    : background $transition-std, transform $transition-std, box-shadow $transition-std;
+  z-index       : 10;
+  backdrop-filter: blur(6px);
+  box-shadow    : 0 2px 8px rgba(0,0,0,.12);
+
+  &:hover {
+    background : #ffffff;
+    color      : #111111;
+    box-shadow : 0 4px 14px rgba(0,0,0,.18);
+    transform  : translateY(-50%) scale(1.08);
+  }
+
+  &.prev { left : 10px; }
+  &.next { right: 10px; }
+
+  // En móvil: centrado sobre la imagen reducida (460px → 230px)
+  @media (max-width: $bp-md) { top: 230px * $scale; }
+  @media (max-width: $bp-sm) {
+    top   : 190px * $scale;
+    width : 32px * $scale;
+    height: 32px * $scale;
+    font-size: 0.85rem * $scale;
+
+    &.prev { left : 6px * $scale; }
+    &.next { right: 6px * $scale; }
+  }
+  @media (max-width: $bp-xs) { top: 150px * $scale; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  BARRA INFERIOR UNIFICADA
+//  Contiene indicadores, play/tts, ajustes y acciones sociales.
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-bottom-bar {
+  position      : relative;
+  width         : 100%;
+  box-sizing    : border-box;
+  display       : flex;
+  align-items   : center;
+  justify-content: space-between;
+  gap           : 12px;
+  padding       : 0.55rem 0.75rem;
+  background    : rgba(250, 250, 250, 0.98);
+  border-top    : 1px solid rgba(0,0,0,.06);
+  z-index       : 10;
+  flex-wrap     : wrap;
+
+  @media (max-width: $bp-sm) {
+    padding: 0.45rem 0.6rem;
+    gap: 10px;
+  }
+}
+
+.bottom-left,
+.bottom-center,
+.bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bottom-center {
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.bottom-right {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.carousel-settings-panel {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 54px;
+  width: min(320px, calc(100% - 1.5rem));
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  box-shadow: 0 14px 35px rgba(0,0,0,.12);
+  padding: 0.85rem 1rem;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  box-sizing: border-box;
+}
+
+.carousel-settings-panel::before {
+  content: '';
+  position: absolute;
+  right: 1.15rem;
+  bottom: -8px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  border-left: 1px solid rgba(0,0,0,.08);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+.settings-toggle-btn {
+  width: 34px;
+  height: 34px;
+}
+
+// ── Indicadores de punto
+.carousel-indicators {
+  display    : flex;
+  gap        : 7px;
+  align-items: center;
+
+  .indicator-dot {
+    width        : 8px * $scale;
+    height       : 8px * $scale;
+    border-radius: $radius-btn;
+    border       : none;
+    background   : rgba(0,0,0,.18);
+    cursor       : pointer;
+    padding      : 0;
+    transition   : background $transition-std, transform 0.2s;
+
+    &.active {
+      background: $accent;
+      transform : scale(1.35);
+    }
+
+    &:hover { background: rgba(0,0,0,.38); }
+
+    // En móvil pequeño, reducir ligeramente los puntos
+    @media (max-width: $bp-xs) {
+      width : 6px * $scale;
+      height: 6px * $scale;
+    }
+  }
+}
+
+// ── Contenedor de botones de acción (pausa + TTS)
+.carousel-actions {
+  display    : flex;
+  gap        : 6px;
+  align-items: center;
+  margin-left: 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Botones de acción compartidos (pausa y TTS)
+// ─────────────────────────────────────────────────────────────────────────────
+.action-btn {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 30px * $scale;
+  height         : 30px * $scale;
+  border-radius  : $radius-btn;
+  border         : 1px solid rgba(0,0,0,.12);
+  background     : rgba(255,255,255,.8);
+  color          : #555555;
+  cursor         : pointer;
+  padding        : 0;
+  transition     : background $transition-std, color $transition-std,
+                   box-shadow $transition-std, transform 0.15s;
+  backdrop-filter: blur(4px);
+
+  svg {
+    width : 15px * $scale;
+    height: 15px * $scale;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background: #ffffff;
+    color     : $text-primary;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    transform : scale(1.08);
+  }
+
+  // Estado activo (pausa activada)
+  &.active {
+    background: $accent;
+    color     : #ffffff;
+    border-color: $accent;
+  }
+}
+
+// ── Botón TTS: animación de "ondas" mientras habla
+.tts-btn {
+  &.speaking {
+    background  : $accent;
+    color       : #ffffff;
+    border-color: $accent;
+    // Pulso suave para indicar actividad
+    animation   : tts-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes tts-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba($accent, 0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba($accent, 0); }
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  INDICADOR FLASH DE PLAY/PAUSA (ESTILO YOUTUBE)
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  pointer-events: none; // No interfiere con clics de usuario
+
+  .flash-circle {
+    width: 72px * $scale;
+    height: 72px * $scale;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    animation: youtube-flash-anim 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+
+    svg {
+      width: 32px * $scale;
+      height: 32px * $scale;
+    }
+  }
+}
+
+// ── Animaciones ──────────────────────────────────────────────────────────────
+
+@keyframes fadeInStatus {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes icon-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50%       { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes youtube-flash-anim {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  EFECTO TYPEWRITER (chat IA)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Texto plano durante la animación — misma tipografía que el HTML final
+.typewriter-text {
+  width        : 100%;
+  font-size    : 0.96rem * $scale;
+  line-height  : 1.75;
+  color        : $text-secondary;
+  white-space  : pre-wrap;
+  word-break   : break-word;
+  padding      : 0;
+
+  @media (max-width: $bp-sm) {
+    font-size  : 0.9rem * $scale;
+    line-height: 1.65;
+  }
+}
+
+// Cursor parpadeante estilo terminal/chat IA
+.typewriter-cursor {
+  display           : inline-block;
+  color             : $accent;
+  font-weight       : 700;
+  margin-left       : 1px;
+  animation         : cursor-blink 0.7s step-end infinite;
+  vertical-align    : text-bottom;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  BARRA DE INTERACCIÓN SOCIAL (Me gusta, Comentar, Repostear, Compartir, Favoritos)
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-interaction-bar {
+  display         : none;
+}
+
+// ── Botón de interacción individual
+.interact-btn {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 36px;
+  height         : 36px;
+  border         : none;
+  background     : transparent;
+  color          : $text-muted;
+  cursor         : pointer;
+  border-radius  : $radius-btn;
+  padding        : 0;
+  transition     : color $transition-std, background $transition-std, transform 0.15s;
+
+  svg {
+    width         : 20px;
+    height        : 20px;
+    pointer-events: none;
+  }
+
+  &:hover {
+    color      : $accent;
+    background : rgba($accent, 0.08);
+    transform  : scale(1.15);
+  }
+
+  &:active { transform: scale(0.95); }
+
+  @media (max-width: $bp-sm) {
+    width : 32px;
+    height: 32px;
+    svg   { width: 18px; height: 18px; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CONTROL DE VELOCIDAD Y LECTURA DEL CARRUSEL
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-speed-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0.6rem 1.25rem;
+  background: rgba(250, 250, 250, 0.97);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 0.88rem;
+  color: $text-secondary;
+
+  .speed-control-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-grow: 1;
+    max-width: 60%;
+  }
+
+  .speed-label {
+    font-weight: 600;
+    min-width: 100px;
+    color: $text-muted;
+  }
+
+  .speed-slider {
+    flex-grow: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.1);
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: transparent;
+      border-radius: 3px;
+    }
+
+    &::-webkit-slider-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: $accent;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -5px;
+      transition: transform 0.1s, background-color 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+      &:hover {
+        background: $accent-light;
+        transform: scale(1.2);
+      }
+    }
+
+    &::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: $accent;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.1s, background-color 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+      &:hover {
+        background: $accent-light;
+        transform: scale(1.2);
+      }
+    }
+  }
+
+  .auto-read-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    .auto-read-checkbox {
+      accent-color: $accent;
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+
+    .auto-read-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: $text-muted;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+
+      &:hover {
+        color: $accent;
+      }
+    }
+  }
+
+  @media (max-width: $bp-sm) {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    gap: 12px;
+
+    .speed-control-group {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .speed-label {
+      min-width: 85px;
+    }
+
+    .auto-read-control {
+      width: 100%;
+      justify-content: flex-start;
+      margin-top: 2px;
+    }
+  }
+}
+
+// ── Animaciones adicionales ──────────────────────────────────────────────────
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes slideUpIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Ajustes para que el carrusel ocupe toda la altura disponible y sea responsivo */
+:host, .carousel-container {
+  height: 91vh; /* reduced by 9% total (7% + 2%) as requested */
+}
+
+.carousel-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-viewport {
+  flex: 1 1 auto;
+  min-height: 0; /* permitir que los hijos con overflow se encojan correctamente */
+}
+
+.carousel-track {
+  align-items: stretch;
+}
+
+.carousel-slide {
+  height: 100%;
+}
+
+.slide-image-container {
+  flex: 1 1 auto;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.slide-content-container {
+  max-height: 30vh; /* reservar espacio para texto y permitir scroll */
+  overflow-y: auto;
+}

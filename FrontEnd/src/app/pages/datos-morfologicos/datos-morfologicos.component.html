@@ -1,0 +1,365 @@
+<main class="dm-page" [class.light-mode]="!isDarkMode">
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="dm-header">
+    <div class="dm-header__inner">
+      <a routerLink="/" class="dm-header__logo">
+        <span class="logo-icon">✦</span>
+        <span>TheorIA M</span>
+      </a>
+      <div class="dm-header__actions">
+        <button class="btn-theme-toggle" (click)="toggleTheme()"
+          [title]="isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+          <span class="theme-icon">{{ isDarkMode ? '☀️' : '🌙' }}</span>
+        </button>
+        <button id="btn-ayuda-global" class="btn-help" (click)="toggleAyudaGeneral()" [class.active]="helpVisible"
+          title="Mostrar ayuda interactiva">
+          <span class="help-icon">?</span>
+          <span>Ayuda</span>
+        </button>
+        <a routerLink="/" class="btn-back">← Inicio</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="dm-hero">
+    <div class="dm-hero__content">
+      <span class="dm-hero__badge">
+        {{ heroBadgeText }}<span class="ai-cursor" *ngIf="isHeroBadgeTyping"></span>
+      </span>
+      <!-- <h1 class="dm-hero__title">Datos Morfológicos</h1> -->
+      <p class="dm-hero__subtitle">
+        {{ heroSubtitleText }}<span class="ai-cursor" *ngIf="isHeroSubtitleTyping"></span>
+      </p>
+    </div>
+    <div class="dm-hero__steps">
+      <div *ngFor="let s of [1, 2]; let i = index" class="step-pill" [class.active]="currentStep === s"
+        [class.done]="currentStep > s">
+        <span class="step-pill__num">{{ s }}</span>
+        <span class="step-pill__label">{{ s === 1 ? 'Características físicas' : 'Medidas corporales' }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SUCCESS STATE ══════════════ -->
+  <div *ngIf="enviado" class="dm-success" id="success-message">
+    <div class="dm-success__icon">🎉</div>
+    <h2>¡Perfil Registrado!</h2>
+    <p>{{ successMsg }}</p>
+    <div class="dm-success__actions">
+      <button class="btn-primary" (click)="reiniciar()" id="btn-nuevo-registro">
+        Registrar nuevos datos
+      </button>
+      <a routerLink="/" class="btn-outline">Ir al inicio</a>
+    </div>
+  </div>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <div *ngIf="!enviado" class="dm-layout">
+
+    <!-- ── FORMULARIO ───────────────────── -->
+    <section class="dm-form-panel">
+
+      <!-- Error global -->
+      <div *ngIf="errorMsg" class="alert-error" role="alert">
+        <span>⚠️</span> {{ errorMsg }}
+      </div>
+
+      <form (ngSubmit)="onSubmit()" id="form-datos-morfologicos" novalidate>
+
+        <!-- ══ PASO 1: Características ══ -->
+        <div *ngIf="currentStep === 1" class="form-step" id="step-1">
+
+          <!-- Sexo -->
+          <div class="form-group" id="grupo-sexo">
+            <label class="form-label">
+              Sexo
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('sexo')"
+                title="¿Por qué registrar el sexo?">❓</button>
+            </label>
+            <div class="radio-group">
+              <label class="radio-card" [class.selected]="form.sexo === 'femenino'" id="radio-femenino">
+                <input type="radio" name="sexo" value="femenino" [(ngModel)]="form.sexo" />
+                <span class="radio-card__icon">♀</span>
+                <span class="radio-card__text">Femenino</span>
+              </label>
+              <label class="radio-card" [class.selected]="form.sexo === 'masculino'" id="radio-masculino">
+                <input type="radio" name="sexo" value="masculino" [(ngModel)]="form.sexo" />
+                <span class="radio-card__icon">♂</span>
+                <span class="radio-card__text">Masculino</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Edad -->
+          <div class="form-group" id="grupo-edad">
+            <label class="form-label" for="input-edad">
+              Edad (años)
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('edad')"
+                title="¿Para qué sirve la edad?">❓</button>
+            </label>
+            <div class="input-with-unit">
+              <input id="input-edad" type="number" class="form-input" [(ngModel)]="form.edad" name="edad"
+                placeholder="Ej: 30" min="10" max="110" />
+              <span class="input-unit">años</span>
+            </div>
+          </div>
+
+          <!-- Color de piel -->
+          <div class="form-group" id="grupo-color-piel">
+            <label class="form-label" for="select-piel">
+              Color de piel
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('color_piel')"
+                title="Color de piel y asesoría de imagen">❓</button>
+            </label>
+            <div class="select-wrapper">
+              <select id="select-piel" class="form-select" [(ngModel)]="form.color_piel" name="color_piel">
+                <option value="" disabled>Selecciona tu tono de piel…</option>
+                <option *ngFor="let o of opcionesColorPiel" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Color de ojos -->
+          <div class="form-group" id="grupo-color-ojos">
+            <label class="form-label" for="select-ojos">
+              Color de ojos
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('color_ojos')"
+                title="Color de ojos y armonía visual">❓</button>
+            </label>
+            <div class="select-wrapper">
+              <select id="select-ojos" class="form-select" [(ngModel)]="form.color_ojos" name="color_ojos">
+                <option value="" disabled>Selecciona tu color de ojos…</option>
+                <option *ngFor="let o of opcionesColorOjos" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Color de cabello -->
+          <div class="form-group" id="grupo-color-cabello">
+            <label class="form-label" for="select-cabello">
+              Color de cabello
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('color_cabello')"
+                title="Color de cabello natural">❓</button>
+            </label>
+            <div class="select-wrapper">
+              <select id="select-cabello" class="form-select" [(ngModel)]="form.color_cabello" name="color_cabello">
+                <option value="" disabled>Selecciona tu color de cabello…</option>
+                <option *ngFor="let o of opcionesColorCabello" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Ubicación Principal -->
+          <div class="form-group" id="grupo-ubicacion-principal">
+            <label class="form-label" for="select-ubicacion-principal">
+              Ubicación Principal
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('ubicacion_principal')"
+                title="Tu lugar de residencia principal">❓</button>
+            </label>
+            <div class="select-wrapper">
+              <select id="select-ubicacion-principal" class="form-select" [(ngModel)]="form.ubicacion_principal"
+                name="ubicacion_principal">
+                <option value="" disabled>Selecciona tu ubicación principal…</option>
+                <option *ngFor="let u of opcionesUbicaciones" [value]="u">{{ u }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Ubicación Secundaria -->
+          <div class="form-group" id="grupo-ubicacion-secundaria">
+            <label class="form-label" for="select-ubicacion-secundaria">
+              Ubicación Secundaria
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('ubicacion_secundaria')"
+                title="Tu lugar de residencia secundaria o donde trabajas">❓</button>
+            </label>
+            <div class="select-wrapper">
+              <select id="select-ubicacion-secundaria" class="form-select" [(ngModel)]="form.ubicacion_secundaria"
+                name="ubicacion_secundaria">
+                <option value="" disabled>Selecciona tu ubicación secundaria…</option>
+                <option *ngFor="let u of opcionesUbicaciones" [value]="u">{{ u }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button type="button" class="btn-primary" id="btn-siguiente" (click)="nextStep()">
+              Continuar →
+            </button>
+          </div>
+        </div>
+
+        <!-- ══ PASO 2: Medidas ══ -->
+        <div *ngIf="currentStep === 2" class="form-step" id="step-2">
+
+          <!-- Peso -->
+          <div class="form-group" id="grupo-peso">
+            <label class="form-label" for="input-peso">
+              Peso
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('peso')"
+                title="¿Cómo registrar tu peso?">❓</button>
+            </label>
+            <div class="input-with-unit">
+              <input id="input-peso" type="number" class="form-input" [(ngModel)]="form.peso_kg" name="peso_kg"
+                placeholder="Ej: 65" min="20" max="300" step="0.1" />
+              <span class="input-unit">kg</span>
+            </div>
+          </div>
+
+          <!-- Estatura -->
+          <div class="form-group" id="grupo-estatura">
+            <label class="form-label" for="input-estatura">
+              Estatura
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('estatura')"
+                title="¿Cómo medir tu estatura?">❓</button>
+            </label>
+            <div class="input-with-unit">
+              <input id="input-estatura" type="number" class="form-input" [(ngModel)]="form.estatura_cm"
+                name="estatura_cm" placeholder="Ej: 165" min="100" max="250" />
+              <span class="input-unit">cm</span>
+            </div>
+          </div>
+
+
+
+          <!-- Climas habituales -->
+          <div class="form-group" id="grupo-climas">
+            <label class="form-label" for="select-clima">
+              Clima habitual de residencia
+              <button type="button" class="btn-field-help" (click)="mostrarAyuda('climas')"
+                title="¿Por qué indicar tu clima habitual?">❓</button>
+            </label>
+            <div class="select-wrapper">
+              <select id="select-clima" class="form-select" [(ngModel)]="climaUnico" name="climaUnico">
+                <option value="" disabled>Selecciona tu clima habitual…</option>
+                <option *ngFor="let c of opcionesClimas" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Medidas Mujer -->
+          <ng-container *ngIf="form.sexo === 'femenino'">
+            <!-- Medida de Hombros -->
+            <div class="form-group" id="grupo-hombros">
+              <label class="form-label" for="input-hombros">
+                Medida de los hombros
+                <button type="button" class="btn-field-help" (click)="mostrarAyuda('hombros')"
+                  title="Mide de hombro a hombro">❓</button>
+              </label>
+              <div class="input-with-unit">
+                <input id="input-hombros" type="number" class="form-input" [(ngModel)]="form.medida_hombros_cm"
+                  name="medida_hombros_cm" placeholder="Ej: 40" min="20" max="100" />
+                <span class="input-unit">cm</span>
+              </div>
+            </div>
+
+            <!-- Medida de Cintura -->
+            <div class="form-group" id="grupo-cintura">
+              <label class="form-label" for="input-cintura">
+                Cintura
+                <button type="button" class="btn-field-help" (click)="mostrarAyuda('cintura')"
+                  title="Mide alrededor de la parte más estrecha">❓</button>
+              </label>
+              <div class="input-with-unit">
+                <input id="input-cintura" type="number" class="form-input" [(ngModel)]="form.medida_cintura_cm"
+                  name="medida_cintura_cm" placeholder="Ej: 70" min="40" max="150" />
+                <span class="input-unit">cm</span>
+              </div>
+            </div>
+
+            <!-- Medida de Cadera -->
+            <div class="form-group" id="grupo-cadera">
+              <label class="form-label" for="input-cadera">
+                Medida de la cadera
+                <button type="button" class="btn-field-help" (click)="mostrarAyuda('cadera')"
+                  title="Mide alrededor de la parte más ancha">❓</button>
+              </label>
+              <div class="input-with-unit">
+                <input id="input-cadera" type="number" class="form-input" [(ngModel)]="form.medida_cadera_cm"
+                  name="medida_cadera_cm" placeholder="Ej: 95" min="50" max="200" />
+                <span class="input-unit">cm</span>
+              </div>
+            </div>
+
+            <!-- Medida de Busto -->
+            <div class="form-group" id="grupo-busto">
+              <label class="form-label" for="input-busto">
+                Medida del busto
+                <button type="button" class="btn-field-help" (click)="mostrarAyuda('busto')"
+                  title="Mide alrededor de la parte más prominente">❓</button>
+              </label>
+              <div class="input-with-unit">
+                <input id="input-busto" type="number" class="form-input" [(ngModel)]="form.medida_busto_cm"
+                  name="medida_busto_cm" placeholder="Ej: 90" min="50" max="200" />
+                <span class="input-unit">cm</span>
+              </div>
+            </div>
+          </ng-container>
+
+          <div class="form-nav">
+            <button type="button" class="btn-outline" id="btn-anterior" (click)="prevStep()">
+              ← Anterior
+            </button>
+            <button type="submit" class="btn-primary" id="btn-guardar" [disabled]="enviando">
+              <span *ngIf="!enviando">Guardar perfil ✓</span>
+              <span *ngIf="enviando" class="spinner"></span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- ── PANEL DE AYUDA INTERACTIVA ─────────── -->
+    <aside class="dm-help-panel" [class.visible]="helpVisible" id="panel-ayuda">
+      <div class="dm-help-panel__inner" *ngIf="helpActivo">
+
+        <div class="help-header">
+          <div class="help-tag">Ayuda</div>
+          <button class="btn-close-help" (click)="cerrarAyuda()" id="btn-cerrar-ayuda"
+            aria-label="Cerrar ayuda">✕</button>
+        </div>
+
+        <h3 class="help-title">{{ helpActivo.titulo }}</h3>
+
+        <div class="help-image-wrapper" *ngIf="helpActivo.imageUrl">
+          <img [src]="helpActivo.imageUrl" [alt]="helpActivo.titulo" class="help-image" loading="lazy" />
+        </div>
+
+        <p class="help-text">
+          <span [innerHTML]="displayedHelpText"></span>
+          <span class="ai-cursor" *ngIf="isTyping"></span>
+        </p>
+
+        <div class="help-video-wrapper" *ngIf="helpActivo.videoUrl">
+          <video controls class="help-video" [src]="helpActivo.videoUrl"></video>
+        </div>
+
+        <!-- Navegación entre ítems de ayuda -->
+        <div class="help-nav">
+          <span class="help-nav__label">Otros temas:</span>
+          <div class="help-nav__pills">
+            <button *ngFor="let entry of ayudaItems | keyvalue" class="pill"
+              [class.active]="campoAyudaActivo === entry.key" (click)="mostrarAyuda(entry.key)"
+              [id]="'help-pill-' + entry.key">
+              {{ entry.value.titulo | slice:0:22 }}…
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Estado vacío si no hay ítem seleccionado -->
+      <div class="dm-help-panel__empty" *ngIf="!helpActivo">
+        <span class="empty-icon">💡</span>
+        <p>
+          <span [innerHTML]="displayedEmptyText"></span>
+          <span class="ai-cursor" *ngIf="isEmptyTyping"></span>
+        </p>
+      </div>
+    </aside>
+
+  </div><!-- /dm-layout -->
+
+</main>

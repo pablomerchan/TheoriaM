@@ -1,0 +1,37 @@
+<div class="wm-add">
+  <h2>Agregar Artículo</h2>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+
+  <label>
+    Menú (menu_servicio_id)<br>
+    <select [(ngModel)]="form.menu_servicio_id">
+      <option [ngValue]="28">(Por defecto) 28</option>
+      <option *ngFor="let m of menus" [ngValue]="m.id">
+        {{ m.subtema || m.menu || m.titulo || ('id=' + m.id) }}
+      </option>
+    </select>
+  </label>
+
+  <label>Título<br><input [(ngModel)]="form.titulo" placeholder="Título del artículo"/></label>
+  <label>Tipo asesoría<br><input [(ngModel)]="form.tipo_asesoria" placeholder="Ej. Blusa Wrap"/></label>
+  <label>Observación en tbl_menu_asesoria<br><input [(ngModel)]="form.observacion" placeholder="Observación del menú"/></label>
+  <label>Orden<br><input type="number" [(ngModel)]="form.orden"/></label>
+  <label>Visible<br>
+    <select [(ngModel)]="form.visible">
+      <option [value]="1">Sí</option>
+      <option [value]="0">No</option>
+    </select>
+  </label>
+  <label>Media URL<br><input [(ngModel)]="form.media_url" placeholder="/images/archivo.png"/></label>
+  <label>Texto HTML<br><textarea rows="8" [(ngModel)]="form.texto_html" placeholder="<h2>Título</h2>..." ></textarea></label>
+
+  <div class="actions">
+    <button class="primary" (click)="submit()" [disabled]="saving">Crear artículo</button>
+    <a routerLink="/webmaster" class="button secondary">Volver al panel</a>
+  </div>
+
+  <h3>Preview</h3>
+  <div class="preview" [innerHTML]="previewHtml()"></div>
+</div>

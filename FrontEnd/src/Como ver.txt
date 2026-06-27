@@ -1,0 +1,14 @@
+¿Como puedo ejecutarlo para verlo?
+
+
+ si llegas a apagar tu computadora o necesitas iniciar el proyecto manualmente por tu cuenta, 
+ solo debes recordar esto:
+
+El proyecto tiene dos partes separadas, por lo que necesitas abrir dos terminales 
+diferentes.
+
+Terminal 1: Navegas a cd backend y ejecutas el comando python backend.py
+Terminal 2: Navegas a cd FrontEnd y ejecutas el comando npm start
+
+Puedes abrir tu navegador e ingresar directamente para ver tu página:
+http://localhost:4200

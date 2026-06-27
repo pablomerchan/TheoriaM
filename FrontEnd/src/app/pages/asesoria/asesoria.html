@@ -1,0 +1,224 @@
+<main class="premium-container" [class.light-mode]="!isDarkMode">
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+  <!-- PANEL IZQUIERDO: Sidebar Dinámico -->
+  <aside class="premium-sidebar" [class.sidebar-open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo">
+         <span class="logo-icon">✧</span> TheorIA M
+      </div>
+      <div class="header-actions-mobile">
+        <button class="theme-btn" (click)="toggleTheme()" [title]="isDarkMode ? 'Modo claro' : 'Modo oscuro'">
+           {{ isDarkMode ? '☀️' : '🌙' }}
+        </button>
+        <button class="mobile-close-btn" (click)="toggleSidebar()">✕</button>
+      </div>
+    </div>
+
+    <!-- Carga de Temas y Subtemas Dinámicos -->
+    <div class="sidebar-scroll">
+      <ng-container *ngFor="let section of menuSections">
+        <div class="menu-group">
+          <!-- Título del Tema Principal -->
+          <h3 class="menu-group-title">{{ section.tema }}</h3>
+
+          <!-- Elementos Anidados (Subtemas) -->
+          <a class="menu-item sub-item"
+             *ngFor="let item of section.items"
+             [class.active]="selectedMenu?.id === item.id"
+             (click)="selectMenu(item)">
+             <span class="sub-indicator"></span>
+             {{ item.subtema }}
+          </a>
+        </div>
+      </ng-container>
+
+      <!-- Estado vacío si no hay datos -->
+      <div class="empty-sidebar" *ngIf="menuSections.length === 0">
+         <p>Cargando asesoría...</p>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <a routerLink="/" class="back-link">← Volver al inicio</a>
+    </div>
+  </aside>
+
+  <!-- PANEL DERECHO: Contenido Principal -->
+  <section class="premium-main">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div class="header-control-bar" *ngIf="carruseles.length && carruseles[activeComponentIndex]?.titulo">
+          {{ carruseles[activeComponentIndex].titulo }}
+        </div>
+      </div>
+
+      <div class="main-header-right">
+        <div class="header-welcome html-content" *ngIf="selectedMenu?.texto_derecho_html" [innerHTML]="selectedMenu?.texto_derecho_html"></div>
+        <div class="header-user" *ngIf="sobrenombre">
+          <span class="header-sobrenombre">{{ sobrenombre }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenedor del área principal -->
+    <div class="main-scroll-area" #scrollArea (wheel)="onScrollWheel($event)">
+      <div class="content-wrapper" *ngIf="selectedMenu">
+
+        <!-- Indicador mientras se resuelve el perfil del usuario -->
+        <div class="loading-indicator" *ngIf="!perfilCargado">
+           <div class="spinner"></div>
+           <span>Identificando usuario...</span>
+        </div>
+
+        <!-- Indicador de Carga de artículos -->
+        <div class="loading-indicator" *ngIf="perfilCargado && isLoadingArticulos">
+           <div class="spinner"></div>
+           <span>Cargando contenido...</span>
+        </div>
+
+        <!-- Renderizado dinámico de componentes de asesoría.
+             Cada entrada en 'carruseles' representa un componente a montar.
+             El campo 'componente' determina qué se renderiza:
+               - 'articulo'   → ArticuloComponent         (tbl_articulo)
+               - 'carousel'   → AsesoriaCarouselComponent (tbl_carrusel_items)
+               - 'rapida'     → AsesoriaRapidaComponent   (tbl_asesoria_rapida)
+               - 'texto_gpt'  → TextoGPTComponent         (tbl_articulo, solo texto_html)
+             Para publicar un nuevo componente, insertar un registro con el
+             marcador correspondiente en tbl_menu_asesoria. -->
+        <ng-container *ngIf="perfilCargado && !isLoadingArticulos">
+
+          <!-- COMPONENTES DINÁMICOS -->
+          <div *ngFor="let def of carruseles; let i = index"
+               class="component-snap-section"
+               [class.component-active]="i === activeComponentIndex"
+               [hidden]="i !== activeComponentIndex">
+            <!-- Carrusel estándar -->
+            <section *ngIf="def.componente === 'carousel'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-asesoria-carousel
+                [usuarioId]="idUsuario"
+                [asesoriaId]="selectedMenu.id"
+                [tipoAsesoria]="def.tipo_asesoria">
+              </app-asesoria-carousel>
+            </section>
+
+            <!-- Reproductor rápido de fotos -->
+            <section *ngIf="def.componente === 'rapida'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-asesoria-rapida
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="def.tipo_asesoria">
+              </app-asesoria-rapida>
+            </section>
+
+            <!-- Texto estilo GPT (efecto typewriter, solo texto HTML) -->
+            <section *ngIf="def.componente === 'texto_gpt'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-texto-gpt
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="def.tipo_asesoria">
+              </app-texto-gpt>
+            </section>
+
+            <!-- Artículo estático (texto izquierda + imagen/video derecha) -->
+            <section *ngIf="def.componente === 'articulo'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-articulo
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="def.tipo_asesoria">
+              </app-articulo>
+            </section>
+
+            <!-- Sugerencia Diaria -->
+            <section *ngIf="def.componente === 'sugerencia_diaria'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-sugerencia-diaria
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="def.tipo_asesoria">
+              </app-sugerencia-diaria>
+            </section>
+
+            <!-- Mi Guardarropas -->
+            <section *ngIf="def.componente === 'mi_guarda_ropas'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-mi-guarda-ropas
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="def.tipo_asesoria">
+              </app-mi-guarda-ropas>
+            </section>
+
+            <!-- Guia de Compras -->
+            <section *ngIf="def.componente === 'guia_compras'"
+                     class="carousel-section"
+                     [attr.data-tipo]="def.tipo_asesoria">
+
+              <app-guia-compras
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="def.tipo_asesoria"
+                (navigateToSubtema)="onNavigateToSubtema($event)">
+              </app-guia-compras>
+            </section>
+
+          </div>
+
+          <!-- Estado vacío -->
+          <div class="empty-state" *ngIf="carruseles.length === 0">
+            <p>No hay contenido disponible para esta sección.</p>
+          </div>
+
+        </ng-container>
+
+      </div>
+    </div>
+
+    <!-- Control de navegación lateral entre componentes -->
+    <nav class="component-nav" *ngIf="carruseles.length > 1 && !isLoadingArticulos && perfilCargado">
+      <button class="component-nav-btn"
+              (click)="navigateToComponent('prev')"
+              [disabled]="activeComponentIndex === 0"
+              aria-label="Componente anterior"
+              title="Anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </button>
+
+      <div class="component-nav-dots">
+        <button *ngFor="let def of carruseles; let i = index"
+                class="component-nav-dot"
+                [class.active]="i === activeComponentIndex"
+                (click)="goToComponent(i)"
+                [title]="def.titulo || ('Componente ' + (i + 1))"
+                [attr.aria-label]="def.titulo || ('Componente ' + (i + 1))">
+        </button>
+      </div>
+
+      <button class="component-nav-btn"
+              (click)="navigateToComponent('next')"
+              [disabled]="activeComponentIndex === carruseles.length - 1"
+              aria-label="Siguiente componente"
+              title="Siguiente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+    </nav>
+
+  </section>
+
+</main>

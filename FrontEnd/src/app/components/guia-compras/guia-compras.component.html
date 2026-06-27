@@ -1,0 +1,95 @@
+<div class="guia-compras-container" *ngIf="config">
+  
+  <!-- Banner Introductorio Superior -->
+  <div class="intro-banner">
+    <div class="intro-text">
+      <p>{{ config.introduccion }}</p>
+    </div>
+    
+    <div class="intro-media">
+      <!-- Video Player -->
+      <ng-container *ngIf="config.media_tipo === 'video'; else imageTemplate">
+        <video 
+          [src]="config.media_url" 
+          autoplay 
+          loop 
+          muted 
+          playsinline
+          class="banner-media-element"
+        >
+        </video>
+      </ng-container>
+
+      <!-- Image Template (Avatar Stick-man Sketch Fallback) -->
+      <ng-template #imageTemplate>
+        <img 
+          *ngIf="config.media_url && config.media_url !== '/images/avatar_sketch.svg'; else sketchFallback"
+          [src]="config.media_url" 
+          alt="Avatar" 
+          class="banner-media-element"
+        />
+      </ng-template>
+
+      <!-- Premium Stick-man Sketch Fallback SVG -->
+      <ng-template #sketchFallback>
+        <div class="avatar-sketch-wrapper">
+          <svg viewBox="0 0 100 120" class="sketch-svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <!-- Cabeza -->
+            <circle cx="50" cy="30" r="12" />
+            <!-- Cuerpo / Columna -->
+            <line x1="50" y1="42" x2="50" y2="80" />
+            <!-- Brazos -->
+            <line x1="25" y1="52" x2="75" y2="52" />
+            <!-- Pierna Izquierda -->
+            <line x1="50" y1="80" x2="35" y2="110" />
+            <!-- Pierna Derecha -->
+            <line x1="50" y1="80" x2="65" y2="110" />
+          </svg>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Grilla de Tarjetas / Opciones -->
+  <div class="cards-grid">
+    <div class="card-item" *ngFor="let card of config.tarjetas">
+      
+      <!-- Icon Container (Camera Fallback) -->
+      <div class="card-icon-area">
+        <img 
+          *ngIf="card.icono_url && card.icono_url !== '/images/iconos/camera.svg'; else cameraFallback"
+          [src]="card.icono_url" 
+          [alt]="card.titulo"
+          class="card-custom-icon"
+        />
+        
+        <!-- Premium Blue Camera Icon SVG -->
+        <ng-template #cameraFallback>
+          <div class="camera-icon-wrapper">
+            <svg viewBox="0 0 24 24" class="camera-svg">
+              <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <circle cx="12" cy="13" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Card Texts -->
+      <div class="card-body">
+        <h4 class="card-title-link">
+          <a href="#" (click)="handleCardClick(card, $event)">
+            {{ card.titulo }}
+          </a>
+        </h4>
+        <p class="card-desc">{{ card.descripcion }}</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading State Indicator overlay -->
+  <div class="grid-loader-overlay" *ngIf="isLoading">
+    <div class="grid-spinner"></div>
+  </div>
+
+</div>

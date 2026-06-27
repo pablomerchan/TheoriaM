@@ -1,0 +1,44 @@
+<div class="carousel-container" (mouseenter)="onHover(true)" (mouseleave)="onHover(false)">
+  <!-- Track -->
+  <div class="carousel-track" [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+    <div class="carousel-slide" *ngFor="let slide of slides; let i = index" [attr.aria-hidden]="currentIndex !== i">
+      
+      <!-- Imagen -->
+      <div class="carousel-image-wrapper">
+         <img [src]="slide.imageUrl" [alt]="slide.imageAltText || slide.title" class="carousel-image" loading="lazy">
+      </div>
+
+      <!-- Contenido (Glassmorphism / Minimalist) -->
+      <div class="carousel-content">
+        <h2 class="carousel-title" *ngIf="i !== 0">{{ slide.title }}</h2>
+        <h1 class="carousel-title" *ngIf="i === 0">{{ slide.title }}</h1>
+        
+        <p class="carousel-text">{{ slide.text }}</p>
+        
+        <!-- Botón Opcional -->
+        <button class="carousel-button" *ngIf="slide.button" (click)="navigate(slide.button.url, slide.button.isExternal)">
+          {{ slide.button.label }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Controles manuales -->
+  <button class="carousel-control prev" (click)="prevSlide()" aria-label="Anterior">
+    &#10094;
+  </button>
+  <button class="carousel-control next" (click)="nextSlide()" aria-label="Siguiente">
+    &#10095;
+  </button>
+
+  <!-- Puntos indicadores -->
+  <div class="carousel-indicators">
+    <button *ngFor="let slide of slides; let i = index" 
+            class="indicator-dot" 
+            [class.active]="currentIndex === i"
+            (click)="goToSlide(i)"
+            [attr.aria-label]="'Ir al slide ' + (i + 1)">
+    </button>
+  </div>
+</div>

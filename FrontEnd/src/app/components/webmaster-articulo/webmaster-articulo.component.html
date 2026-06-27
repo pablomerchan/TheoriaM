@@ -1,0 +1,169 @@
+<div class="wm-admin">
+  <h2>Webmaster - Artículos</h2>
+
+  <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
+  <div *ngIf="message" class="message success">{{ message }}</div>
+
+  <div class="menu-info">
+    <h4>Relación con tbl_menu_asesoria</h4>
+    <ul>
+      <li><strong>id_usuario</strong>: controla el usuario propietario del ítem en tbl_menu_asesoria.</li>
+      <li><strong>tipo_asesoria</strong>: define la categoría que sincroniza el menú.</li>
+      <li><strong>menu_servicio_id</strong>: identifica el menú padre en tbl_menu_asesoria.</li>
+      <li><strong>observacion</strong>: campo en tbl_menu_asesoria que describe el origen del registro; por defecto se usa "Artículo gestionado desde webmaster".</li>
+    </ul>
+  </div>
+
+  <div class="menu-table">
+    <h4>Valores reales de tbl_menu_asesoria</h4>
+    <div *ngIf="selectedMenuRows.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>menu_servicio_id</th>
+            <th>id_usuario</th>
+            <th>tipo_asesoria</th>
+            <th>observacion</th>
+            <th>titulo</th>
+            <th>texto_html</th>
+            <th>imagen_url</th>
+            <th>imagen_alt</th>
+            <th>orden</th>
+            <th>visible</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let menu of selectedMenuRows">
+            <td>{{ menu.id }}</td>
+            <td>{{ menu.menu_servicio_id ?? '-' }}</td>
+            <td>{{ menu.id_usuario ?? '-' }}</td>
+            <td>{{ menu.tipo_asesoria || '-' }}</td>
+            <td>{{ menu.observacion || '-' }}</td>
+            <td>{{ menu.titulo || '-' }}</td>
+            <td><code>{{ menu.texto_html || '-' }}</code></td>
+            <td>{{ menu.imagen_url || '-' }}</td>
+            <td>{{ menu.imagen_alt || '-' }}</td>
+            <td>{{ menu.orden ?? '-' }}</td>
+            <td>{{ menu.visible === 1 ? 'Sí' : menu.visible === 0 ? 'No' : '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="selectedMenuRows.length > 1" class="menu-note">Se encontraron {{ selectedMenuRows.length }} registros relacionados.</div>
+    </div>
+    <div *ngIf="selectedMenuRows.length === 0" class="menu-note">Seleccione un artículo y pulse "Ver contenido" para ver los valores reales de tbl_menu_asesoria.</div>
+  </div>
+
+  <div class="list">
+    <div class="list-header">
+      <div>
+        <h3>Listado de artículos</h3>
+        <p>{{ articulos.length }} artículo(s) registrados</p>
+      </div>
+      <button class="primary" routerLink="/webmaster/articulos/nuevo">Nuevo artículo</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Título</th>
+          <th>Tipo asesoría</th>
+          <th>Menú</th>
+          <th>Orden</th>
+          <th>Visible</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of articulos">
+          <td>{{ a.id }}</td>
+          <td>{{ a.id_usuario ?? '-' }}</td>
+          <td>{{ a.titulo || '-' }}</td>
+          <td>{{ a.tipo_asesoria || '-' }}</td>
+          <td>{{ a.menu_servicio_id || '-' }}</td>
+          <td>{{ a.orden }}</td>
+          <td>{{ a.visible === 1 ? 'Sí' : 'No' }}</td>
+          <td>
+            <button (click)="viewContent(a)">Ver contenido</button>
+            <button (click)="edit(a)">Editar</button>
+            <button class="danger" (click)="remove(a)">Eliminar</button>
+          </td>
+        </tr>
+        <tr *ngIf="articulos.length === 0">
+          <td colspan="7" class="empty">No hay artículos disponibles.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="preview" *ngIf="selectedArticulo">
+    <h3>Contenido del artículo {{ selectedArticulo.id }}</h3>
+    <div class="preview-meta">
+      <span><strong>Título:</strong> {{ selectedArticulo.titulo || '-' }}</span>
+      <span><strong>Tipo:</strong> {{ selectedArticulo.tipo_asesoria || '-' }}</span>
+      <span><strong>Visible:</strong> {{ selectedArticulo.visible === 1 ? 'Sí' : 'No' }}</span>
+    </div>
+    <div class="preview-content" [innerHTML]="selectedArticuloHtml"></div>
+    <div class="preview-actions">
+      <button type="button" class="secondary" (click)="selectedArticulo = null; selectedArticuloHtml = null">Cerrar vista</button>
+    </div>
+  </div>
+
+  <div class="form">
+    <h3 *ngIf="!editing">Crear artículo</h3>
+    <h3 *ngIf="editing">Editar artículo {{ editing?.id }}</h3>
+
+    <label>
+      Título<br>
+      <input [(ngModel)]="form.titulo" placeholder="Título del artículo" />
+    </label>
+    <label>
+      Tipo asesoría<br>
+      <input [(ngModel)]="form.tipo_asesoria" placeholder="Ej. Blusa Wrap" />
+    </label>
+    <label>
+      Usuario (id_usuario)<br>
+      <input type="number" [(ngModel)]="form.id_usuario" placeholder="ID de usuario" />
+    </label>
+    <label>
+      Menú asociado (menu_servicio_id)<br>
+      <select [(ngModel)]="form.menu_servicio_id">
+        <option [ngValue]="28">(Por defecto) 28</option>
+        <option *ngFor="let m of menus" [ngValue]="m.id">
+          {{ m.subtema || m.menu || m.titulo || ('id=' + m.id) }}
+        </option>
+      </select>
+    </label>
+    <label>
+      Observación en tbl_menu_asesoria<br>
+      <input [(ngModel)]="form.observacion" placeholder="Observación del menú" />
+    </label>
+    <label>
+      Orden<br>
+      <input type="number" [(ngModel)]="form.orden" />
+    </label>
+    <label>
+      Visible<br>
+      <select [(ngModel)]="form.visible">
+        <option [value]="1">Sí</option>
+        <option [value]="0">No</option>
+      </select>
+    </label>
+    <label>
+      Media URL<br>
+      <input [(ngModel)]="form.media_url" placeholder="/images/archivo.png" />
+    </label>
+    <label>
+      Texto HTML<br>
+      <textarea rows="6" [(ngModel)]="form.texto_html" placeholder="<p>Contenido del artículo</p>"></textarea>
+    </label>
+
+    <div class="actions">
+      <button class="primary" (click)="save()" [disabled]="saving">{{ editing ? 'Actualizar' : 'Guardar' }}</button>
+      <button type="button" class="secondary" (click)="clearForm()">Limpiar</button>
+      <a routerLink="/webmaster" class="button secondary">Volver al panel</a>
+    </div>
+  </div>
+</div>

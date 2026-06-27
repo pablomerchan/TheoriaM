@@ -1,0 +1,159 @@
+<div class="sugerencia-card" [class.loading-state]="isLoading">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Actualizando sugerencia...</p>
+  </div>
+
+  <!-- Header -->
+  <div class="sugerencia-header">
+    <h2 class="sugerencia-title">Sugerencia del dia</h2>
+    <p class="sugerencia-subtitle">Conjunto seleccionado basado en datos</p>
+  </div>
+
+  <!-- Content Block: Los datos -->
+  <div class="datos-container">
+    <span class="datos-label">Los datos:</span>
+
+    <div class="datos-grid">
+      <!-- Guardarropas -->
+      <div class="dato-row">
+        <label class="dato-lbl">Mi guardarropas</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="guardarropasSel" class="dato-select">
+            <option *ngFor="let opt of guardarropasOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Gustos -->
+      <div class="dato-row">
+        <label class="dato-lbl">Mis gustos y preferencias</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="gustosSel" class="dato-select">
+            <option *ngFor="let opt of gustosOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div class="dato-row">
+        <label class="dato-lbl">Mis medidas</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="medidasSel" class="dato-select">
+            <option *ngFor="let opt of medidasOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dia, Hora y Contexto -->
+      <div class="dato-row complex-row">
+        <div class="select-wrapper short-select">
+          <select [(ngModel)]="diaSel" class="dato-select">
+            <option *ngFor="let opt of diaOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+        
+        <div class="select-wrapper short-select">
+          <select [(ngModel)]="horaSel" class="dato-select">
+            <option *ngFor="let opt of horaOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+
+        <label class="dato-lbl inline-lbl">Contexto</label>
+
+        <div class="select-wrapper medium-select">
+          <select [(ngModel)]="contextoSel" class="dato-select">
+            <option *ngFor="let opt of contextoOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Clima -->
+      <div class="dato-row complex-row">
+        <div class="select-wrapper city-select">
+          <select [(ngModel)]="ciudadSel" class="dato-select">
+            <option *ngFor="let opt of ciudadOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+        <span class="prediccion-txt">, prediccion climatica</span>
+
+        <div class="select-wrapper short-select gap-left">
+          <select [(ngModel)]="tempSel" class="dato-select">
+            <option *ngFor="let opt of tempOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+
+        <div class="select-wrapper short-select">
+          <select [(ngModel)]="climaSel" class="dato-select">
+            <option *ngFor="let opt of climaOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Lucir & Recalcular -->
+      <div class="dato-row action-row">
+        <div class="lucir-group">
+          <label class="dato-lbl">Lucir:</label>
+          <div class="select-wrapper medium-select">
+            <select [(ngModel)]="lucirSel" class="dato-select">
+              <option *ngFor="let opt of lucirOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+        </div>
+
+        <button (click)="recalcular()" [disabled]="isRecalculating" class="btn-recalcular">
+          <span class="spinner-inline" *ngIf="isRecalculating"></span>
+          {{ isRecalculating ? 'Calculando...' : 'Recalcular' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Razonamiento -->
+    <div class="razonamiento-section">
+      <h3 class="razonamiento-title">Razonamiento:</h3>
+      <p class="razonamiento-text">{{ razonamientoText }}</p>
+    </div>
+  </div>
+
+  <!-- Outfit visual flowchart / tree -->
+  <div class="outfit-section" [class.blur-outfit]="isRecalculating">
+    <div class="outfit-tree-container">
+      
+      <!-- Flow Tree Drawing -->
+      <div class="tree-flow-visual">
+        <div class="tree-line-main"></div>
+        
+        <div class="outfit-items-list">
+          <div *ngFor="let item of prendasRecomendadas; let idx = index" class="outfit-item-row">
+            <div class="tree-branch-line"></div>
+            
+            <div class="item-card">
+              <div class="item-image-wrapper">
+                <img [src]="item.imagen" [alt]="item.nombre" class="item-img" onerror="this.src='/images/prendas/BlusasTpoCruzadasNegra.png'" />
+              </div>
+              <div class="item-details">
+                <span class="item-name">{{ item.nombre }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Action footer -->
+  <div class="sugerencia-footer">
+    <button (click)="aceptarSugerencia()" class="btn-aceptar">Aceptar</button>
+  </div>
+
+  <!-- Toast feedback alert -->
+  <div class="toast-notification" [class.show]="showToast">
+    <div class="toast-content">
+      <span class="toast-icon">✓</span>
+      <span class="toast-message">{{ toastMessage }}</span>
+    </div>
+  </div>
+</div>

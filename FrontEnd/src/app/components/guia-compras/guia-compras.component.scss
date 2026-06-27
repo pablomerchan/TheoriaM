@@ -1,0 +1,249 @@
+$font-title: 'Plus Jakarta Sans', sans-serif;
+$font-body: 'Inter', sans-serif;
+$blue-accent: #1a73e8;
+$blue-hover: #1557b0;
+
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.guia-compras-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  animation: containerFadeIn 0.4s ease-out;
+}
+
+@keyframes containerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Banner Introductorio Superior
+.intro-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.75rem 2.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .intro-text {
+    flex: 1;
+    
+    p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+
+  .intro-media {
+    width: 160px;
+    height: 160px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-color);
+    background: rgba(128, 128, 128, 0.04);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: border-color 0.25s;
+
+    &:hover {
+      border-color: $blue-accent;
+    }
+
+    .banner-media-element {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-sketch-wrapper {
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+
+      .sketch-svg {
+        width: 55px;
+        height: auto;
+        opacity: 0.85;
+      }
+    }
+  }
+}
+
+// Grilla de Tarjetas (4 Columnas en Desktop)
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.card-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: $blue-accent;
+    box-shadow: 0 10px 25px rgba(26, 115, 232, 0.08);
+
+    .camera-icon-wrapper {
+      background: $blue-accent;
+      color: #ffffff;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.card-icon-area {
+  display: flex;
+  align-items: center;
+
+  .card-custom-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+  }
+}
+
+// Icono de cámara azul
+.camera-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(26, 115, 232, 0.1);
+  color: $blue-accent;
+  transition: all 0.25s ease;
+
+  .camera-svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.card-title-link {
+  font-family: $font-title;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.35;
+
+  a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $blue-accent;
+      text-decoration: underline;
+    }
+  }
+}
+
+.card-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+// Loader overlay
+.grid-loader-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--bg-main), 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 20px;
+
+  .grid-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: $blue-accent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Adaptabilidad Móvil (Responsive)
+@media (max-width: 1120px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr); // 2 Columnas en tabletas
+  }
+}
+
+@media (max-width: 768px) {
+  .intro-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+
+    .intro-media {
+      width: 140px;
+      height: 140px;
+    }
+  }
+}
+
+@media (max-width: 580px) {
+  .cards-grid {
+    grid-template-columns: 1fr; // 1 Columna en móviles pequeños
+    gap: 1rem;
+  }
+  
+  .card-item {
+    padding: 1.25rem;
+  }
+}

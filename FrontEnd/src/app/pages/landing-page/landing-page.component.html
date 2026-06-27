@@ -1,0 +1,45 @@
+<main class="landing-main">
+  <!-- Sección Header Minimalista -->
+  <header class="landing-header">
+    <div class="logo">TheorIA M</div>
+    <nav>
+      <a href="#servicios">Servicios</a>
+      <a href="#portafolio">Portafolio</a>
+      <a href="#contacto">Contacto</a>
+      <a routerLink="/datos-morfologicos" class="nav-cta" id="link-datos-morfologicos">Iniciar Asesoría</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section con el Carrusel -->
+  <section class="hero-section">
+    <app-carousel [slides]="slidesData" [autoPlayInterval]="5000"></app-carousel>
+  </section>
+
+  <!-- Nuestros Servicios -->
+  <section class="content-section" id="servicios">
+    <div class="section-title">
+      <h2>Nuestros Servicios</h2>
+      <p>Explora cómo podemos ayudarte a alcanzar el éxito con herramientas de asesoría personalizadas.</p>
+    </div>
+    <div class="services-grid">
+      <a routerLink="/datos-morfologicos" class="service-card" id="card-datos-morfologicos">
+        <div class="service-card__icon">🧬</div>
+        <h3>Perfil Morfológico</h3>
+        <p>Registra tus características físicas y recibe recomendaciones de imagen y estilo completamente personalizadas.</p>
+        <span class="service-card__cta">Comenzar →</span>
+      </a>
+      <div class="service-card service-card--soon">
+        <div class="service-card__icon">🎨</div>
+        <h3>Análisis de Color</h3>
+        <p>Descubre tu paleta cromática personal y aprende a combinar colores que realcen tu esencia natural.</p>
+        <span class="service-card__badge">Próximamente</span>
+      </div>
+      <div class="service-card service-card--soon">
+        <div class="service-card__icon">👗</div>
+        <h3>Guía de Estilo</h3>
+        <p>Recibe una guía personalizada de prendas, siluetas y estilos que mejor se adaptan a tu morfología.</p>
+        <span class="service-card__badge">Próximamente</span>
+      </div>
+    </div>
+  </section>
+</main>

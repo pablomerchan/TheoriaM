@@ -1,0 +1,195 @@
+<div class="guarda-ropas-card" (click)="closeDropdowns()">
+  
+  <!-- Encabezado -->
+  <div class="card-header">
+    <div class="header-titles">
+      <h2 class="title">Mi guardarropas digitalizado</h2>
+      <span class="subtitle">Confirmación y detalles de clasificación.</span>
+    </div>
+    <button type="button" class="add-prenda-btn" (click)="anadirNuevaPrenda()">
+      + Añadir prenda
+    </button>
+  </div>
+
+  <!-- Formulario -->
+  <form [formGroup]="prendaForm" class="classification-form" (submit)="$event.preventDefault()">
+    
+    <!-- Descripción Prenda -->
+    <div class="form-group">
+      <label for="descripcion">Descripción prenda:</label>
+      <input 
+        id="descripcion" 
+        type="text" 
+        formControlName="descripcion" 
+        placeholder="Ej: Camisa blanca"
+        class="form-control-input"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Categoría Desplegable -->
+    <div class="form-group dropdown-group">
+      <label>Categoría:</label>
+      <div 
+        class="custom-select" 
+        [class.open]="activeDropdown === 'categoria'"
+        (click)="toggleDropdown('categoria', $event)"
+      >
+        <span class="selected-value">{{ prendaForm.get('categoria')?.value }}</span>
+        <span class="arrow-indicator">▼</span>
+      </div>
+      <ul class="dropdown-list" *ngIf="activeDropdown === 'categoria'">
+        <li 
+          *ngFor="let opt of categoriasOptions" 
+          (click)="selectOption('categoria', opt)"
+          [class.selected]="prendaForm.get('categoria')?.value === opt"
+        >
+          {{ opt }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tipo Desplegable -->
+    <div class="form-group dropdown-group">
+      <label>Tipo:</label>
+      <div 
+        class="custom-select" 
+        [class.open]="activeDropdown === 'tipo'"
+        (click)="toggleDropdown('tipo', $event)"
+      >
+        <span class="selected-value">{{ prendaForm.get('tipo')?.value }}</span>
+        <span class="arrow-indicator">▼</span>
+      </div>
+      <ul class="dropdown-list" *ngIf="activeDropdown === 'tipo'">
+        <li 
+          *ngFor="let opt of tiposOptions" 
+          (click)="selectOption('tipo', opt)"
+          [class.selected]="prendaForm.get('tipo')?.value === opt"
+        >
+          {{ opt }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Material Desplegable -->
+    <div class="form-group dropdown-group">
+      <label>Material:</label>
+      <div 
+        class="custom-select" 
+        [class.open]="activeDropdown === 'material'"
+        (click)="toggleDropdown('material', $event)"
+      >
+        <span class="selected-value">{{ prendaForm.get('material')?.value }}</span>
+        <span class="arrow-indicator">▼</span>
+      </div>
+      <ul class="dropdown-list" *ngIf="activeDropdown === 'material'">
+        <li 
+          *ngFor="let opt of materialesOptions" 
+          (click)="selectOption('material', opt)"
+          [class.selected]="prendaForm.get('material')?.value === opt"
+        >
+          {{ opt }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Estado Desplegable -->
+    <div class="form-group dropdown-group">
+      <label>Estado:</label>
+      <div 
+        class="custom-select" 
+        [class.open]="activeDropdown === 'estado'"
+        (click)="toggleDropdown('estado', $event)"
+      >
+        <span class="selected-value">{{ prendaForm.get('estado')?.value }}</span>
+        <span class="arrow-indicator">▼</span>
+      </div>
+      <ul class="dropdown-list" *ngIf="activeDropdown === 'estado'">
+        <li 
+          *ngFor="let opt of estadosOptions" 
+          (click)="selectOption('estado', opt)"
+          [class.selected]="prendaForm.get('estado')?.value === opt"
+        >
+          {{ opt }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Clima Desplegable -->
+    <div class="form-group dropdown-group">
+      <label>Clima:</label>
+      <div 
+        class="custom-select" 
+        [class.open]="activeDropdown === 'clima'"
+        (click)="toggleDropdown('clima', $event)"
+      >
+        <span class="selected-value">{{ prendaForm.get('clima')?.value }}</span>
+        <span class="arrow-indicator">▼</span>
+      </div>
+      <ul class="dropdown-list" *ngIf="activeDropdown === 'clima'">
+        <li 
+          *ngFor="let opt of climasOptions" 
+          (click)="selectOption('clima', opt)"
+          [class.selected]="prendaForm.get('clima')?.value === opt"
+        >
+          {{ opt }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Ocasión (Chips / Tags) -->
+    <div class="form-group tag-management-group">
+      <label>Ocasión</label>
+      <div class="tags-container">
+        <!-- Chips list -->
+        <span class="tag-chip" *ngFor="let tag of ocasionesSeleccionadas; let idx = index">
+          {{ tag }}
+          <button type="button" class="remove-tag-btn" (click)="removerOcasion(idx)">✕</button>
+        </span>
+        
+        <!-- Input inline for adding tags -->
+        <input 
+          #tagInput 
+          type="text" 
+          class="tag-inline-input" 
+          placeholder="Tags..."
+          (keyup.enter)="agregarOcasion(tagInput)"
+          (blur)="agregarOcasion(tagInput)"
+        />
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="form-actions">
+      <button type="button" class="btn-save" (click)="guardarPrenda()">
+        Guardar
+      </button>
+      <button type="button" class="btn-discard" (click)="descartarCambios()">
+        Descartar
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Loader Indication -->
+  <div class="form-loader-overlay" *ngIf="isLoading">
+    <div class="form-spinner"></div>
+  </div>
+
+  <!-- Toast Notification Overlay -->
+  <div 
+    class="feedback-toast" 
+    [class.show]="showToast" 
+    [class.success]="toastType === 'success'"
+    [class.info]="toastType === 'info'"
+    [class.error]="toastType === 'error'"
+  >
+    <span class="toast-icon">
+      <ng-container *ngIf="toastType === 'success'">✓</ng-container>
+      <ng-container *ngIf="toastType === 'info'">ℹ</ng-container>
+      <ng-container *ngIf="toastType === 'error'">✕</ng-container>
+    </span>
+    <span class="toast-text">{{ toastMessage }}</span>
+  </div>
+
+</div>

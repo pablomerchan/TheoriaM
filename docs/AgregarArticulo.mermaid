@@ -1,0 +1,19 @@
+erDiagram
+    Usuarios {
+        int Id_usuario PK
+    }
+
+    tbl_asesoria {
+        int Id_usuario FK
+        string texto_html
+        string tipo_asesoria FK
+    }
+
+    tbl_articulo {
+        int Id_usuario FK
+        string tipo_asesoria FK
+    }
+
+    Usuarios ||--o{ tbl_asesoria : "Id_usuario"
+    tbl_asesoria ||--o{ tbl_articulo : "Id_usuario"
+    tbl_articulo }o..o{ tbl_asesoria : "tipo_asesoria"

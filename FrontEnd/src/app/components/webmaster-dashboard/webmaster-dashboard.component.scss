@@ -1,0 +1,92 @@
+.wm-dashboard {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  gap: 1rem;
+  background: #f3f4f6;
+}
+
+.wm-dashboard .sidebar {
+  background: #111827;
+  color: #f9fafb;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.wm-dashboard .sidebar .brand h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.wm-dashboard .sidebar .brand p {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: #d1d5db;
+}
+
+.wm-dashboard .sidebar nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.wm-dashboard .sidebar nav a {
+  display: block;
+  color: #e5e7eb;
+  text-decoration: none;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.wm-dashboard .sidebar nav a:hover,
+.wm-dashboard .sidebar nav a.active {
+  background: #1f2937;
+}
+
+.wm-dashboard .content {
+  padding: 1.5rem;
+}
+
+.wm-dashboard .hero {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 14px rgba(15, 23, 42, 0.06);
+}
+
+.wm-dashboard .hero h2 {
+  margin: 0 0 0.5rem;
+}
+
+.wm-dashboard .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.wm-dashboard .card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.3rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+}
+
+.wm-dashboard .card h3 {
+  margin-top: 0;
+}
+
+.wm-dashboard .button {
+  display: inline-block;
+  margin-top: 1rem;
+  color: white;
+  background: #2563eb;
+  text-decoration: none;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+}

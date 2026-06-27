@@ -1,0 +1,82 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ArticuloComponent
+     ─ Arriba: imagen o video (410×614, object-fit: contain).
+     ─ Abajo: texto HTML con efecto typewriter + botón TTS.
+     ─ Marco estático — no es carrusel.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div
+  class="articulo-container"
+  aria-label="Artículo de asesoría"
+  role="article"
+  *ngIf="articulo">
+
+  <!-- ── VIEWPORT: recorte horizontal sin afectar el texto inferior ──────── -->
+  <div class="articulo-viewport">
+
+    <div class="articulo-slide">
+
+      <!-- PARTE SUPERIOR: imagen o video -->
+      <div class="articulo-media-panel">
+
+        <!-- Imagen -->
+        <img
+          *ngIf="articulo.media_tipo === 'imagen' && articulo.media_url"
+          [src]="articulo.media_url"
+          [alt]="articulo.tipo_asesoria || 'Imagen de asesoría'"
+          class="articulo-media"
+          loading="lazy">
+
+        <!-- Video: soporta webm (preferido) y mp4 -->
+        <video
+          #videoPlayer
+          *ngIf="showVideo"
+          class="articulo-media"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata">
+          <ng-container *ngFor="let source of videoSources">
+            <source [src]="source.src" [type]="source.type">
+          </ng-container>
+        </video>
+
+      </div>
+
+      <!-- PARTE INFERIOR: texto -->
+      <div class="articulo-texto-panel">
+
+        <!-- Durante la animación typewriter -->
+        <div *ngIf="isTyping" class="typewriter-text">
+          {{ typewriterText }}<span class="typewriter-cursor">▋</span>
+        </div>
+
+        <!-- HTML completo al terminar -->
+        <div
+          *ngIf="!isTyping"
+          class="html-content"
+          [innerHTML]="textoHtml">
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FOOTER: botón TTS fuera del viewport (visible, sin recorte) ─────── -->
+  <div class="articulo-footer">
+    <button
+      class="tts-btn"
+      (click)="toggleTTS()"
+      [class.speaking]="isSpeaking"
+      [attr.aria-label]="isSpeaking ? 'Detener lectura' : 'Leer en voz alta'"
+      [title]="isSpeaking ? 'Detener lectura' : 'Leer en voz alta'">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        <path *ngIf="isSpeaking"  d="M18.5 12c0-2.98-1.68-5.57-4.15-6.89l-.85 1.55C15.5 7.57 16.5 9.68 16.5 12s-1 4.43-3 5.34l.85 1.55C16.82 17.57 18.5 14.98 18.5 12z"/>
+        <path *ngIf="!isSpeaking" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06C15.48 15.3 16.5 13.77 16.5 12z"/>
+      </svg>
+    </button>
+  </div>
+
+</div>

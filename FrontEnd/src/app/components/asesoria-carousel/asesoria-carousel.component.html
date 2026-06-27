@@ -1,0 +1,326 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Carrusel de asesorías
+     ─ Responsivo: se adapta a móvil, tablet y escritorio.
+     ─ Controles: prev / next, indicadores de punto, pausa/reanudar y TTS.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div
+  class="carousel-container"
+  aria-label="Carrusel de asesorías"
+  role="region"
+  [class.is-paused]="isPaused"
+  [class.is-speaking]="isSpeaking"
+  [class.hide-text-enabled]="hideTextEnabled">
+
+  <!-- ── VIEWPORT: única capa con overflow:hidden (sólo oculta slides fuera de pantalla) -->
+  <div class="carousel-viewport">
+  <!-- ── PISTA DESLIZANTE ──────────────────────────────────────────────── -->
+  <div
+    class="carousel-track"
+    [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+
+    <article
+      class="carousel-slide"
+      *ngFor="let item of asesorias; let i = index"
+      [attr.aria-hidden]="currentIndex !== i"
+      [class.active]="currentIndex === i">
+
+      <!-- Imagen o Video (arriba, 410×614, sin recortar) -->
+      <div class="slide-image-container">
+        <!-- Video (mp4, webm, ogg) -->
+        <video
+          *ngIf="item.imagen_url && (item.imagen_url.endsWith('.mp4') || item.imagen_url.endsWith('.webm') || item.imagen_url.endsWith('.ogg'))"
+          [src]="item.imagen_url"
+          class="slide-video"
+          [muted]="videoVolume === 0"
+          playsinline
+          (click)="toggleVideoPlay($event)"
+          (timeupdate)="onVideoTimeUpdate($event)"
+          (loadedmetadata)="onVideoLoadedMetadata($event)"
+          (ended)="onVideoEnded($event)"
+          (play)="onVideoPlay()"
+          (pause)="onVideoPause()"
+          aria-label="Video descriptivo de la asesoría">
+        </video>
+        <!-- Imagen estática -->
+        <img
+          *ngIf="!item.imagen_url || (!item.imagen_url.endsWith('.mp4') && !item.imagen_url.endsWith('.webm') && !item.imagen_url.endsWith('.ogg'))"
+          [src]="item.imagen_url"
+          alt="Imagen descriptiva de la asesoría"
+          class="slide-image"
+          loading="lazy">
+
+        <!-- Play overlay button -->
+        <div 
+          *ngIf="item.imagen_url && (item.imagen_url.endsWith('.mp4') || item.imagen_url.endsWith('.webm') || item.imagen_url.endsWith('.ogg'))" 
+          class="video-play-overlay"
+          [class.playing]="isVideoPlaying"
+          (click)="toggleVideoPlay($event)">
+          <div class="video-play-icon">
+            <svg *ngIf="!isVideoPlaying" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg *ngIf="isVideoPlaying" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"/>
+              <rect x="14" y="4" width="4" height="16" rx="1"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Control de volumen (estilo YouTube, aparece en la esquina inferior derecha al hacer hover) -->
+        <div 
+          *ngIf="item.imagen_url && (item.imagen_url.endsWith('.mp4') || item.imagen_url.endsWith('.webm') || item.imagen_url.endsWith('.ogg'))" 
+          class="video-volume-control"
+          (click)="$event.stopPropagation()">
+          <button 
+            class="video-volume-btn"
+            (click)="toggleMute($event)"
+            [title]="videoVolume === 0 ? 'Activar sonido' : 'Silenciar'">
+            <!-- Speaker icons -->
+            <svg *ngIf="videoVolume === 0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+            </svg>
+            <svg *ngIf="videoVolume > 0 && videoVolume <= 0.5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/>
+            </svg>
+            <svg *ngIf="videoVolume > 0.5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          </button>
+          
+          <input 
+            type="range"
+            class="video-volume-slider"
+            min="0"
+            max="1"
+            step="0.05"
+            [value]="videoVolume"
+            (input)="onVolumeChange($event)">
+        </div>
+
+        <!-- Progress bar for the video (only when current slide is a video) -->
+        <div 
+          *ngIf="item.imagen_url && (item.imagen_url.endsWith('.mp4') || item.imagen_url.endsWith('.webm') || item.imagen_url.endsWith('.ogg'))" 
+          class="video-progress-container"
+          (click)="onProgressClick($event)">
+          <div 
+            class="video-progress-bar" 
+            [style.width.%]="videoProgressPercent">
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido HTML sanitizado / efecto typewriter -->
+      <div class="slide-content-container">
+
+        <!-- Durante la animación: texto plano con cursor parpadeante -->
+        <div
+          *ngIf="currentIndex === i && isTyping"
+          class="slide-content-inner typewriter-text">
+          {{ typewriterText }}<span class="typewriter-cursor">▋</span>
+        </div>
+
+        <!-- Al terminar: HTML completo sanitizado -->
+        <div
+          *ngIf="!(currentIndex === i && isTyping)"
+          class="slide-content-inner html-content"
+          [innerHTML]="item.texto_html">
+        </div>
+
+      </div>
+
+    </article>
+  </div><!-- /.carousel-track -->
+  </div><!-- /.carousel-viewport -->
+
+  <!-- ── FLECHAS PREV / NEXT ───────────────────────────────────────────── -->
+  <button
+    class="carousel-control prev"
+    (click)="onManualPrev()"
+    aria-label="Diapositiva anterior"
+    *ngIf="!isFirstSlide() && asesorias.length > 1">
+    &#10094;
+  </button>
+
+  <button
+    class="carousel-control next"
+    (click)="onManualNext()"
+    aria-label="Siguiente diapositiva"
+    *ngIf="asesorias.length > 1">
+    &#10095;
+  </button>
+
+  <!-- ── BARRA INFERIOR COMPACTA: indicadores, play/tts, ajustes y sociales ── -->
+  <div class="carousel-bottom-bar" *ngIf="asesorias.length > 0">
+
+    <div class="bottom-left">
+      <div class="carousel-indicators" role="tablist" *ngIf="asesorias.length > 1">
+        <button
+          *ngFor="let item of asesorias; let i = index"
+          class="indicator-dot"
+          [class.active]="currentIndex === i"
+          (click)="goToSlide(i)"
+          role="tab"
+          [attr.aria-selected]="currentIndex === i"
+          [attr.aria-label]="'Ir a la diapositiva ' + (i + 1)">
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-center">
+      <div class="carousel-actions">
+
+        <button
+          class="action-btn pause-btn"
+          (click)="isPaused ? resume() : pause()"
+          [attr.aria-label]="isPaused ? 'Reanudar avance automático' : 'Pausar avance automático'"
+          [class.active]="isPaused"
+          [title]="isPaused ? 'Reanudar' : 'Pausar'">
+          <svg *ngIf="!isPaused" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" rx="1"/>
+            <rect x="14" y="4" width="4" height="16" rx="1"/>
+          </svg>
+          <svg *ngIf="isPaused" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+
+        <button
+          class="action-btn tts-btn"
+          (click)="readSlide()"
+          [class.speaking]="isSpeaking"
+          [attr.aria-label]="isSpeaking ? 'Detener lectura en voz alta' : 'Leer en voz alta'"
+          [title]="isSpeaking ? 'Detener lectura' : 'Leer en voz alta'">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+            <path *ngIf="isSpeaking" d="M18.5 12c0-2.98-1.68-5.57-4.15-6.89l-.85 1.55C15.5 7.57 16.5 9.68 16.5 12s-1 4.43-3 5.34l.85 1.55C16.82 17.57 18.5 14.98 18.5 12z"/>
+            <path *ngIf="!isSpeaking" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06C15.48 15.3 16.5 13.77 16.5 12z"/>
+          </svg>
+        </button>
+      </div>
+
+      <button
+        class="action-btn settings-toggle-btn"
+        type="button"
+        (click)="toggleSettingsPanel($event)"
+        [attr.aria-expanded]="showSettingsPanel"
+        aria-label="Ajustes de velocidad y lectura"
+        title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/>
+          <path d="M19.4 13.4a7.7 7.7 0 0 0 .1-2.8l2.1-1.7a0.5 0.5 0 0 0 .1-.7l-2-3.5a0.5 0.5 0 0 0-.6-.2l-2.5 1a7.8 7.8 0 0 0-2.4-1.4L14 2.5a0.5 0.5 0 0 0-.5-.4h-4a0.5 0.5 0 0 0-.5.4l-.4 2.6a7.8 7.8 0 0 0-2.4 1.4l-2.5-1a0.5 0.5 0 0 0-.6.2l-2 3.5a0.5 0.5 0 0 0 .1.7l2.1 1.7a7.7 7.7 0 0 0 .1 2.8L2.5 15.6a0.5 0.5 0 0 0-.1.7l2 3.5a0.5 0.5 0 0 0 .6.2l2.5-1a7.8 7.8 0 0 0 2.4 1.4l.4 2.6a0.5 0.5 0 0 0 .5.4h4a0.5 0.5 0 0 0 .5-.4l.4-2.6a7.8 7.8 0 0 0 2.4-1.4l2.5 1a0.5 0.5 0 0 0 .6-.2l2-3.5a0.5 0.5 0 0 0-.1-.7z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="bottom-right">
+      <button
+        class="interact-btn"
+        aria-label="Me gusta"
+        title="Me gusta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+      <button
+        class="interact-btn"
+        aria-label="No me gusta"
+        title="No me gusta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 21s-6.5-4.4-8.9-8.2C1.1 9.4 2.9 6 6.6 5.2c1.5-.3 3.1.2 4.3 1.2l.1.1.1-.1c1.2-1 2.8-1.5 4.3-1.2 3.7.8 5.5 4.2 3.5 7.6C18.5 16.6 12 21 12 21z"/>
+          <path d="M10 8.5l1.5 2-1 4 3.5-2.5-1 4 2.5-3"/>
+        </svg>
+      </button>
+
+      <button
+        class="interact-btn hide-text-btn"
+        [class.active]="hideTextEnabled"
+        (click)="toggleHideText()"
+        [attr.aria-pressed]="hideTextEnabled"
+        [attr.aria-label]="hideTextEnabled ? 'Mostrar texto' : 'Ocultar texto'"
+        [attr.title]="hideTextEnabled ? 'Mostrar texto' : 'Ocultar texto'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <ng-container *ngIf="!hideTextEnabled">
+            <path d="M17.94 17.94A10 10 0 0 1 6.06 6.06"/>
+            <path d="M1 1l22 22"/>
+            <path d="M12 5a7 7 0 0 1 7 7c0 1.2-.3 2.4-.86 3.44"/>
+            <path d="M4.86 4.86C3.33 6.39 2.5 8.12 2.5 10a9.5 9.5 0 0 0 3.5 7"/>
+          </ng-container>
+          <ng-container *ngIf="hideTextEnabled">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+          </ng-container>
+        </svg>
+      </button>
+
+      <button
+        class="interact-btn"
+        [class.active]="autoReadEnabled"
+        (click)="toggleAutoRead()"
+        [attr.aria-pressed]="autoReadEnabled"
+        aria-label="Lectura automática"
+        title="Lectura automática">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 8v8l5-4-5-4z"/>
+          <path d="M14.5 8.5c1.5 1.3 1.5 3.5 0 4.8"/>
+          <path d="M17.5 6.5c2.5 2.2 2.5 5.8 0 8"/>
+        </svg>
+      </button>
+    </div>
+
+    <div
+      class="carousel-settings-panel"
+      *ngIf="showSettingsPanel"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-label="Ajustes del carrusel">
+      <div class="speed-control-group">
+        <label for="speedRange" class="speed-label">Velocidad: {{ autoPlayDelay / 1000 }}s</label>
+        <input
+          type="range"
+          id="speedRange"
+          class="speed-slider"
+          min="1"
+          max="10"
+          step="1"
+          [value]="autoPlayDelay / 1000"
+          (input)="onSpeedChange($event)"
+          [attr.aria-label]="'Ajustar velocidad de paso'">
+      </div>
+
+      <div class="auto-read-control">
+        <input
+          type="checkbox"
+          id="autoReadToggle"
+          class="auto-read-checkbox"
+          [checked]="autoReadEnabled"
+          (change)="onAutoReadChange($event)">
+        <label for="autoReadToggle" class="auto-read-label">Lectura automática</label>
+      </div>
+      <div class="hide-text-control">
+        <input
+          type="checkbox"
+          id="hideTextToggle"
+          class="hide-text-checkbox"
+          [checked]="hideTextEnabled"
+          (change)="onHideTextChange($event)">
+        <label for="hideTextToggle" class="hide-text-label">Ocultar texto</label>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Indicador de flash de reproducción/pausa (estilo YouTube) -->
+  <div class="carousel-flash" *ngIf="flashState" [class]="'flash-' + flashState">
+    <div class="flash-circle">
+      <svg *ngIf="flashState === 'play'" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <svg *ngIf="flashState === 'pause'" viewBox="0 0 24 24" fill="currentColor">
+        <rect x="6" y="4" width="4" height="16" rx="1"/>
+        <rect x="14" y="4" width="4" height="16" rx="1"/>
+      </svg>
+    </div>
+  </div>
+
+</div>

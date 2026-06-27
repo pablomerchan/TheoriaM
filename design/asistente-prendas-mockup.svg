@@ -1,0 +1,125 @@
+<svg width="1440" height="960" viewBox="0 0 1440 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="960" fill="#F5F7FA"/>
+
+  <rect x="0" y="0" width="1440" height="72" fill="#FFFFFF"/>
+  <rect x="0" y="71" width="1440" height="1" fill="#E1E7EF"/>
+  <text x="40" y="45" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#18202A">TheoriaM</text>
+  <text x="160" y="45" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#687586">Catalogo inteligente</text>
+  <rect x="1172" y="20" width="120" height="32" rx="6" fill="#ECFDF5"/>
+  <text x="1201" y="41" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#047857">IA activa</text>
+  <circle cx="1346" cy="36" r="18" fill="#DDE7F2"/>
+  <text x="1337" y="42" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#344256">PM</text>
+
+  <rect x="32" y="96" width="248" height="824" rx="8" fill="#FFFFFF" stroke="#E1E7EF"/>
+  <text x="56" y="136" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">MODULOS</text>
+  <rect x="48" y="164" width="216" height="44" rx="6" fill="#EEF6FF"/>
+  <rect x="56" y="176" width="20" height="20" rx="5" fill="#2D7FF9"/>
+  <text x="88" y="192" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#1A2B3C">Asistente de prendas</text>
+  <text x="56" y="248" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#687586">Inventario</text>
+  <text x="56" y="292" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#687586">Ventas</text>
+  <text x="56" y="336" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#687586">Clientes</text>
+  <text x="56" y="380" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#687586">Reportes</text>
+
+  <text x="312" y="123" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="26" font-weight="750" fill="#18202A">Asistente de catalogacion</text>
+  <text x="312" y="151" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#687586">Convierte una foto en una ficha lista para revisar y guardar.</text>
+  <rect x="1143" y="106" width="112" height="40" rx="6" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="1171" y="131" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="650" fill="#344256">Borrador</text>
+  <rect x="1268" y="106" width="132" height="40" rx="6" fill="#0E7490"/>
+  <text x="1300" y="131" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="750" fill="#FFFFFF">Guardar</text>
+
+  <rect x="312" y="184" width="540" height="736" rx="8" fill="#FFFFFF" stroke="#E1E7EF"/>
+  <rect x="336" y="208" width="492" height="388" rx="8" fill="#F0F4F8"/>
+  <rect x="360" y="232" width="214" height="340" rx="8" fill="#FFFFFF" stroke="#D8E0EA"/>
+  <text x="386" y="260" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">FOTO ORIGINAL</text>
+  <rect x="398" y="306" width="136" height="184" rx="18" fill="#315B8C"/>
+  <path d="M398 338 C370 356 360 397 368 438 C376 477 393 507 410 530 L432 511 C417 484 408 451 410 412 L398 338Z" fill="#244A75"/>
+  <path d="M534 338 C562 356 572 397 564 438 C556 477 539 507 522 530 L500 511 C515 484 524 451 522 412 L534 338Z" fill="#244A75"/>
+  <path d="M422 306 C434 286 499 286 511 306 C496 323 437 323 422 306Z" fill="#274E7D"/>
+  <rect x="432" y="322" width="68" height="190" rx="14" fill="#37699F"/>
+  <circle cx="466" cy="230" r="58" fill="#E2E8F0" opacity=".55"/>
+  <circle cx="425" cy="516" r="32" fill="#E2E8F0" opacity=".55"/>
+  <circle cx="519" cy="515" r="36" fill="#E2E8F0" opacity=".55"/>
+
+  <rect x="590" y="232" width="214" height="340" rx="8" fill="#FFFFFF" stroke="#D8E0EA"/>
+  <text x="616" y="260" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">SIN FONDO</text>
+  <rect x="620" y="286" width="154" height="238" rx="8" fill="#FBFCFE"/>
+  <path d="M620 286 H774 V524 H620 V286Z" fill="url(#grid)"/>
+  <rect x="653" y="330" width="88" height="138" rx="16" fill="#315B8C"/>
+  <path d="M653 354 C632 369 626 400 632 431 C638 460 650 483 663 500 L680 486 C668 466 661 441 663 412 L653 354Z" fill="#244A75"/>
+  <path d="M741 354 C762 369 768 400 762 431 C756 460 744 483 731 500 L714 486 C726 466 733 441 731 412 L741 354Z" fill="#244A75"/>
+  <path d="M669 330 C679 315 715 315 725 330 C714 343 680 343 669 330Z" fill="#274E7D"/>
+  <rect x="680" y="342" width="34" height="144" rx="11" fill="#37699F"/>
+  <rect x="650" y="540" width="94" height="32" rx="6" fill="#ECFDF5"/>
+  <text x="674" y="561" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#047857">Recorte OK</text>
+
+  <text x="336" y="632" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" font-weight="750" fill="#18202A">Atributos detectados</text>
+  <rect x="336" y="656" width="492" height="68" rx="8" fill="#F8FAFC" stroke="#E1E7EF"/>
+  <text x="360" y="683" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">TIPO</text>
+  <text x="360" y="707" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="750" fill="#18202A">Camisa manga larga</text>
+  <rect x="648" y="674" width="148" height="32" rx="6" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="681" y="695" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="650" fill="#344256">Cambiar tipo</text>
+
+  <rect x="336" y="740" width="236" height="72" rx="8" fill="#F8FAFC" stroke="#E1E7EF"/>
+  <text x="360" y="767" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">COLOR</text>
+  <circle cx="372" cy="792" r="10" fill="#315B8C"/>
+  <text x="392" y="798" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" font-weight="750" fill="#18202A">Azul oscuro</text>
+  <text x="506" y="798" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#687586">91%</text>
+
+  <rect x="592" y="740" width="236" height="72" rx="8" fill="#F8FAFC" stroke="#E1E7EF"/>
+  <text x="616" y="767" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">PATRON</text>
+  <text x="616" y="798" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" font-weight="750" fill="#18202A">Liso</text>
+  <text x="766" y="798" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#687586">88%</text>
+
+  <rect x="336" y="832" width="152" height="40" rx="6" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="376" y="857" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="650" fill="#344256">Reanalizar</text>
+  <rect x="500" y="832" width="160" height="40" rx="6" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="533" y="857" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="650" fill="#344256">Tomar otra foto</text>
+  <rect x="672" y="832" width="156" height="40" rx="6" fill="#0E7490"/>
+  <text x="711" y="857" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="750" fill="#FFFFFF">Confirmar</text>
+
+  <rect x="876" y="184" width="524" height="736" rx="8" fill="#FFFFFF" stroke="#E1E7EF"/>
+  <rect x="876" y="184" width="524" height="64" rx="8" fill="#FFFFFF"/>
+  <rect x="876" y="247" width="524" height="1" fill="#E1E7EF"/>
+  <circle cx="916" cy="216" r="18" fill="#DFF6F0"/>
+  <path d="M908 216 C908 210 912 206 918 206 C924 206 928 210 928 216 C928 222 924 226 918 226 H909 L913 222 C910 221 908 219 908 216Z" fill="#0F766E"/>
+  <text x="946" y="211" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" font-weight="750" fill="#18202A">Asistente virtual</text>
+  <text x="946" y="232" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#687586">Revisa, corrige y guarda por conversacion</text>
+
+  <rect x="900" y="276" width="392" height="92" rx="10" fill="#F1F5F9"/>
+  <text x="924" y="306" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#344256">Detecte una camisa manga larga azul oscuro,</text>
+  <text x="924" y="330" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#344256">lisa, con fondo removido correctamente.</text>
+  <text x="924" y="354" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#344256">Quieres guardarla asi?</text>
+
+  <rect x="1012" y="392" width="340" height="56" rx="10" fill="#DFF6F0"/>
+  <text x="1036" y="426" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#134E4A">Es una blusa azul petroleo, talla M.</text>
+
+  <rect x="900" y="472" width="414" height="122" rx="10" fill="#F1F5F9"/>
+  <text x="924" y="502" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#344256">Listo. Actualice el tipo a blusa, el color a</text>
+  <text x="924" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#344256">azul petroleo y agregue talla M.</text>
+  <text x="924" y="560" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#344256">Ficha lista para guardar.</text>
+
+  <rect x="900" y="626" width="138" height="36" rx="18" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="929" y="649" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="650" fill="#344256">Confirmar</text>
+  <rect x="1050" y="626" width="162" height="36" rx="18" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="1080" y="649" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="650" fill="#344256">Cambiar color</text>
+  <rect x="1224" y="626" width="128" height="36" rx="18" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="1252" y="649" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="650" fill="#344256">Descartar</text>
+
+  <rect x="900" y="700" width="452" height="84" rx="8" fill="#F8FAFC" stroke="#E1E7EF"/>
+  <text x="924" y="728" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#748095">RESUMEN ACTUAL</text>
+  <text x="924" y="758" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="750" fill="#18202A">Blusa · Azul petroleo · Talla M · Lisa</text>
+
+  <rect x="900" y="820" width="452" height="56" rx="8" fill="#FFFFFF" stroke="#CCD6E2"/>
+  <text x="924" y="853" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#98A4B3">Escribe una correccion o instruccion...</text>
+  <circle cx="1324" cy="848" r="18" fill="#0E7490"/>
+  <path d="M1316 848 H1330 M1325 842 L1331 848 L1325 854" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="12" height="12" fill="#EEF2F7"/>
+      <rect x="12" y="12" width="12" height="12" fill="#EEF2F7"/>
+      <rect x="12" width="12" height="12" fill="#FFFFFF"/>
+      <rect y="12" width="12" height="12" fill="#FFFFFF"/>
+    </pattern>
+  </defs>
+</svg>

@@ -1,0 +1,190 @@
+.wm-admin {
+  padding: 1rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.wm-admin .message {
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+}
+
+.wm-admin .message.error {
+  background: #fdecea;
+  color: #9d1a0f;
+  border: 1px solid #f4c7c3;
+}
+
+.wm-admin .message.success {
+  background: #e7f7ec;
+  color: #1f5b2d;
+  border: 1px solid #c7e6d2;
+}
+
+.wm-admin .list,
+.wm-admin .form {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.wm-admin .list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.wm-admin table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.wm-admin th,
+.wm-admin td {
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: left;
+}
+
+.wm-admin th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.wm-admin .empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 1rem;
+}
+
+.wm-admin label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.wm-admin input,
+.wm-admin select,
+.wm-admin textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.wm-admin textarea {
+  min-height: 140px;
+}
+
+.wm-admin .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.wm-admin .menu-info,
+.wm-admin .menu-table {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.wm-admin .menu-info h4,
+.wm-admin .menu-table h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.wm-admin .menu-info ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.wm-admin .menu-info li {
+  margin-bottom: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.wm-admin .menu-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.75rem;
+}
+
+.wm-admin .menu-table th,
+.wm-admin .menu-table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.wm-admin .menu-table th {
+  background: #eef2ff;
+}
+
+.wm-admin .menu-note {
+  font-size: 0.92rem;
+  color: #374151;
+}
+
+.wm-admin button {
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+}
+
+.wm-admin button.primary {
+  background: #1d4ed8;
+  color: white;
+}
+
+.wm-admin button.secondary {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.wm-admin button.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.wm-admin .preview {
+  background: #f8fafc;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.wm-admin .preview-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.wm-admin .preview-content {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 6rem;
+  overflow: auto;
+}
+
+.wm-admin .preview-actions {
+  margin-top: 1rem;
+}

@@ -1,0 +1,34 @@
+<div class="wm-dashboard">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Panel Webmaster</h1>
+      <p>Gestión de contenidos</p>
+    </div>
+    <nav>
+      <ul>
+        <li><a routerLink="/webmaster-articulos" routerLinkActive="active">Artículos</a></li>
+        <li><a routerLink="/webmaster-articulos/nuevo" routerLinkActive="active">Agregar artículo</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <div class="hero">
+      <h2>Bienvenido al panel</h2>
+      <p>Aquí podrás administrar artículos y otros contenidos que se agreguen más adelante.</p>
+    </div>
+
+    <section class="cards">
+      <article class="card">
+        <h3>Artículos</h3>
+        <p>Lista y administra todos los artículos del sitio.</p>
+        <a routerLink="/webmaster/articulos" class="button">Ir a artículos</a>
+      </article>
+      <article class="card">
+        <h3>Agregar contenido</h3>
+        <p>Crea un nuevo artículo o configura futuros módulos desde el panel.</p>
+        <a routerLink="/webmaster/articulos/nuevo" class="button">Agregar artículo</a>
+      </article>
+    </section>
+  </main>
+</div>

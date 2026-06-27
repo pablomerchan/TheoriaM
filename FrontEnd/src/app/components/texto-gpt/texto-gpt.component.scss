@@ -1,0 +1,284 @@
+// ═══════════════════════════════════════════════════════════════════════════
+//  Variables
+// ═══════════════════════════════════════════════════════════════════════════
+$surface        : #FAFAFA;
+$surface-border : rgba(0, 0, 0, 0.08);
+$text-primary   : #111111;
+$text-secondary : #3C3C3C;
+$text-muted     : #555555;
+$accent         : #B8860B;
+$radius-card    : 16px;
+$radius-btn     : 50%;
+$shadow-card    : 0 4px 6px -1px rgba(0,0,0,.05), 0 10px 30px -5px rgba(0,0,0,.10);
+$transition-std : 0.25s ease;
+
+// Breakpoints responsivos
+$bp-sm   : 480px;
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  HOST — alineación izquierda, max-width 492px (410px × 120%)
+// ═══════════════════════════════════════════════════════════════════════════
+:host {
+  display     : block;
+  width       : 100%;
+  max-width   : 492px;
+  box-sizing  : border-box;
+  margin-left : 0;
+  margin-right: auto;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CONTENEDOR — total de altura igual a los demás componentes
+// ═══════════════════════════════════════════════════════════════════════════
+.texto-gpt-container {
+  display        : flex;
+  flex-direction : column;
+  width          : 100%;
+  box-sizing     : border-box;
+  border-radius  : $radius-card;
+  background     : $surface;
+  border         : none;
+  box-shadow     : $shadow-card;
+  /* Limit vertical size to match AsesoriaCarouselComponent and avoid overflow */
+  max-height     : 91vh;
+  min-height     : 0;
+  overflow       : hidden;
+  box-shadow   : $shadow-card;
+
+  @media (max-width: $bp-sm) {
+    max-height: 400px;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  VIEWPORT
+// ═══════════════════════════════════════════════════════════════════════════
+.texto-gpt-viewport {
+  flex            : 1 1 auto;
+  overflow        : hidden;
+  width           : 100%;
+  box-sizing      : border-box;
+  border-radius   : $radius-card $radius-card 0 0;
+  display         : flex;
+  flex-direction  : column;
+  min-height      : 0; /* allow children to scroll properly */
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  PANEL DE TEXTO — ocupa el espacio y muestra scroll dorado si desborda
+// ═══════════════════════════════════════════════════════════════════════════
+.texto-gpt-texto-panel {
+  width         : 100%;
+  flex          : 1 1 auto;
+  min-height    : 0; /* allow proper flexbox scrolling */
+  box-sizing    : border-box;
+  padding       : 2rem 2rem 1.5rem;
+  background    : $surface;
+  overflow-y    : auto;
+
+  // Scrollbar dorada visible
+  &::-webkit-scrollbar       { width: 6px; }
+  &::-webkit-scrollbar-track { background: rgba(0,0,0,.04); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.45); border-radius: 3px;
+    &:hover                  { background: rgba(184,134,11,0.7); }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184,134,11,0.45) rgba(0,0,0,.04);
+
+  @media (max-width: $bp-sm) {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+}
+
+// ── Clase transitoria durante la animación typewriter
+.typewriter-active {
+  // El html-content ya aplica todos los estilos de tipografía;
+  // sólo se añade la clase para poder aplicar ajustes puntuales si se requiere.
+}
+
+// ── Cursor parpadeante
+.typewriter-cursor {
+  display       : inline;
+  color         : $accent;
+  font-weight   : 700;
+  margin-left   : 1px;
+  animation     : cursor-blink 0.7s step-end infinite;
+  line-height   : inherit;
+  vertical-align: baseline;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+// ── HTML completo
+.html-content {
+  box-sizing: border-box;
+  width     : 100%;
+
+  ::ng-deep {
+    h1, h2, h3, h4 {
+      margin-top   : 0;
+      margin-bottom: 0.75rem;
+      color        : $text-primary !important;
+      font-weight  : 700;
+      line-height  : 1.3;
+    }
+    p {
+      line-height  : 1.75;
+      margin-bottom: 1rem;
+      color        : $text-secondary !important;
+      font-size    : 0.96rem;
+      &:last-child { margin-bottom: 0; }
+    }
+    strong { font-weight: 700; color: $text-primary !important; }
+    em     { color: $text-muted !important; }
+    ul, ol {
+      padding-left : 1.5rem;
+      margin-bottom: 1rem;
+      color        : $text-secondary !important;
+    }
+    li {
+      margin-bottom: 0.4rem;
+      line-height  : 1.65;
+      color        : $text-secondary !important;
+    }
+    a { color: $accent !important; text-decoration: underline; }
+    img {
+      max-width : 100% !important;
+      width     : auto !important;
+      box-sizing: border-box;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  FOOTER: para botón TTS
+// ═══════════════════════════════════════════════════════════════════════════
+.texto-gpt-footer {
+  position  : relative;
+  width     : 100%;
+  box-sizing: border-box;
+  display   : flex;
+  align-items    : center;
+  justify-content: flex-end;
+  padding   : 0.5rem 1.25rem;
+  background: rgba(250, 250, 250, 0.92);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+
+// ── Botón TTS
+.tts-btn {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 32px;
+  height         : 32px;
+  border-radius  : 50%;
+  border         : 1px solid rgba(0,0,0,.12);
+  background     : rgba(255,255,255,.8);
+  color          : #555;
+  cursor         : pointer;
+  padding        : 0;
+  flex-shrink    : 0;
+  transition     : background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+
+  svg {
+    width : 16px;
+    height: 16px;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background: #fff;
+    color     : $text-primary;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    transform : scale(1.08);
+  }
+
+  &.speaking {
+    background  : $accent;
+    color       : #fff;
+    border-color: $accent;
+    animation   : tts-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes tts-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184,134,11,.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(184,134,11,0); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  BARRA DE INTERACCIÓN SOCIAL (Me gusta, Comentar, Repostear, Compartir, Favoritos)
+// ═══════════════════════════════════════════════════════════════════════════
+.texto-gpt-interaction-bar {
+  position        : relative;
+  width           : 100%;
+  box-sizing      : border-box;
+  display         : flex;
+  align-items     : center;
+  justify-content : space-around;
+  padding         : 0.5rem 1rem;
+  background      : $surface;
+  border-top      : 1px solid $surface-border;
+  border-radius   : 0 0 $radius-card $radius-card;
+
+  @media (max-width: $bp-sm) { padding: 0.4rem 0.5rem; }
+}
+
+// ── Botón de interacción individual
+.interact-btn {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 36px;
+  height         : 36px;
+  border         : none;
+  background     : transparent;
+  color          : $text-muted;
+  cursor         : pointer;
+  border-radius  : $radius-btn;
+  padding        : 0;
+  transition     : color $transition-std, background $transition-std, transform 0.15s;
+
+  svg {
+    width         : 20px;
+    height        : 20px;
+    pointer-events: none;
+  }
+
+  &:hover, &.active {
+    color      : $accent;
+    background : rgba($accent, 0.08);
+    transform  : scale(1.15);
+  }
+
+  &.liked {
+    color      : #e0245e;
+    background : rgba(224, 36, 94, 0.08);
+    svg {
+      fill: #e0245e;
+      stroke: #e0245e;
+    }
+  }
+
+  &.favorited {
+    color      : #dfb11b;
+    background : rgba(223, 177, 27, 0.08);
+    svg {
+      fill: #dfb11b;
+      stroke: #dfb11b;
+    }
+  }
+
+  &:active { transform: scale(0.95); }
+
+  @media (max-width: $bp-sm) {
+    width : 32px;
+    height: 32px;
+    svg   { width: 18px; height: 18px; }
+  }
+}

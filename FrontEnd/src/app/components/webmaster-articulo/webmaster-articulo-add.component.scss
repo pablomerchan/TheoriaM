@@ -1,0 +1,58 @@
+.wm-add {
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+}
+
+.wm-add label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.wm-add input,
+.wm-add select,
+.wm-add textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.wm-add textarea {
+  min-height: 160px;
+}
+
+.wm-add .preview {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-top: 8px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.wm-add .error {
+  color: #b00020;
+  margin-bottom: 1rem;
+}
+
+.wm-add .success {
+  color: #166534;
+  margin-bottom: 1rem;
+}
+
+.wm-add .actions {
+  margin-top: 12px;
+}
+
+.wm-add button.primary {
+  background: #2563eb;
+  border: none;
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
