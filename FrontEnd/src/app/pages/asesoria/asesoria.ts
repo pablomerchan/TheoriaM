@@ -11,6 +11,8 @@ import { SugerenciaDiariaComponent } from '../../components/sugerencia-diaria/su
 import { MiGuardaRopasComponent } from '../../components/mi-guarda-ropas/mi-guarda-ropas.component';
 import { GuiaComprasComponent } from '../../components/guia-compras/guia-compras.component';
 import { UsuarioService } from '../../services/usuario.service';
+import { WebmasterArticuloService } from '../../services/webmaster-articulo.service';
+import { AsesoriaCarouselService } from '../../services/asesoria-carousel.service';
 
 interface MenuSection {
   tema: string;
@@ -38,11 +40,19 @@ export class AsesoriaComponent implements OnInit {
   private asesoriaService = inject(AsesoriaService);
   private usuarioService  = inject(UsuarioService);
   private cdr             = inject(ChangeDetectorRef);
+  private webmasterArticuloService = inject(WebmasterArticuloService);
+  private asesoriaCarouselService  = inject(AsesoriaCarouselService);
 
   menus: MenuServicioItem[] = [];
   menuSections: MenuSection[] = [];
+  menusConArticulos: Set<number> = new Set<number>();
 
   selectedMenu: MenuServicioItem | null = null;
+  showRelatedMode = false;
+  articulosRelacionados: any[] = [];
+  isLoadingRelated = false;
+  userClickedMenuId: number | null = null;
+  selectedRelatedArticle: any | null = null;
 
   /**
    * Definiciones de componentes del menú activo, resueltas desde el mapa estático
@@ -123,6 +133,7 @@ export class AsesoriaComponent implements OnInit {
 
         this.menus = processedItems;
         this.agruparPorTema(this.menus);
+        this.actualizarIndicadores();
         if (this.menus.length > 0) {
           this.selectMenu(this.menus[0]);
         } else {
@@ -157,6 +168,7 @@ export class AsesoriaComponent implements OnInit {
   // 2. Seleccionar un menú y cargar sus componentes
   selectMenu(menu: MenuServicioItem): void {
     this.selectedMenu = menu;
+    this.showRelatedMode = false;
     this.isLoadingArticulos = true;
     this.carruseles = [];
     this.tiposCarrusel = [];
@@ -183,6 +195,120 @@ export class AsesoriaComponent implements OnInit {
     if (this.scrollArea) {
       this.scrollArea.nativeElement.scrollTop = 0;
     }
+
+    this.actualizarIndicadores();
+  }
+
+  actualizarIndicadores(): void {
+    if (!this.idUsuario) return;
+
+    // Obtener las definiciones de menú para construir el mapa tipo_asesoria → menu_id
+    this.asesoriaService.getCarruseles(this.idUsuario).subscribe({
+      next: (defs) => {
+        const menuTiposMap = new Map<number, Set<string>>();
+        defs.forEach(def => {
+          if (def.menu_servicio_id) {
+            if (!menuTiposMap.has(def.menu_servicio_id)) {
+              menuTiposMap.set(def.menu_servicio_id, new Set<string>());
+            }
+            menuTiposMap.get(def.menu_servicio_id)?.add(def.tipo_asesoria);
+          }
+        });
+
+        // Solo consultar tbl_articulo (incluye tipo_contenido='articulo' y 'diapositiva')
+        this.webmasterArticuloService.list(this.idUsuario).subscribe({
+          next: (articulos) => {
+            const articulosTipos = new Set(
+              articulos
+                .filter(a => a.visible === undefined || !!a.visible)
+                .map(a => a.tipo_asesoria)
+            );
+
+            this.menusConArticulos.clear();
+            menuTiposMap.forEach((tipos, menuId) => {
+              let tieneArticulo = false;
+              tipos.forEach(tipo => {
+                if (articulosTipos.has(tipo)) tieneArticulo = true;
+              });
+              if (tieneArticulo) this.menusConArticulos.add(menuId);
+            });
+
+            this.cdr.markForCheck();
+          },
+          error: (err) => console.error('Error al cargar artículos para indicadores:', err)
+        });
+      },
+      error: (err) => console.error('Error al cargar carruseles para indicadores:', err)
+    });
+  }
+
+  selectRelated(menu: MenuServicioItem): void {
+    this.selectedMenu = menu;
+    this.showRelatedMode = true;
+    this.isLoadingRelated = true;
+    this.selectedRelatedArticle = null;
+    this.articulosRelacionados = [];
+
+    // Obtener los tipos de asesoría asociados a este menú
+    this.asesoriaService.getCarruseles(this.idUsuario, menu.id).subscribe({
+      next: (defs) => {
+        const tipos = defs.map(d => d.tipo_asesoria).filter(Boolean);
+
+        if (tipos.length === 0) {
+          this.isLoadingRelated = false;
+          this.cdr.markForCheck();
+          return;
+        }
+
+        // Solo consultar tbl_articulo (incluye artículos y diapositivas)
+        this.webmasterArticuloService.list(this.idUsuario).subscribe({
+          next: (articulos) => {
+            this.articulosRelacionados = articulos.filter(
+              a => (a.visible === undefined || !!a.visible) && a.tipo_asesoria && tipos.includes(a.tipo_asesoria)
+            );
+            this.isLoadingRelated = false;
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error('Error al cargar artículos para relacionados:', err);
+            this.isLoadingRelated = false;
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al obtener carruseles de este menú:', err);
+        this.isLoadingRelated = false;
+        this.cdr.markForCheck();
+      }
+    });
+
+    if (window.innerWidth <= 768) {
+      this.isSidebarOpen = false;
+    }
+    if (this.scrollArea) {
+      this.scrollArea.nativeElement.scrollTop = 0;
+    }
+  }
+
+  onMenuClick(menu: MenuServicioItem): void {
+    this.userClickedMenuId = menu.id;
+    this.selectMenu(menu);
+  }
+
+  /** Muestra el detalle del artículo seleccionado dentro de la vista de Relacionados. */
+  goToArticle(art: any): void {
+    this.selectedRelatedArticle = art;
+    this.cdr.markForCheck();
+    if (this.scrollArea) {
+      this.scrollArea.nativeElement.scrollTop = 0;
+    }
+  }
+
+  /** Vuelve al listado de Relacionados desde el detalle de un artículo. */
+  backToRelatedList(): void {
+    this.selectedRelatedArticle = null;
+    this.cdr.markForCheck();
   }
 
   toggleSidebar(): void {

@@ -27,6 +27,7 @@ class Articulo:
     tags: Optional[List[str]] = None
     publicado_en: Optional[str] = None
     visible: int = 1
+    tipo_contenido: str = "articulo"  # 'articulo' | 'diapositiva'
 
     def to_row(self) -> Dict[str, Any]:
         row = asdict(self)
@@ -76,16 +77,16 @@ def _build_menu_row(
         "tipo_prenda": tipo_asesoria,
         "visible": visible,
         "titulo": titulo or tipo_asesoria,
+        "componente": "articulo",  # campo explícito — ya no depende de marcadores
     }
 
 
 def _fetch_menu_articulo_id(
     cursor: sqlite3.Cursor,
     tipo_asesoria: Optional[str] = None,
-    id_usuario: Optional[int] = None,
     menu_servicio_id: Optional[int] = None,
 ) -> Optional[int]:
-    query = "SELECT id FROM tbl_menu_asesoria WHERE texto_html LIKE ?"
+    query = "SELECT id FROM tbl_menu_asesoria WHERE (componente = 'articulo' OR texto_html LIKE ?)"
     params: List[Any] = [f"%{ARTICULO_MARKER}%"]
     if menu_servicio_id is not None:
         query += " AND menu_servicio_id = ?"
@@ -93,9 +94,6 @@ def _fetch_menu_articulo_id(
     if tipo_asesoria is not None:
         query += " AND tipo_asesoria = ?"
         params.append(tipo_asesoria)
-    if id_usuario is not None:
-        query += " AND (id_usuario IS NULL OR id_usuario = ?)"
-        params.append(id_usuario)
     query += " LIMIT 1"
     cursor.execute(query, params)
     row = cursor.fetchone()
@@ -125,11 +123,10 @@ def create_articulo(
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO tbl_articulo (id_usuario, texto_html, media_url, media_url_webm, media_tipo, orden, "
-        "tipo_asesoria, titulo, contenido, grupo_id, tags, publicado_en, visible) "
+        "INSERT INTO tbl_articulo (texto_html, media_url, media_url_webm, media_tipo, orden, "
+        "tipo_asesoria, titulo, contenido, grupo_id, tags, publicado_en, visible, tipo_contenido) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
-            articulo.id_usuario,
             articulo.texto_html,
             articulo.media_url,
             articulo.media_url_webm,
@@ -142,6 +139,7 @@ def create_articulo(
             _normalize_tags(articulo.tags),
             articulo.publicado_en,
             articulo.visible,
+            getattr(articulo, 'tipo_contenido', 'articulo'),
         ),
     )
     articulo_id = cursor.lastrowid
@@ -157,11 +155,11 @@ def create_articulo(
         observacion=menu_observacion,
     )
 
-    menu_id = _fetch_menu_articulo_id(cursor, menu_servicio_id, articulo.tipo_asesoria, articulo.id_usuario)
+    menu_id = _fetch_menu_articulo_id(cursor, articulo.tipo_asesoria, menu_servicio_id)
     if menu_id is None:
         cursor.execute(
             "INSERT INTO tbl_menu_asesoria (menu_servicio_id, menu_principal, texto_html, imagen_url, imagen_alt, orden, "
-            "id_usuario, tipo_asesoria, observacion, tipo_prenda, visible, titulo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "id_usuario, tipo_asesoria, observacion, tipo_prenda, visible, titulo, componente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 menu_data["menu_servicio_id"],
                 menu_data["menu_principal"],
@@ -175,6 +173,7 @@ def create_articulo(
                 menu_data["tipo_prenda"],
                 menu_data["visible"],
                 menu_data["titulo"],
+                menu_data["componente"],
             ),
         )
         menu_id = cursor.lastrowid
@@ -203,11 +202,10 @@ def create_articulo(
 
 
 def get_articulos(
-    id_usuario: Optional[int] = None,
     tipo_asesoria: Optional[str] = None,
     visible_only: bool = True,
 ) -> List[Dict[str, Any]]:
-    """Devuelve artículos desde tbl_articulo, filtrando por usuario, tipo de asesoría y visibilidad."""
+    """Devuelve artículos desde tbl_articulo, filtrando por tipo de asesoría y visibilidad."""
     conn = connect()
     cursor = conn.cursor()
 
@@ -216,9 +214,6 @@ def get_articulos(
 
     if visible_only:
         query += " AND visible = 1"
-    if id_usuario is not None:
-        query += " AND id_usuario = ?"
-        params.append(id_usuario)
     if tipo_asesoria is not None:
         query += " AND tipo_asesoria = ?"
         params.append(tipo_asesoria)
@@ -259,7 +254,7 @@ def update_articulo(
         "tags",
         "publicado_en",
         "visible",
-        "id_usuario",
+        "tipo_contenido",
     }
 
     if not updates:
@@ -297,14 +292,12 @@ def update_articulo(
     if updated.get("tipo_asesoria"):
         menu_id = _fetch_menu_articulo_id(
             tipo_asesoria=updated["tipo_asesoria"],
-            id_usuario=updated["id_usuario"],
             menu_servicio_id=menu_updates.get("menu_servicio_id") if menu_updates else None,
         )
         if menu_id is None and menu_updates and menu_updates.get("menu_servicio_id"):
             menu_id = _fetch_menu_articulo_id(
                 tipo_asesoria=existing.get("tipo_asesoria"),
-                id_usuario=updated["id_usuario"],
-                menu_servicio_id=menu_updates["menu_servicio_id"],
+                menu_servicio_id=menu_updates.get("menu_servicio_id"),
             )
 
         if menu_id is not None:
@@ -313,7 +306,6 @@ def update_articulo(
                 "orden": menu_updates.get("orden", updated.get("orden")),
                 "visible": menu_updates.get("visible", updated.get("visible")),
                 "tipo_asesoria": updated.get("tipo_asesoria"),
-                "id_usuario": updated.get("id_usuario"),
                 "observacion": menu_updates.get("observacion", "Artículo gestionado desde webmaster"),
                 "tipo_prenda": updated.get("tipo_asesoria"),
                 "menu_principal": menu_updates.get("menu_principal"),

@@ -1,7 +1,9 @@
+import os
 import sqlite3
 from typing import Optional, List, Dict, Any
 
-ASESORIA_DB = "asesoria.db"
+BASE_DIR = os.path.dirname(__file__)
+ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "asesoria.db"))
 
 def parse_id_usuario(val):
     if val is None:
@@ -13,23 +15,21 @@ def parse_id_usuario(val):
 
 class ContenidosPersonalizadosService:
     @staticmethod
-    def get_articulo(id_usuario: str, tipo_asesoria: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    def get_articulo(tipo_asesoria: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         Consulta la tabla 'tbl_articulo' y devuelve el primer registro visible
-        para el usuario y tipo de asesoría indicados, ordenado por 'orden' ASC.
+        para el tipo de asesoría indicado, ordenado por 'orden' ASC.
         """
         conn = sqlite3.connect(ASESORIA_DB)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        parsed_id = parse_id_usuario(id_usuario)
         
         query = """
-            SELECT id, id_usuario, texto_html, media_url, media_url_webm, media_tipo, orden, tipo_asesoria
+            SELECT id, texto_html, media_url, media_url_webm, media_tipo, orden, tipo_asesoria
             FROM tbl_articulo
             WHERE visible = 1
-              AND (id_usuario IS NULL OR id_usuario = ?)
         """
-        params = [parsed_id]
+        params: List[Any] = []
         
         if tipo_asesoria is not None:
             query += " AND (tipo_asesoria IS NULL OR tipo_asesoria = ?)"
@@ -86,11 +86,6 @@ class ContenidosPersonalizadosService:
         
         query = "SELECT * FROM tbl_carrusel_items WHERE (visible IS NULL OR visible = 1)"
         params = []
-        
-        parsed_id = parse_id_usuario(id_usuario)
-        if parsed_id is not None:
-            query += " AND (id_usuario IS NULL OR id_usuario = ?)"
-            params.append(parsed_id)
             
         if asesoria_id is not None:
             query += " AND (asesoria_id IS NULL OR asesoria_id = ?)"

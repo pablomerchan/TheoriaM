@@ -26,7 +26,7 @@ export interface ArticuloItem {
   texto_html: string;
   media_url: string | null;
   media_url_webm: string | null;
-  media_tipo: 'imagen' | 'video';
+  media_tipo: 'imagen' | 'video' | 'webm';
   orden: number;
   tipo_asesoria?: string;
 }
@@ -66,7 +66,7 @@ export class ArticuloComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   textoHtml: SafeHtml = '';
 
   get videoSources(): Array<{ src: string; type: string }> {
-    if (!this.articulo || this.articulo.media_tipo !== 'video') {
+    if (!this.articulo || !this.isVideoMedia(this.articulo.media_tipo)) {
       return [];
     }
 
@@ -75,7 +75,8 @@ export class ArticuloComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       sources.push({ src: this.articulo.media_url_webm, type: 'video/webm' });
     }
     if (this.isValidVideoUrl(this.articulo.media_url)) {
-      sources.push({ src: this.articulo.media_url, type: 'video/mp4' });
+      const type = /\.webm(\?.*)?$/i.test(this.articulo.media_url) ? 'video/webm' : 'video/mp4';
+      sources.push({ src: this.articulo.media_url, type });
     }
 
     return sources;
@@ -83,6 +84,10 @@ export class ArticuloComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   get showVideo(): boolean {
     return this.videoSources.length > 0;
+  }
+
+  private isVideoMedia(tipo: string | null | undefined): boolean {
+    return tipo === 'video' || tipo === 'webm';
   }
 
   private isValidVideoUrl(url: string | null | undefined): url is string {

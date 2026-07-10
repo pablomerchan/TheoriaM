@@ -24,7 +24,7 @@ export interface ArticuloItem {
   texto_html: string;
   media_url: string | null;
   media_url_webm: string | null;
-  media_tipo: 'imagen' | 'video';
+  media_tipo: 'imagen' | 'video' | 'webm';
   orden: number;
   tipo_asesoria?: string;
 }
@@ -53,6 +53,35 @@ export class TextoGPTComponent implements OnInit, OnChanges, OnDestroy {
   // ── Estado ────────────────────────────────────────────────────────────────
   articulo: ArticuloItem | null = null;
   textoHtml: SafeHtml = '';
+
+  get videoSources(): Array<{ src: string; type: string }> {
+    if (!this.articulo || !this.isVideoMedia(this.articulo.media_tipo)) {
+      return [];
+    }
+
+    const sources: Array<{ src: string; type: string }> = [];
+    if (this.isValidVideoUrl(this.articulo.media_url_webm)) {
+      sources.push({ src: this.articulo.media_url_webm, type: 'video/webm' });
+    }
+    if (this.isValidVideoUrl(this.articulo.media_url)) {
+      const type = /\.webm(\?.*)?$/i.test(this.articulo.media_url) ? 'video/webm' : 'video/mp4';
+      sources.push({ src: this.articulo.media_url, type });
+    }
+
+    return sources;
+  }
+
+  get showVideo(): boolean {
+    return this.videoSources.length > 0;
+  }
+
+  private isVideoMedia(tipo: string | null | undefined): boolean {
+    return tipo === 'video' || tipo === 'webm';
+  }
+
+  private isValidVideoUrl(url: string | null | undefined): url is string {
+    return !!url && /\.(mp4|webm)(\?.*)?$/i.test(url);
+  }
 
   typewriterHtml: SafeHtml = '';
   isTyping: boolean = false;

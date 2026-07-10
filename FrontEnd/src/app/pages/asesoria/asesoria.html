@@ -25,13 +25,24 @@
           <h3 class="menu-group-title">{{ section.tema }}</h3>
 
           <!-- Elementos Anidados (Subtemas) -->
-          <a class="menu-item sub-item"
-             *ngFor="let item of section.items"
-             [class.active]="selectedMenu?.id === item.id"
-             (click)="selectMenu(item)">
-             <span class="sub-indicator"></span>
-             {{ item.subtema }}
-          </a>
+          <div *ngFor="let item of section.items" class="menu-item-wrapper">
+            <a class="menu-item sub-item"
+               [class.active]="selectedMenu?.id === item.id && !showRelatedMode"
+               [class.has-articles-indicator]="menusConArticulos.has(item.id)"
+               (click)="onMenuClick(item)">
+               <span class="sub-indicator" [class.has-related]="menusConArticulos.has(item.id)"></span>
+               {{ item.subtema }}
+            </a>
+
+            <!-- Submenú Relacionados (desplegado si el menú principal está seleccionado y tiene artículos asociados Y el usuario hizo clic) -->
+            <div class="submenu-container" *ngIf="selectedMenu?.id === item.id && menusConArticulos.has(item.id) && userClickedMenuId === item.id">
+              <a class="submenu-item"
+                 [class.active]="showRelatedMode"
+                 (click)="selectRelated(item)">
+                <span class="submenu-icon">↪</span> Relacionados
+              </a>
+            </div>
+          </div>
         </div>
       </ng-container>
 
@@ -88,7 +99,7 @@
                - 'texto_gpt'  → TextoGPTComponent         (tbl_articulo, solo texto_html)
              Para publicar un nuevo componente, insertar un registro con el
              marcador correspondiente en tbl_menu_asesoria. -->
-        <ng-container *ngIf="perfilCargado && !isLoadingArticulos">
+        <ng-container *ngIf="perfilCargado && !isLoadingArticulos && !showRelatedMode">
 
           <!-- COMPONENTES DINÁMICOS -->
           <div *ngFor="let def of carruseles; let i = index"
@@ -183,11 +194,59 @@
 
         </ng-container>
 
+        <!-- CONTENIDO DE RELACIONADOS -->
+        <ng-container *ngIf="perfilCargado && showRelatedMode">
+
+          <!-- Cargando -->
+          <div class="loading-indicator" *ngIf="isLoadingRelated">
+             <div class="spinner"></div>
+             <span>Cargando relacionados...</span>
+          </div>
+
+          <div *ngIf="!isLoadingRelated">
+
+            <!-- ── DETALLE DEL ARTÍCULO SELECCIONADO ────────────────────────── -->
+            <div *ngIf="selectedRelatedArticle" class="related-article-detail">
+              <button class="related-back-btn" (click)="backToRelatedList()">
+                ← Volver al listado
+              </button>
+              <app-articulo
+                [idUsuario]="idUsuario"
+                [tipoAsesoria]="selectedRelatedArticle.tipo_asesoria">
+              </app-articulo>
+            </div>
+
+            <!-- ── LISTADO DE ARTÍCULOS ─────────────────────────────────────── -->
+            <div *ngIf="!selectedRelatedArticle" class="related-content-container">
+              <h2 class="related-title">Artículos de "{{ selectedMenu!.subtema }}"</h2>
+
+              <!-- Lista de artículos de tbl_articulo -->
+              <div class="related-section" *ngIf="articulosRelacionados.length > 0">
+                <ul class="related-list">
+                  <li class="related-list-item"
+                      *ngFor="let art of articulosRelacionados"
+                      (click)="goToArticle(art)">
+                    <span class="related-list-icon">📄</span>
+                    <span class="related-list-label">{{ art.titulo || art.tipo_asesoria }}</span>
+                    <span class="related-list-arrow">›</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Estado vacío -->
+              <div class="empty-state" *ngIf="articulosRelacionados.length === 0">
+                <p>No se encontraron artículos relacionados para esta sección.</p>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+
       </div>
     </div>
 
     <!-- Control de navegación lateral entre componentes -->
-    <nav class="component-nav" *ngIf="carruseles.length > 1 && !isLoadingArticulos && perfilCargado">
+    <nav class="component-nav" *ngIf="carruseles.length > 1 && !isLoadingArticulos && perfilCargado && !showRelatedMode">
       <button class="component-nav-btn"
               (click)="navigateToComponent('prev')"
               [disabled]="activeComponentIndex === 0"

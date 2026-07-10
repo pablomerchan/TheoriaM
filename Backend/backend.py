@@ -1,19 +1,20 @@
+import os
+import sys
+import sqlite3
+import uuid
+from typing import Optional
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
-import sqlite3
-import uuid
-import os
-from services.auth_service import AuthService
-from services.contenidos_personalizados_service import ContenidosPersonalizadosService
-import sys
-import os
 
-# Permitir importar el paquete `webmaster` que está en el nivel superior del workspace
+# Permitir importar el paquete `services` y `webmaster` que están en el nivel superior del archivo
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
+
+from services.auth_service import AuthService
+from services.contenidos_personalizados_service import ContenidosPersonalizadosService
 
 from webmaster.articulo_crud import (
     Articulo as WC_Articulo,
@@ -49,11 +50,12 @@ app.add_middleware(
 # ─────────────────────────────────────────────
 #  Bases de datos
 # ─────────────────────────────────────────────
-CAROUSEL_DB = "carousel.db"
-HELP_DB = "interactive_help.db"
-MORFOLOGICOS_DB = "datos_morfologicos.db"
-MAESTRAS_DB = "maestras_menus.db"
-ASESORIA_DB = "asesoria.db"
+BASE_DIR = os.path.dirname(__file__)
+CAROUSEL_DB = os.path.normpath(os.path.join(BASE_DIR, "carousel.db"))
+HELP_DB = os.path.normpath(os.path.join(BASE_DIR, "interactive_help.db"))
+MORFOLOGICOS_DB = os.path.normpath(os.path.join(BASE_DIR, "datos_morfologicos.db"))
+MAESTRAS_DB = os.path.normpath(os.path.join(BASE_DIR, "maestras_menus.db"))
+ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "asesoria.db"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
@@ -393,12 +395,13 @@ def init_asesoria_db():
     except: pass
     try: cursor.execute("ALTER TABLE tbl_menu_asesoria ADD COLUMN observacion TEXT")
     except: pass
+    try: cursor.execute("ALTER TABLE tbl_menu_asesoria ADD COLUMN componente TEXT DEFAULT NULL")
+    except: pass
 
     # ── tbl_articulo: marco estático texto + imagen/video
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS tbl_articulo (
             id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_usuario    INTEGER NOT NULL DEFAULT 1,
             texto_html    TEXT    NOT NULL DEFAULT '',
             media_url     TEXT    DEFAULT NULL,
             media_tipo    TEXT    NOT NULL DEFAULT 'imagen',
@@ -426,6 +429,63 @@ def init_asesoria_db():
     except: pass
     try: cursor.execute("ALTER TABLE tbl_articulo ADD COLUMN media_url_webm TEXT DEFAULT NULL")
     except: pass
+    try: cursor.execute("ALTER TABLE tbl_articulo ADD COLUMN tipo_contenido TEXT DEFAULT 'articulo'")
+    except: pass
+
+    # ── Migración de tbl_articulo para eliminar id_usuario si aún existe
+    cursor.execute("PRAGMA table_info(tbl_articulo)")
+    old_columns = [row for row in cursor.fetchall()]
+    old_column_names = [row[1] for row in old_columns]
+    if "id_usuario" in old_column_names:
+        cursor.execute("DROP TABLE IF EXISTS tbl_articulo_new")
+
+        desired_columns = {
+            "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+            "texto_html": "TEXT NOT NULL DEFAULT ''",
+            "media_url": "TEXT DEFAULT NULL",
+            "media_tipo": "TEXT NOT NULL DEFAULT 'imagen'",
+            "orden": "INTEGER NOT NULL DEFAULT 0",
+            "tipo_asesoria": "TEXT DEFAULT NULL",
+            "visible": "INTEGER NOT NULL DEFAULT 1",
+            "titulo": "TEXT",
+            "contenido": "TEXT",
+            "grupo_id": "TEXT",
+            "tags": "TEXT DEFAULT '[]'",
+            "publicado_en": "TIMESTAMP",
+            "media_url_webm": "TEXT DEFAULT NULL",
+        }
+
+        new_columns = []
+        for cid, name, ctype, notnull, dflt_value, pk in old_columns:
+            if name == "id_usuario":
+                continue
+            if name == "id":
+                new_columns.append("id INTEGER PRIMARY KEY AUTOINCREMENT")
+                continue
+            if name in desired_columns:
+                new_columns.append(f"{name} {desired_columns[name]}")
+                continue
+            column_def = ctype or "TEXT"
+            if pk:
+                column_def = f"{column_def} PRIMARY KEY"
+            if notnull:
+                column_def += " NOT NULL"
+            if dflt_value is not None:
+                column_def += f" DEFAULT {dflt_value}"
+            new_columns.append(f"{name} {column_def}")
+
+        for name, definition in desired_columns.items():
+            if name not in old_column_names:
+                new_columns.append(f"{name} {definition}")
+
+        cursor.execute(f"CREATE TABLE tbl_articulo_new ({', '.join(new_columns)})")
+
+        insert_columns = [name for name in old_column_names if name != "id_usuario"]
+        cursor.execute(
+            f"INSERT INTO tbl_articulo_new ({', '.join(insert_columns)}) SELECT {', '.join(insert_columns)} FROM tbl_articulo"
+        )
+        cursor.execute("DROP TABLE tbl_articulo")
+        cursor.execute("ALTER TABLE tbl_articulo_new RENAME TO tbl_articulo")
 
     # ── tbl_asesoria_rapida: reproductor continuo de fotos
     cursor.execute('''
@@ -451,7 +511,6 @@ def init_asesoria_db():
             imagen_url           TEXT    NOT NULL,
             visible              BOOLEAN DEFAULT 1,
             orden                INTEGER DEFAULT 0,
-            id_usuario           INTEGER DEFAULT 1,
             tipo_asesoria        TEXT,
             descripcion_registro TEXT,
             asesoria_id          INTEGER,
@@ -462,7 +521,6 @@ def init_asesoria_db():
         )
     ''')
     for _col, _def in [
-        ("id_usuario",           "INTEGER DEFAULT 1"),
         ("tipo_asesoria",        "TEXT"),
         ("descripcion_registro", "TEXT"),
         ("asesoria_id",          "INTEGER"),
@@ -810,7 +868,7 @@ def get_asesoria_menus(id_usuario: Optional[str] = None):
     parsed_id = parse_id_usuario(id_usuario)
     if parsed_id is not None:
         cursor.execute(
-            "SELECT * FROM tbl_menu_servicios WHERE (id_usuario IS NULL OR id_usuario = ?) AND (visible IS NULL OR visible = 1) ORDER BY orden ASC",
+            "SELECT * FROM tbl_menu_servicios WHERE (id_usuario IS NULL OR id_usuario = ? OR id_usuario = 1) AND (visible IS NULL OR visible = 1) ORDER BY orden ASC",
             (parsed_id,)
         )
     else:
@@ -844,18 +902,31 @@ def get_asesoria_articulos(menu_id: int, id_usuario: Optional[str] = None):
 @app.get("/api/asesorias")
 def get_todas_asesorias(id_usuario: Optional[str] = None, asesoria_id: Optional[int] = None, tipo_asesoria: Optional[str] = None):
     """
-    Devuelve items del carrusel desde tbl_carrusel_items.
+    Devuelve items de tipo 'diapositiva' desde tbl_articulo (migrado de tbl_carrusel_items).
     Filtros opcionales:
-      - id_usuario: Solo items del usuario especificado
-      - asesoria_id: Solo items asociados a esa asesoría/menú
-      - tipo_asesoria: Filtra por tipo_asesoria en tbl_carrusel_items
+      - tipo_asesoria: Filtra por tipo_asesoria
     Solo devuelve items con visible=1, ordenados por 'orden' ascendente.
     """
-    return ContenidosPersonalizadosService.get_carrusel_prendas(
-        id_usuario=id_usuario, 
-        asesoria_id=asesoria_id, 
-        tipo_asesoria=tipo_asesoria
-    )
+    conn = sqlite3.connect(ASESORIA_DB)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    query = """
+        SELECT id, texto_html AS text_html, media_url AS imagen_url, media_tipo,
+               orden, tipo_asesoria, titulo AS nombre, visible, grupo_id, tipo_contenido
+        FROM tbl_articulo
+        WHERE tipo_contenido = 'diapositiva'
+          AND visible = 1
+    """
+    params: list = []
+    if tipo_asesoria:
+        query += " AND tipo_asesoria = ?"
+        params.append(tipo_asesoria)
+    query += " ORDER BY orden ASC"
+    cursor.execute(query, params)
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
 
 
 
@@ -865,13 +936,14 @@ def get_todas_asesorias(id_usuario: Optional[str] = None, asesoria_id: Optional[
 @app.get("/api/asesoria/articulo")
 def get_articulo(id_usuario: str = "1", tipo_asesoria: Optional[str] = None):
     """
-    Devuelve el artículo de tbl_articulo para el usuario indicado.
-    Filtros opcionales: id_usuario, tipo_asesoria.
+    Devuelve el artículo de tbl_articulo para el tipo de asesoría indicado.
+    El parámetro id_usuario se conserva por compatibilidad, pero la tabla
+    tbl_articulo ya no depende de id_usuario.
     Devuelve el primer registro visible ordenado por 'orden' ASC.
     """
-    row = ContenidosPersonalizadosService.get_articulo(id_usuario=id_usuario, tipo_asesoria=tipo_asesoria)
+    row = ContenidosPersonalizadosService.get_articulo(tipo_asesoria=tipo_asesoria)
     if not row:
-        raise HTTPException(status_code=404, detail="No se encontró artículo para este usuario")
+        raise HTTPException(status_code=404, detail="No se encontró artículo para este tipo de asesoría")
     return row
 
 
@@ -893,7 +965,7 @@ class ArticuloIn(BaseModel):
 
 @app.get("/api/webmaster/articulos")
 def wm_list_articulos(id_usuario: Optional[int] = None, tipo_asesoria: Optional[str] = None, visible_only: bool = True):
-    return wc_get_articulos(id_usuario=id_usuario, tipo_asesoria=tipo_asesoria, visible_only=visible_only)
+    return wc_get_articulos(tipo_asesoria=tipo_asesoria, visible_only=visible_only)
 
 
 @app.get("/api/webmaster/articulo/{articulo_id}")
@@ -913,7 +985,6 @@ def wm_get_articulo_menu(articulo_id: int):
     menu_rows = wc_get_menu_articulo(
         menu_servicio_id=None,
         tipo_asesoria=article.get("tipo_asesoria"),
-        id_usuario=article.get("id_usuario"),
         visible_only=False,
     )
     return menu_rows
@@ -1012,10 +1083,8 @@ def get_mi_perfil(request: Request):
 def get_carruseles(id_usuario: str = "1", menu_servicio_id: Optional[int] = None):
     """
     Devuelve las definiciones de componentes dinámicos para un usuario desde tbl_menu_asesoria.
-    Detecta el tipo de componente por el marcador en texto_html:
-      - CAROUSEL_MARKER → AsesoriaCarouselComponent (datos de tbl_carrusel_items)
-      - RAPIDA_MARKER   → AsesoriaRapidaComponent   (datos de tbl_asesoria_rapida)
-    El campo tipo_asesoria clasifica el tipo de contenido del componente.
+    El tipo de componente se lee del campo 'componente' (columna explícita).
+    Si 'componente' es NULL (registros legacy sin migrar) se hace fallback al parsing de marcadores.
     """
     conn = sqlite3.connect(ASESORIA_DB)
     conn.row_factory = sqlite3.Row
@@ -1023,15 +1092,9 @@ def get_carruseles(id_usuario: str = "1", menu_servicio_id: Optional[int] = None
 
     parsed_id = parse_id_usuario(id_usuario)
     query = """
-        SELECT id, menu_servicio_id, tipo_asesoria, orden, texto_html, titulo
+        SELECT id, menu_servicio_id, tipo_asesoria, orden, componente, texto_html, titulo
         FROM tbl_menu_asesoria
-        WHERE (texto_html LIKE '%CAROUSEL_MARKER%'
-            OR texto_html LIKE '%RAPIDA_MARKER%'
-            OR texto_html LIKE '%ARTICULO_MARKER%'
-            OR texto_html LIKE '%TEXTO_GPT_MARKER%'
-            OR texto_html LIKE '%SUGERENCIA_DIARIA_MARKER%'
-            OR texto_html LIKE '%[mi_guarda_ropas]%'
-            OR texto_html LIKE '%[guia_compras]%')
+        WHERE componente IS NOT NULL
           AND (id_usuario IS NULL OR id_usuario = ?)
           AND (visible IS NULL OR visible = 1)
     """
@@ -1049,21 +1112,16 @@ def get_carruseles(id_usuario: str = "1", menu_servicio_id: Optional[int] = None
     result = []
     for r in rows:
         row = dict(r)
-        texto = row.get('texto_html') or ''
-        if 'RAPIDA_MARKER' in texto:
-            row['componente'] = 'rapida'
-        elif 'ARTICULO_MARKER' in texto:
-            row['componente'] = 'articulo'
-        elif 'TEXTO_GPT_MARKER' in texto:
-            row['componente'] = 'texto_gpt'
-        elif 'SUGERENCIA_DIARIA_MARKER' in texto:
-            row['componente'] = 'sugerencia_diaria'
-        elif '[mi_guarda_ropas]' in texto:
-            row['componente'] = 'mi_guarda_ropas'
-        elif '[guia_compras]' in texto:
-            row['componente'] = 'guia_compras'
-        else:
-            row['componente'] = 'carousel'
+        # Fallback por si 'componente' estuviera vacío (no debería ocurrir tras la migración)
+        if not row.get('componente'):
+            texto = row.get('texto_html') or ''
+            if 'RAPIDA_MARKER' in texto:            row['componente'] = 'rapida'
+            elif 'ARTICULO_MARKER' in texto:        row['componente'] = 'articulo'
+            elif 'TEXTO_GPT_MARKER' in texto:       row['componente'] = 'texto_gpt'
+            elif 'SUGERENCIA_DIARIA_MARKER' in texto: row['componente'] = 'sugerencia_diaria'
+            elif '[mi_guarda_ropas]' in texto:      row['componente'] = 'mi_guarda_ropas'
+            elif '[guia_compras]' in texto:         row['componente'] = 'guia_compras'
+            else:                                   row['componente'] = 'carousel'
         del row['texto_html']
         result.append(row)
 

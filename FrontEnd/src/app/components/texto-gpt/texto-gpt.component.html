@@ -4,8 +4,32 @@
   role="article"
   *ngIf="articulo">
 
-  <!-- ── VIEWPORT: panel de texto ──────── -->
+  <!-- ── VIEWPORT: panel de media y texto ──────── -->
   <div class="texto-gpt-viewport">
+
+    <div class="texto-gpt-media-panel" *ngIf="articulo">
+      <img
+        *ngIf="articulo.media_tipo === 'imagen' && articulo.media_url"
+        [src]="articulo.media_url"
+        [alt]="articulo.tipo_asesoria || 'Imagen de asesoría'"
+        class="texto-gpt-media"
+        loading="lazy">
+
+      <video
+        *ngIf="showVideo"
+        class="texto-gpt-media"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata">
+        <ng-container *ngFor="let source of videoSources">
+          <source [src]="source.src" [type]="source.type">
+        </ng-container>
+        Tu navegador no soporta video.
+      </video>
+    </div>
+
     <div class="texto-gpt-texto-panel">
 
       <!-- Durante la animación typewriter (HTML renderizado progresivamente) -->

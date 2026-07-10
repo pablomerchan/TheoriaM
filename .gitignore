@@ -86,3 +86,6 @@ credentials/
 *~
 *.swp
 *.swo
+*.bkp
+.*.bkp
+
