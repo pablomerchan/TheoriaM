@@ -263,9 +263,26 @@ export class AsesoriaComponent implements OnInit {
         // Solo consultar tbl_articulo (incluye artículos y diapositivas)
         this.webmasterArticuloService.list(this.idUsuario).subscribe({
           next: (articulos) => {
-            this.articulosRelacionados = articulos.filter(
+            const filtrados = articulos.filter(
               a => (a.visible === undefined || !!a.visible) && a.tipo_asesoria && tipos.includes(a.tipo_asesoria)
             );
+
+            const unificados: any[] = [];
+            const nombresDiapositivas = new Set<string>();
+
+            for (const a of filtrados) {
+              if (a.tipo_contenido === 'diapositiva') {
+                const nombre = a.titulo || a.tipo_asesoria;
+                if (!nombresDiapositivas.has(nombre)) {
+                  nombresDiapositivas.add(nombre);
+                  unificados.push(a);
+                }
+              } else {
+                unificados.push(a);
+              }
+            }
+
+            this.articulosRelacionados = unificados;
             this.isLoadingRelated = false;
             this.cdr.markForCheck();
           },
