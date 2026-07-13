@@ -59,20 +59,6 @@
 
   <!-- PANEL DERECHO: Contenido Principal -->
   <section class="premium-main">
-    <header class="main-header">
-      <div class="main-header-left">
-        <div class="header-control-bar" *ngIf="carruseles.length && carruseles[activeComponentIndex]?.titulo">
-          {{ carruseles[activeComponentIndex].titulo }}
-        </div>
-      </div>
-
-      <div class="main-header-right">
-        <div class="header-welcome html-content" *ngIf="selectedMenu?.texto_derecho_html" [innerHTML]="selectedMenu?.texto_derecho_html"></div>
-        <div class="header-user" *ngIf="sobrenombre">
-          <span class="header-sobrenombre">{{ sobrenombre }}</span>
-        </div>
-      </div>
-    </header>
 
     <!-- Contenedor del área principal -->
     <div class="main-scroll-area" #scrollArea (wheel)="onScrollWheel($event)">
