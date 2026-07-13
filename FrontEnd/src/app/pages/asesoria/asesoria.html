@@ -210,10 +210,24 @@
               <button class="related-back-btn" (click)="backToRelatedList()">
                 ← Volver al listado
               </button>
-              <app-articulo
-                [idUsuario]="idUsuario"
-                [tipoAsesoria]="selectedRelatedArticle.tipo_asesoria">
-              </app-articulo>
+
+              <!-- Renderizar componente según el 'tipo_contenido' de tbl_articulo -->
+              <ng-container [ngSwitch]="selectedRelatedArticle.tipo_contenido">
+                
+                <!-- Si el artículo es un carrusel de diapositivas -->
+                <app-asesoria-carousel *ngSwitchCase="'diapositiva'"
+                  [usuarioId]="idUsuario"
+                  [asesoriaId]="selectedMenu?.id"
+                  [tipoAsesoria]="selectedRelatedArticle.tipo_asesoria">
+                </app-asesoria-carousel>
+
+                <!-- Si el artículo es normal (o por defecto) -->
+                <app-articulo *ngSwitchDefault
+                  [idUsuario]="idUsuario"
+                  [tipoAsesoria]="selectedRelatedArticle.tipo_asesoria">
+                </app-articulo>
+
+              </ng-container>
             </div>
 
             <!-- ── LISTADO DE ARTÍCULOS ─────────────────────────────────────── -->

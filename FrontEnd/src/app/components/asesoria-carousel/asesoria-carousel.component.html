@@ -3,6 +3,33 @@
      ─ Responsivo: se adapta a móvil, tablet y escritorio.
      ─ Controles: prev / next, indicadores de punto, pausa/reanudar y TTS.
      ═══════════════════════════════════════════════════════════════════════ -->
+<ng-container *ngIf="!slides">
+  <div class="carousel-groups-container">
+    <div *ngFor="let grupo of grupos" class="carousel-group-wrapper">
+      <div class="group-header" (click)="grupo.activo = !grupo.activo">
+        <h3 class="group-title">Grupo: {{ grupo.nombre }}</h3>
+        <button class="group-toggle-btn" [attr.aria-expanded]="grupo.activo" [attr.aria-label]="grupo.activo ? 'Ocultar grupo' : 'Mostrar grupo'">
+          <svg *ngIf="grupo.activo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="18 15 12 9 6 15"></polyline></svg>
+          <svg *ngIf="!grupo.activo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+      </div>
+      <div class="group-body" *ngIf="grupo.activo">
+        <app-asesoria-carousel
+          [slides]="grupo.slides"
+          [usuarioId]="usuarioId"
+          [asesoriaId]="asesoriaId"
+          [tipoAsesoria]="tipoAsesoria">
+        </app-asesoria-carousel>
+      </div>
+    </div>
+    
+    <div class="empty-state" *ngIf="grupos.length === 0">
+      <p>No hay contenido disponible para esta sección.</p>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="slides">
 <div
   class="carousel-container"
   aria-label="Carrusel de asesorías"
@@ -324,3 +351,4 @@
   </div>
 
 </div>
+</ng-container>

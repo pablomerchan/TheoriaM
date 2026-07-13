@@ -33,6 +33,76 @@ $bp-xs : 360px;   // móvil pequeño
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+//  GROUPS CONTAINER (When slides are grouped)
+// ═══════════════════════════════════════════════════════════════════════════
+.carousel-groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.carousel-group-wrapper {
+  background: $surface;
+  border-radius: $radius-card;
+  border: 1px solid $surface-border;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: rgba(0,0,0,0.02);
+  cursor: pointer;
+  transition: background $transition-std;
+
+  &:hover {
+    background: rgba(0,0,0,0.04);
+  }
+}
+
+.group-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.group-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: $text-muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: background $transition-std, color $transition-std;
+
+  &:hover {
+    background: rgba(0,0,0,0.05);
+    color: $text-primary;
+  }
+}
+
+.group-body {
+  padding: 1.25rem;
+  border-top: 1px solid $surface-border;
+  background: #ffffff;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: $text-muted;
+  font-size: 0.95rem;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 //  CONTENEDOR PRINCIPAL
 //  Fondo claro explícito para evitar herencia del tema oscuro del padre.
 // ═══════════════════════════════════════════════════════════════════════════

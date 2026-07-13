@@ -345,6 +345,7 @@ export class AsesoriaComponent implements OnInit {
       this.activeComponentIndex--;
     }
     this.resetScrollPosition();
+    this.cdr.markForCheck();
   }
 
   /** Salta directamente a un componente por su índice. */
@@ -352,6 +353,7 @@ export class AsesoriaComponent implements OnInit {
     if (index >= 0 && index < this.carruseles.length) {
       this.activeComponentIndex = index;
       this.resetScrollPosition();
+      this.cdr.markForCheck();
     }
   }
 

@@ -8,7 +8,8 @@ import {
   ChangeDetectorRef,
   inject,
   Input,
-  ElementRef
+  ElementRef,
+  forwardRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -52,7 +53,7 @@ const TYPEWRITER_START_DELAY_MS = 300;
 @Component({
   selector: 'app-asesoria-carousel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, forwardRef(() => AsesoriaCarouselComponent)],
   templateUrl: './asesoria-carousel.component.html',
   styleUrls: ['./asesoria-carousel.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -80,6 +81,12 @@ export class AsesoriaCarouselComponent implements OnInit, OnChanges, OnDestroy {
    * Se mapea a 'tipo_asesoria' en tbl_carrusel_items.
    */
   @Input() tipoAsesoria?: string;
+
+  /** Diapositivas proporcionadas directamente (modo instancia de grupo). */
+  @Input() slides?: Asesoria[];
+
+  /** Grupos de diapositivas cuando actúa como contenedor principal. */
+  grupos: { id: string, nombre: string, activo: boolean, slides: Asesoria[] }[] = [];
 
   // ══════════════════════════════════════════════════════════════════════════
   //  DEPENDENCIAS INYECTADAS
@@ -182,8 +189,19 @@ export class AsesoriaCarouselComponent implements OnInit, OnChanges, OnDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   ngOnInit(): void {
-    this.cargarPrendas();
-    this.setupIntersectionObserver();
+    if (this.slides) {
+      this.asesorias = this.slides;
+      this.currentIndex = 0;
+      this.isPaused = true;
+      if (this.asesorias.length > 0) {
+        this.iniciarTypewriter();
+        this.stopAllVideos();
+      }
+      this.setupIntersectionObserver();
+    } else {
+      this.cargarPrendas();
+      this.setupIntersectionObserver();
+    }
   }
 
   /**
@@ -191,6 +209,21 @@ export class AsesoriaCarouselComponent implements OnInit, OnChanges, OnDestroy {
    * recargamos el carrusel con los nuevos filtros.
    */
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['slides'] && !changes['slides'].firstChange) {
+      this.asesorias = this.slides || [];
+      this.currentIndex = 0;
+      this.isPaused = true;
+      this.cancelSpeech();
+      if (this.asesorias.length > 0) {
+        this.iniciarTypewriter();
+        this.stopAllVideos();
+      }
+      this.cdr.markForCheck();
+      return;
+    }
+
+    if (this.slides) return;
+
     const relevantChange = changes['usuarioId'] || changes['asesoriaId'] || changes['tipoAsesoria'];
     const isFirstChange  = Object.values(changes).every(c => c.firstChange);
     if (relevantChange && !isFirstChange) {
@@ -240,10 +273,11 @@ export class AsesoriaCarouselComponent implements OnInit, OnChanges, OnDestroy {
    *   - tipo_prenda: Subtipo de prenda (opcional, retrocompatibilidad)
    */
   private cargarPrendas(): void {
+    if (this.slides) return;
     this.subscription.add(
       this.asesoriaService.getAsesorias(this.usuarioId, this.asesoriaId, this.tipoAsesoria).subscribe({
         next: (data: Asesoria[]) => {
-          this.asesorias = data
+          const processed = data
             // 1. Filtro de visibilidad
             .filter(item => item.visible !== false && item.visible !== 0)
             // 2. Orden ascendente
@@ -259,19 +293,25 @@ export class AsesoriaCarouselComponent implements OnInit, OnChanges, OnDestroy {
               };
             });
 
-          this.currentIndex = 0;
-          // El carrusel arranca pausado — el usuario debe presionar Play para iniciar.
-          this.isPaused = true;
+          const groupMap = new Map<string, Asesoria[]>();
+          processed.forEach(item => {
+            const gid = item.grupo_id || 'Sin Grupo';
+            if (!groupMap.has(gid)) groupMap.set(gid, []);
+            groupMap.get(gid)!.push(item);
+          });
 
-          if (this.asesorias.length > 0) {
-            this.iniciarTypewriter();
-            this.stopAllVideos();
-          }
+          this.grupos = Array.from(groupMap.entries()).map(([gid, items]) => ({
+            id: gid,
+            nombre: gid,
+            activo: true,
+            slides: items
+          }));
+
           this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('[AsesoriaCarousel] Error al cargar items del carrusel:', err);
-          this.asesorias = [];
+          this.grupos = [];
           this.cdr.markForCheck();
         }
       })

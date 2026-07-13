@@ -36,4 +36,7 @@ export interface Asesoria {
 
   /** Visibilidad del item. Solo mostrar si visible=true o visible=1. */
   visible?: boolean | number;
+
+  /** Grupo al que pertenece este item. Usado para agrupar carruseles. */
+  grupo_id?: string;
 }
