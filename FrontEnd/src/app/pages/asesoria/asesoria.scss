@@ -210,78 +210,6 @@ $accent-light: #B8860B;
   min-width: 0;
 }
 
-.main-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 0.35rem 2rem 0.35rem;
-    border-bottom: 1px solid var(--border-color);
-    background: rgba(var(--bg-main), 0.95);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border: none;
-    color: var(--text-primary);
-    font-size: 1.5rem;
-    cursor: pointer;
-
-    .main-header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-control-bar {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.45rem 1rem;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .main-header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-left: auto;
-    }
-
-    .header-welcome {
-      max-width: 320px;
-      text-align: right;
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.5;
-
-      p, span, strong, em {
-        margin: 0;
-        color: inherit;
-        font-size: inherit;
-        line-height: inherit;
-      }
-    }
-
-    .header-user {
-      display: flex;
-      align-items: center;
-    }
-
-    .header-sobrenombre {
-      font-family: $font-title;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--accent);
-      letter-spacing: 0.3px;
-    }
-}
-
 // Contenedor del Scroll Infinito
 .main-scroll-area {
   flex: 1;
@@ -667,11 +595,6 @@ $accent-light: #B8860B;
   .sidebar-overlay { display: block; }
   .sidebar-header .mobile-close-btn { display: block; }
   /* mobile menu button removed */
-
-  .main-header {
-    padding: 0 1rem;
-    .header-search { display: none; }
-  }
 
   .main-scroll-area {
     padding: 2rem 1.2rem;
