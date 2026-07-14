@@ -50,47 +50,28 @@ $bp-xs : 360px;   // móvil pequeño
   box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
+// ── Encabezado del grupo: una sola línea con el título, sin controles adicionales
 .group-header {
-  display: flex;
-  justify-content: space-between;
+  display    : flex;
   align-items: center;
-  padding: 1rem 1.25rem;
-  background: rgba(0,0,0,0.02);
-  cursor: pointer;
-  transition: background $transition-std;
-
-  &:hover {
-    background: rgba(0,0,0,0.04);
-  }
+  padding    : 0.5rem 1.25rem;
+  background : rgba(0,0,0,0.02);
+  // Sin cursor pointer ni hover — no es interactivo
 }
 
+// ── Título del grupo: tipografía coherente con el componente
 .group-title {
-  margin: 0;
-  font-size: 1.1rem;
+  margin     : 0;
+  font-size  : 1rem;
   font-weight: 600;
-  color: $text-primary;
-}
-
-.group-toggle-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: $text-muted;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem;
-  border-radius: 50%;
-  transition: background $transition-std, color $transition-std;
-
-  &:hover {
-    background: rgba(0,0,0,0.05);
-    color: $text-primary;
-  }
+  color      : $text-primary;
+  white-space: nowrap;
+  overflow   : hidden;
+  text-overflow: ellipsis;
 }
 
 .group-body {
-  padding: 1.25rem;
+  padding   : 0;
   border-top: 1px solid $surface-border;
   background: #ffffff;
 }

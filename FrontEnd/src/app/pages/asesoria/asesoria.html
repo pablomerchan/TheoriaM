@@ -203,7 +203,7 @@
                 <!-- Si el artículo es un carrusel de diapositivas -->
                 <app-asesoria-carousel *ngSwitchCase="'diapositiva'"
                   [usuarioId]="idUsuario"
-                  [asesoriaId]="selectedMenu?.id"
+                  [asesoriaId]="selectedMenu && selectedMenu.id"
                   [tipoAsesoria]="selectedRelatedArticle.tipo_asesoria">
                 </app-asesoria-carousel>
 

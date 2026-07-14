@@ -302,7 +302,7 @@ export class AsesoriaCarouselComponent implements OnInit, OnChanges, OnDestroy {
 
           this.grupos = Array.from(groupMap.entries()).map(([gid, items]) => ({
             id: gid,
-            nombre: gid,
+            nombre: items[0]?.nombre || gid,
             activo: true,
             slides: items
           }));

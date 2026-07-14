@@ -6,14 +6,12 @@
 <ng-container *ngIf="!slides">
   <div class="carousel-groups-container">
     <div *ngFor="let grupo of grupos" class="carousel-group-wrapper">
-      <div class="group-header" (click)="grupo.activo = !grupo.activo">
-        <h3 class="group-title">Grupo: {{ grupo.nombre }}</h3>
-        <button class="group-toggle-btn" [attr.aria-expanded]="grupo.activo" [attr.aria-label]="grupo.activo ? 'Ocultar grupo' : 'Mostrar grupo'">
-          <svg *ngIf="grupo.activo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="18 15 12 9 6 15"></polyline></svg>
-          <svg *ngIf="!grupo.activo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
+      <!-- Título del grupo: muestra el titulo del primer registro (campo 'titulo' de tbl_articulo).
+           Solo una línea, sin controles adicionales. -->
+      <div class="group-header" *ngIf="grupo.nombre">
+        <h3 class="group-title">{{ grupo.nombre }}</h3>
       </div>
-      <div class="group-body" *ngIf="grupo.activo">
+      <div class="group-body">
         <app-asesoria-carousel
           [slides]="grupo.slides"
           [usuarioId]="usuarioId"

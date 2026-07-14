@@ -12,6 +12,9 @@ export interface Asesoria {
   /** ID único del item en la BD */
   id: number;
 
+  /** Nombre visible del item o slide */
+  nombre?: string;
+
   /** URL de la imagen asociada */
   imagen_url: string;
 
