@@ -687,7 +687,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="_fDnTb5jGJbfdmrMuF1O" name="Servicios">
-    <mxGraphModel dx="1238" dy="510" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="457" dy="188" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1236,6 +1236,9 @@
         </mxCell>
         <mxCell id="Ph9dUUZ2E9No_crrPrtq-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="¿Como vestir segun ocasion?" vertex="1">
           <mxGeometry height="60" width="380" x="2700" y="565" as="geometry" />
+        </mxCell>
+        <mxCell id="5u6EIJJMykowBarMyuRo-1" parent="1" style="text;whiteSpace=wrap;" value="brindame_asesoria_mujer_20_30" vertex="1">
+          <mxGeometry height="40" width="210" x="3230" y="290" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
