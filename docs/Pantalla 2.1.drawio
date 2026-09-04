@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" pages="8">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" pages="9">
   <diagram id="G3I-IpPNEaBhWHwF6x47" name="Primera asesoria">
     <mxGraphModel dx="1550" dy="736" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -1203,6 +1203,128 @@
         </mxCell>
         <mxCell id="5u6EIJJMykowBarMyuRo-1" parent="1" style="text;whiteSpace=wrap;" value="brindame_asesoria_mujer_20_30" vertex="1">
           <mxGeometry height="40" width="210" x="3270" y="300" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="id-rX8xvdSRanv07PsWo" name="MisPreferencias">
+    <mxGraphModel dx="2092" dy="1020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="jR-bla47SQAbRAkhYKsd-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;Sexo&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="65" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Edad" vertex="1">
+          <mxGeometry height="30" width="60" x="65" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Color de piel" vertex="1">
+          <mxGeometry height="30" width="90" x="70" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Color de ojos" vertex="1">
+          <mxGeometry height="30" width="90" x="72.5" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Color de cabello" vertex="1">
+          <mxGeometry height="30" width="110" x="70" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Ubicacion principal" vertex="1">
+          <mxGeometry height="30" width="110" x="72.5" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Ubicacion secundaria" vertex="1">
+          <mxGeometry height="30" width="125" x="75" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Peso:" vertex="1">
+          <mxGeometry height="30" width="60" x="70" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Estatura" vertex="1">
+          <mxGeometry height="30" width="90" x="60" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Medidas hombros" vertex="1">
+          <mxGeometry height="30" width="115" x="72.5" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Medidas cintura" vertex="1">
+          <mxGeometry height="30" width="110" x="70" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-12" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Medidas cadera" vertex="1">
+          <mxGeometry height="30" width="95" x="77.5" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="jR-bla47SQAbRAkhYKsd-13" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Medidas busto" vertex="1">
+          <mxGeometry height="30" width="105" x="70" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160" x="240" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-16" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;b&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Datos morfologicos&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="412.5" x="37.5" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-17" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;Estilo de Vida y Rutina (Contexto)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="682.5" x="70" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-32" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;0&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Para ofrecer recomendaciones de estilismo realmente personalizadas y efectivas, necesitamos ir mucho más allá de la silueta y los datos demográficos básicos. El estilo personal se construye en la intersección entre &lt;b data-path-to-node=&quot;0&quot; data-index-in-node=&quot;215&quot;&gt;quién es la persona, cómo vive y cómo se siente&lt;/b&gt;.&lt;/font&gt;&lt;/p&gt;&lt;p data-path-to-node=&quot;1&quot;&gt;&lt;font size=&quot;3&quot;&gt;Aquí tienes el listado estructurado de los datos que deberías recolectar, divididos por categorías clave&lt;/font&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="130" width="885" x="75" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-33" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;5,0,0&quot;&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b data-path-to-node=&quot;5,0,0&quot; data-index-in-node=&quot;0&quot;&gt;¿A qué dedicas la mayor parte de tu semana?&lt;/b&gt; &lt;i data-path-to-node=&quot;5,0,0&quot; data-index-in-node=&quot;44&quot;&gt;(Selecciona hasta 2)&lt;/i&gt;&lt;/font&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;5,0,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,0,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Trabajo presencial (Corporativo / Formal)&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,1,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Trabajo presencial (Casual / Creativo)&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,2,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Trabajo remoto / &lt;i data-path-to-node=&quot;5,0,1,2,0&quot; data-index-in-node=&quot;21&quot;&gt;Home Office&lt;/i&gt;&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,3,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Eventos sociales / Salidas constantes&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,4,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Cuidado del hogar / Niños&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,5,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Estudiante / Vida académica&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,0,1,6,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Actividades al aire libre / Movilidad activa&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="270" width="585" x="50" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-34" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;5,1,0&quot;&gt;&lt;b data-path-to-node=&quot;5,1,0&quot; data-index-in-node=&quot;0&quot;&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;¿Cómo te desplazas habitualmente?&lt;/font&gt;&lt;/b&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;5,1,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,1,1,0,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Vehículo propio (Comodidad con todo tipo de prendas)&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,1,1,1,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Transporte público / Caminando (Prioridad: calzado cómodo y resistencia)&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;5,1,1,2,0&quot;&gt;&lt;font size=&quot;3&quot;&gt;[ ] Mixto&lt;/font&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="160" width="810" x="50" y="1280" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-36" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;h2 data-path-to-node=&quot;7&quot;&gt;Gustos y Estética (Técnica Visual)&lt;/h2&gt;&lt;blockquote data-path-to-node=&quot;8&quot;&gt;&lt;p data-path-to-node=&quot;8,0&quot;&gt;&lt;b data-path-to-node=&quot;8,0&quot; data-index-in-node=&quot;0&quot;&gt;Regla de oro:&lt;/b&gt; Las personas responden mejor a imágenes que a términos de moda que pueden malinterpretar (como &quot;boho&quot; o &quot;dramático&quot;).&lt;/p&gt;&lt;/blockquote&gt;&lt;ul data-path-to-node=&quot;9&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,0,0&quot;&gt;&lt;b data-path-to-node=&quot;9,0,0&quot; data-index-in-node=&quot;0&quot;&gt;Matriz Visual de Estilos:&lt;/b&gt; Presenta 6 u 8 tableros con un outfit completo cada uno.&lt;/p&gt;&lt;ul data-path-to-node=&quot;9,0,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,0,1,0,0&quot;&gt;&lt;i data-path-to-node=&quot;9,0,1,0,0&quot; data-index-in-node=&quot;0&quot;&gt;Pregunta:&lt;/i&gt; &lt;b data-path-to-node=&quot;9,0,1,0,0&quot; data-index-in-node=&quot;10&quot;&gt;&quot;¿Cuál de estos looks te pondrías mañana sin dudarlo?&quot;&lt;/b&gt; (Permite seleccionar 2).&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,0,1,1,0&quot;&gt;&lt;i data-path-to-node=&quot;9,0,1,1,0&quot; data-index-in-node=&quot;0&quot;&gt;Pregunta inversa:&lt;/i&gt; &lt;b data-path-to-node=&quot;9,0,1,1,0&quot; data-index-in-node=&quot;18&quot;&gt;&quot;¿Cuál de estos looks JAMÁS te pondrías?&quot;&lt;/b&gt; &lt;i data-path-to-node=&quot;9,0,1,1,0&quot; data-index-in-node=&quot;60&quot;&gt;(Esto descarta patrones y cortes de inmediato).&lt;/i&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,1,0&quot;&gt;&lt;b data-path-to-node=&quot;9,1,0&quot; data-index-in-node=&quot;0&quot;&gt;Relación con los Colores y Estampados:&lt;/b&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;9,1,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,1,1,0,0&quot;&gt;¿Cómo te sientes respecto a la paleta de tu armario?&lt;/p&gt;&lt;ul data-path-to-node=&quot;9,1,1,0,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,1,1,0,1,0,0&quot;&gt;( ) &lt;i data-path-to-node=&quot;9,1,1,0,1,0,0&quot; data-index-in-node=&quot;4&quot;&gt;Neutro total:&lt;/i&gt; Blancos, negros, grises, beige, denim.&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,1,1,0,1,1,0&quot;&gt;( ) &lt;i data-path-to-node=&quot;9,1,1,0,1,1,0&quot; data-index-in-node=&quot;4&quot;&gt;Acentos sobrios:&lt;/i&gt; Neutros con toques de color en accesorios o prendas clave.&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,1,1,0,1,2,0&quot;&gt;( ) &lt;i data-path-to-node=&quot;9,1,1,0,1,2,0&quot; data-index-in-node=&quot;4&quot;&gt;Color Block / Vibrante:&lt;/i&gt; Me encantan los colores saturados y combinarlos.&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;9,1,1,0,1,3,0&quot;&gt;( ) &lt;i data-path-to-node=&quot;9,1,1,0,1,3,0&quot; data-index-in-node=&quot;4&quot;&gt;Estampados:&lt;/i&gt; Flores, rayas, animal print, geométricos (Me gustan / Los evito).&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="350" width="662.5" x="82.5" y="1590" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-37" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;h2 data-path-to-node=&quot;11&quot;&gt;Zonas de Confort y Aspectos Sensoriales&lt;/h2&gt;&lt;p data-path-to-node=&quot;12&quot;&gt;Para este bloque, utiliza &lt;b data-path-to-node=&quot;12&quot; data-index-in-node=&quot;26&quot;&gt;escalas simples&lt;/b&gt; para medir el nivel de tolerancia.&lt;/p&gt;&lt;ul data-path-to-node=&quot;13&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,0,0&quot;&gt;&lt;b data-path-to-node=&quot;13,0,0&quot; data-index-in-node=&quot;0&quot;&gt;Aversión a materiales y sensaciones:&lt;/b&gt; &lt;i data-path-to-node=&quot;13,0,0&quot; data-index-in-node=&quot;37&quot;&gt;(Selección múltiple)&lt;/i&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;13,0,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,0,1,0,0&quot;&gt;[ ] Telas sintéticas / Que no transpiran&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,0,1,1,0&quot;&gt;[ ] Lana o texturas que puedan picar&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,0,1,2,0&quot;&gt;[ ] Ropa muy ceñida al cuerpo&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,0,1,3,0&quot;&gt;[ ] Prendas que se arrugan con facilidad&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,0,1,4,0&quot;&gt;[ ] Calzado alto / Tacones (&amp;gt; 5 cm)&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,1,0&quot;&gt;&lt;b data-path-to-node=&quot;13,1,0&quot; data-index-in-node=&quot;0&quot;&gt;Manejo del cuerpo y silueta:&lt;/b&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;13,1,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,1,1,0,0&quot;&gt;&lt;b data-path-to-node=&quot;13,1,1,0,0&quot; data-index-in-node=&quot;0&quot;&gt;Zonas a potenciar:&lt;/b&gt; &lt;i data-path-to-node=&quot;13,1,1,0,0&quot; data-index-in-node=&quot;19&quot;&gt;(¿Qué te encanta destacar?)&lt;/i&gt; [ Busto / Cintura / Piernas / Espalda / Hombros / Ninguna en particular ]&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;13,1,1,1,0&quot;&gt;&lt;b data-path-to-node=&quot;13,1,1,1,0&quot; data-index-in-node=&quot;0&quot;&gt;Zonas de confort:&lt;/b&gt; &lt;i data-path-to-node=&quot;13,1,1,1,0&quot; data-index-in-node=&quot;18&quot;&gt;(¿Qué prefieres mantener en un ajuste relajado o disimulado?)&lt;/i&gt; [ Abdomen / Brazos / Caderas / Ninguna ]&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="370" width="560" x="82.5" y="2075" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-39" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;h2 data-path-to-node=&quot;15&quot;&gt;Disposición al Cambio y Presupuesto&lt;/h2&gt;&lt;ul data-path-to-node=&quot;16&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,0,0&quot;&gt;&lt;b data-path-to-node=&quot;16,0,0&quot; data-index-in-node=&quot;0&quot;&gt;Nivel de riesgo / Apertura al estilismo:&lt;/b&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;16,0,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,0,1,0,0&quot;&gt;(1) &lt;b data-path-to-node=&quot;16,0,1,0,0&quot; data-index-in-node=&quot;4&quot;&gt;Conservador:&lt;/b&gt; Quiero perfeccionar lo que ya uso sin salirme de mi zona segura.&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,0,1,1,0&quot;&gt;(2) &lt;b data-path-to-node=&quot;16,0,1,1,0&quot; data-index-in-node=&quot;4&quot;&gt;Moderado:&lt;/b&gt; Quiero actualizar mi estilo e incorporar tendencias fáciles de llevar.&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,0,1,2,0&quot;&gt;(3) &lt;b data-path-to-node=&quot;16,0,1,2,0&quot; data-index-in-node=&quot;4&quot;&gt;Audaz:&lt;/b&gt; Quiero una transformación radical, probar tendencias y experimentar.&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,1,0&quot;&gt;&lt;b data-path-to-node=&quot;16,1,0&quot; data-index-in-node=&quot;0&quot;&gt;Filtro de Presupuesto:&lt;/b&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;16,1,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,1,1,0,0&quot;&gt;&lt;i data-path-to-node=&quot;16,1,1,0,0&quot; data-index-in-node=&quot;0&quot;&gt;Rango de inversión preferido por prenda clave (ej. abrigo, pantalón, calzado):&lt;/i&gt;&lt;/p&gt;&lt;ul data-path-to-node=&quot;16,1,1,0,1&quot;&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,1,1,0,1,0,0&quot;&gt;[ ] Gama Accesible (&lt;i data-path-to-node=&quot;16,1,1,0,1,0,0&quot; data-index-in-node=&quot;20&quot;&gt;Fast Fashion&lt;/i&gt; / Marcas locales básicas)&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,1,1,0,1,1,0&quot;&gt;[ ] Gama Media (&lt;i data-path-to-node=&quot;16,1,1,0,1,1,0&quot; data-index-in-node=&quot;16&quot;&gt;Contemporary brands&lt;/i&gt; / Marcas locales de autor)&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p data-path-to-node=&quot;16,1,1,0,1,2,0&quot;&gt;[ ] Gama Alta / Lujo (&lt;i data-path-to-node=&quot;16,1,1,0,1,2,0&quot; data-index-in-node=&quot;22&quot;&gt;Investment pieces&lt;/i&gt;)&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="330" width="560" x="72.5" y="2600" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-40" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;3,0&quot;&gt;&lt;b data-path-to-node=&quot;3,0&quot; data-index-in-node=&quot;0&quot;&gt;¿Por qué te lo preguntamos?&lt;/b&gt;&lt;/p&gt;&lt;p data-path-to-node=&quot;3,1&quot;&gt;Queremos proponerte conjuntos que no solo se vean bien, sino que se adapten a tu día a día, tus actividades y tu ritmo real de movimiento.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="560" x="62.5" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-41" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;6,0&quot;&gt;&lt;b data-path-to-node=&quot;6,0&quot; data-index-in-node=&quot;0&quot;&gt;¿Por qué te lo pedimos?&lt;/b&gt;&lt;/p&gt;&lt;p data-path-to-node=&quot;6,1&quot;&gt;Nos ayuda a recomendarte opciones realistas y acordes a tu presupuesto, respetando tus marcas favoritas y cómo prefieres comprar.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="560" x="77.5" y="1490" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-42" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;9,0&quot;&gt;&lt;b data-path-to-node=&quot;9,0&quot; data-index-in-node=&quot;0&quot;&gt;¿Por qué te lo pedimos?&lt;/b&gt;&lt;/p&gt;&lt;p data-path-to-node=&quot;9,1&quot;&gt;Tu ropa debe reflejar quién eres. Conocer tus gustos visuales nos permite crear looks alineados con tu personalidad e imagen deseada.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="560" x="82.5" y="1990" as="geometry" />
+        </mxCell>
+        <mxCell id="kMlGJzYHsjIf-hBEpPeK-43" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;12,0&quot;&gt;&lt;b data-path-to-node=&quot;12,0&quot; data-index-in-node=&quot;0&quot;&gt;¿Por qué te lo pedimos?&lt;/b&gt;&lt;/p&gt;&lt;p data-path-to-node=&quot;12,1&quot;&gt;La moda también es sentirte a gusto. Necesitamos saber qué texturas, cortes y siluetas te hacen sentir cómodo/a y seguro/a en tu propia piel.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="560" x="72.5" y="2520" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

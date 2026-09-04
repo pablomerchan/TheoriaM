@@ -85,7 +85,7 @@
                - 'texto_gpt'  → TextoGPTComponent         (tbl_articulo, solo texto_html)
              Para publicar un nuevo componente, insertar un registro con el
              marcador correspondiente en tbl_menu_asesoria. -->
-        <ng-container *ngIf="perfilCargado && !isLoadingArticulos && !showRelatedMode">
+        <ng-container *ngIf="perfilCargado && !isLoadingArticulos && !showRelatedMode && !isGustosYPreferenciasSelected()">
 
           <!-- COMPONENTES DINÁMICOS -->
           <div *ngFor="let def of carruseles; let i = index"
@@ -174,10 +174,15 @@
           </div>
 
           <!-- Estado vacío -->
-          <div class="empty-state" *ngIf="carruseles.length === 0">
+          <div class="empty-state" *ngIf="carruseles.length === 0 && !isGustosYPreferenciasSelected()">
             <p>No hay contenido disponible para esta sección.</p>
           </div>
 
+        </ng-container>
+
+        <!-- Especial: Mis gustos y preferencias -->
+        <ng-container *ngIf="perfilCargado && !isLoadingArticulos && !showRelatedMode && isGustosYPreferenciasSelected()">
+          <app-datos-morfologicos [idUsuario]="idUsuario"></app-datos-morfologicos>
         </ng-container>
 
         <!-- CONTENIDO DE RELACIONADOS -->

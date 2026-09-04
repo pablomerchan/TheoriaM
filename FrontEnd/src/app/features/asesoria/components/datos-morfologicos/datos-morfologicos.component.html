@@ -1,0 +1,279 @@
+<div class="morfologia-container">
+  <header class="morfologia-header">
+    <h2 class="morfologia-title">Datos Morfológicos</h2>
+    <p class="morfologia-subtitle">Define tus rasgos y proporciones físicas para una asesoría de alta costura a tu medida.</p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="morfologia-form">
+    
+    <!-- Alertas -->
+    <div *ngIf="errorMsg" class="alert error-alert" role="alert">
+      <span class="alert-icon">✦</span>
+      <span class="alert-text">{{ errorMsg }}</span>
+    </div>
+
+    <div *ngIf="guardadoExitoso" class="alert success-alert" role="alert">
+      <span class="alert-icon">✦</span>
+      <span class="alert-text">Tu perfil morfológico ha sido guardado con éxito.</span>
+    </div>
+
+    <!-- BLOQUE 1: Perfil Básico y Ubicación -->
+    <fieldset class="form-section">
+      <legend class="section-legend">I. Perfil Básico & Ubicación</legend>
+      
+      <div class="form-grid">
+        <!-- Sexo -->
+        <div class="form-field">
+          <label class="field-label" for="sexo">Sexo</label>
+          <div class="select-wrapper">
+            <select id="sexo" formControlName="sexo" class="field-select">
+              <option value="" disabled>Selecciona tu sexo...</option>
+              <option *ngFor="let s of opcionesSexo" [value]="s">
+                {{ s | titlecase }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Edad -->
+        <div class="form-field">
+          <label class="field-label" for="edad">Edad (Años)</label>
+          <input type="number" id="edad" formControlName="edad" class="field-input" placeholder="Ej: 28" />
+        </div>
+
+        <!-- Ubicación Principal -->
+        <div class="form-field">
+          <label class="field-label" for="ubicacion_principal">Ubicación Principal</label>
+          <div class="select-wrapper">
+            <select id="ubicacion_principal" formControlName="ubicacion_principal" class="field-select">
+              <option value="" disabled>Selecciona tu ubicación...</option>
+              <option *ngFor="let u of opcionesUbicaciones" [value]="u">{{ u }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Ubicación Secundaria -->
+        <div class="form-field">
+          <label class="field-label" for="ubicacion_secundaria">Ubicación Secundaria (Clima)</label>
+          <div class="select-wrapper">
+            <select id="ubicacion_secundaria" formControlName="ubicacion_secundaria" class="field-select">
+              <option value="" disabled>Selecciona tu ubicación...</option>
+              <option *ngFor="let u of opcionesUbicaciones" [value]="u">{{ u }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- BLOQUE 2: Rasgos y Colorimetría Real -->
+    <fieldset class="form-section">
+      <legend class="section-legend">II. Rasgos & Colorimetría Real</legend>
+      <p class="section-desc">Carga fotografías reales (drag-and-drop o haz clic) y gestiona los matices de tus rasgos en la tabla interactiva.</p>
+
+      <!-- Zonas de Carga de Imágenes -->
+      <div class="image-uploads-container">
+        <!-- Piel -->
+        <div class="upload-zone" 
+             [class.drag-over]="dragOverElement === 'piel'"
+             (dragover)="onDragOver($event, 'piel')"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event, 'piel')">
+          <span class="upload-title">Tono de Piel</span>
+          <span class="upload-sub">Luz natural</span>
+          <div class="upload-preview" *ngIf="rasgosArray.value | keyvalue">
+            <ng-container *ngFor="let r of rasgosArray.value">
+              <img *ngIf="r.elemento === 'Piel' && r.muestra_visual" [src]="r.muestra_visual" alt="Piel" class="preview-img" />
+            </ng-container>
+          </div>
+          <label class="upload-btn">
+            <span>Subir imagen</span>
+            <input type="file" (change)="onFileSelected($event, 'Piel')" accept="image/*" class="file-input" />
+          </label>
+        </div>
+
+        <!-- Ojos -->
+        <div class="upload-zone" 
+             [class.drag-over]="dragOverElement === 'ojos'"
+             (dragover)="onDragOver($event, 'ojos')"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event, 'ojos')">
+          <span class="upload-title">Color de Ojos</span>
+          <span class="upload-sub">Detalle de iris</span>
+          <div class="upload-preview">
+            <ng-container *ngFor="let r of rasgosArray.value">
+              <img *ngIf="r.elemento === 'Ojos' && r.muestra_visual" [src]="r.muestra_visual" alt="Ojos" class="preview-img" />
+            </ng-container>
+          </div>
+          <label class="upload-btn">
+            <span>Subir imagen</span>
+            <input type="file" (change)="onFileSelected($event, 'Ojos')" accept="image/*" class="file-input" />
+          </label>
+        </div>
+
+        <!-- Cabello -->
+        <div class="upload-zone" 
+             [class.drag-over]="dragOverElement === 'cabello'"
+             (dragover)="onDragOver($event, 'cabello')"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event, 'cabello')">
+          <span class="upload-title">Tono de Cabello</span>
+          <span class="upload-sub">Estado actual</span>
+          <div class="upload-preview">
+            <ng-container *ngFor="let r of rasgosArray.value">
+              <img *ngIf="r.elemento === 'Cabello' && r.muestra_visual" [src]="r.muestra_visual" alt="Cabello" class="preview-img" />
+            </ng-container>
+          </div>
+          <label class="upload-btn">
+            <span>Subir imagen</span>
+            <input type="file" (change)="onFileSelected($event, 'Cabello')" accept="image/*" class="file-input" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Tabla Interactiva de Rasgos -->
+      <div class="table-container">
+        <table class="traits-table">
+          <thead>
+            <tr>
+              <th>Elemento / Rasgo</th>
+              <th>Muestra Visual</th>
+              <th>Descripción / Tono</th>
+              <th class="actions-header">Acciones</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="rasgos">
+            <tr *ngFor="let ctrl of rasgosArray.controls; let i = index" [formGroupName]="i" [class.editing-row]="editingIndex === i">
+              <!-- Elemento / Rasgo -->
+              <td>
+                <span *ngIf="editingIndex !== i" class="trait-name">{{ ctrl.get('elemento')?.value }}</span>
+                <input *ngIf="editingIndex === i" type="text" formControlName="elemento" class="table-input" placeholder="Ej: Subtono" />
+              </td>
+              
+              <!-- Muestra Visual -->
+              <td>
+                <div class="visual-sample">
+                  <div *ngIf="ctrl.get('muestra_visual')?.value" class="sample-thumbnail">
+                    <img *ngIf="ctrl.get('es_imagen')?.value" [src]="ctrl.get('muestra_visual')?.value" alt="Muestra" class="sample-img" />
+                    <div *ngIf="!ctrl.get('es_imagen')?.value" [style.background-color]="ctrl.get('muestra_visual')?.value" class="sample-color"></div>
+                  </div>
+                  <span *ngIf="!ctrl.get('muestra_visual')?.value" class="sample-empty">—</span>
+                  <input *ngIf="editingIndex === i" type="text" formControlName="muestra_visual" class="table-input small-input" placeholder="#hex o URL" />
+                </div>
+              </td>
+              
+              <!-- Descripción / Tono -->
+              <td>
+                <span *ngIf="editingIndex !== i">{{ ctrl.get('descripcion')?.value || 'Sin descripción' }}</span>
+                <input *ngIf="editingIndex === i" type="text" formControlName="descripcion" class="table-input" placeholder="Ej: Claro Cálido" />
+              </td>
+
+              <!-- Acciones -->
+              <td class="actions-cell">
+                <!-- Read mode -->
+                <ng-container *ngIf="editingIndex !== i">
+                  <button type="button" class="btn-table btn-edit" (click)="editarRasgo(i)" title="Editar">
+                    <span class="btn-text">Editar</span>
+                  </button>
+                  <button type="button" class="btn-table btn-delete" (click)="eliminarRasgo(i)" title="Eliminar">
+                    <span class="btn-text">Eliminar</span>
+                  </button>
+                </ng-container>
+
+                <!-- Edit mode -->
+                <ng-container *ngIf="editingIndex === i">
+                  <button type="button" class="btn-table btn-save" (click)="guardarRasgo()" title="Guardar">
+                    <span class="btn-text">Aceptar</span>
+                  </button>
+                  <button type="button" class="btn-table btn-cancel" (click)="cancelarEdicion()" title="Cancelar">
+                    <span class="btn-text">Cancelar</span>
+                  </button>
+                </ng-container>
+              </td>
+            </tr>
+
+            <!-- Tabla Vacía -->
+            <tr *ngIf="rasgosArray.length === 0">
+              <td colspan="4" class="empty-table-msg">No se han registrado rasgos ni colorimetrías aún.</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="table-actions">
+          <button type="button" class="btn-add-trait" (click)="agregarRasgo()">
+            <span>+ Agregar rasgo personalizado</span>
+          </button>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- BLOQUE 3: Dimensiones y Proporciones -->
+    <fieldset class="form-section">
+      <legend class="section-legend">III. Dimensiones & Proporciones</legend>
+      <p class="section-desc">Ingresa tus medidas físicas exactas en centímetros para calibrar las recomendaciones del guardarropa.</p>
+
+      <div class="form-grid">
+        <!-- Estatura -->
+        <div class="form-field">
+          <label class="field-label" for="estatura_cm">Estatura (cm)</label>
+          <input type="number" id="estatura_cm" formControlName="estatura_cm" class="field-input" placeholder="Ej: 170" />
+        </div>
+
+        <!-- Peso -->
+        <div class="form-field">
+          <label class="field-label" for="peso_kg">Peso (kg)</label>
+          <input type="number" id="peso_kg" formControlName="peso_kg" class="field-input" placeholder="Ej: 68" />
+        </div>
+
+        <!-- Clima de Residencia -->
+        <div class="form-field full-width-field">
+          <label class="field-label">Climas Habituales</label>
+          <div class="climates-pills">
+            <button type="button" 
+                    *ngFor="let c of opcionesClimas" 
+                    (click)="toggleClima(c)" 
+                    [class.active]="isClimaSelected(c)"
+                    class="climate-pill">
+              {{ c }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Medidas Condicionales (Femenino) -->
+        <ng-container *ngIf="form.get('sexo')?.value === 'femenino'">
+          <!-- Hombros -->
+          <div class="form-field">
+            <label class="field-label" for="medida_hombros_cm">Medida Hombros (cm)</label>
+            <input type="number" id="medida_hombros_cm" formControlName="medida_hombros_cm" class="field-input" placeholder="Ej: 42" />
+          </div>
+
+          <!-- Busto -->
+          <div class="form-field">
+            <label class="field-label" for="medida_busto_cm">Medida Pecho/Busto (cm)</label>
+            <input type="number" id="medida_busto_cm" formControlName="medida_busto_cm" class="field-input" placeholder="Ej: 90" />
+          </div>
+
+          <!-- Cintura -->
+          <div class="form-field">
+            <label class="field-label" for="medida_cintura_cm">Medida Cintura (cm)</label>
+            <input type="number" id="medida_cintura_cm" formControlName="medida_cintura_cm" class="field-input" placeholder="Ej: 68" />
+          </div>
+
+          <!-- Cadera -->
+          <div class="form-field">
+            <label class="field-label" for="medida_cadera_cm">Medida Cadera (cm)</label>
+            <input type="number" id="medida_cadera_cm" formControlName="medida_cadera_cm" class="field-input" placeholder="Ej: 96" />
+          </div>
+        </ng-container>
+      </div>
+    </fieldset>
+
+    <!-- Botón de Envío -->
+    <div class="form-actions">
+      <button type="submit" [disabled]="form.invalid || enviando" class="btn-submit">
+        <span *ngIf="!enviando">Guardar Perfil Morfológico</span>
+        <span *ngIf="enviando" class="spinner"></span>
+      </button>
+    </div>
+
+  </form>
+</div>

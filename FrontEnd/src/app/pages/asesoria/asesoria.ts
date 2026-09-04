@@ -13,6 +13,8 @@ import { GuiaComprasComponent } from '../../components/guia-compras/guia-compras
 import { UsuarioService } from '../../services/usuario.service';
 import { WebmasterArticuloService } from '../../services/webmaster-articulo.service';
 import { AsesoriaCarouselService } from '../../services/asesoria-carousel.service';
+import { DatosMorfologicosComponent } from '../../features/asesoria/components/datos-morfologicos/datos-morfologicos.component';
+import { MorfologiaService } from '../../features/asesoria/components/datos-morfologicos/services/morfologia.service';
 
 interface MenuSection {
   tema: string;
@@ -31,7 +33,8 @@ interface MenuSection {
     TextoGPTComponent,
     SugerenciaDiariaComponent,
     MiGuardaRopasComponent,
-    GuiaComprasComponent
+    GuiaComprasComponent,
+    DatosMorfologicosComponent
   ],
   templateUrl: './asesoria.html',
   styleUrls: ['./asesoria.scss']
@@ -42,6 +45,7 @@ export class AsesoriaComponent implements OnInit {
   private cdr             = inject(ChangeDetectorRef);
   private webmasterArticuloService = inject(WebmasterArticuloService);
   private asesoriaCarouselService  = inject(AsesoriaCarouselService);
+  private morfologiaService        = inject(MorfologiaService);
 
   menus: MenuServicioItem[] = [];
   menuSections: MenuSection[] = [];
@@ -168,6 +172,7 @@ export class AsesoriaComponent implements OnInit {
   // 2. Seleccionar un menú y cargar sus componentes
   selectMenu(menu: MenuServicioItem): void {
     this.selectedMenu = menu;
+    this.morfologiaService.setActiveMenuId(menu.id);
     this.showRelatedMode = false;
     this.isLoadingArticulos = true;
     this.carruseles = [];
@@ -395,5 +400,11 @@ export class AsesoriaComponent implements OnInit {
     if (foundMenu) {
       this.selectMenu(foundMenu);
     }
+  }
+
+  isGustosYPreferenciasSelected(): boolean {
+    if (!this.selectedMenu) return false;
+    const subtema = this.selectedMenu.subtema?.toLowerCase() || '';
+    return this.selectedMenu.id === 32 || subtema.includes('gustos y preferencias');
   }
 }
