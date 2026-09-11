@@ -1,8 +1,5 @@
-¿Como puedo ejecutarlo para verlo?
+¿Como puedo ejecutarlo el proyecto verlo?
 
-
- si llegas a apagar tu computadora o necesitas iniciar el proyecto manualmente por tu cuenta, 
- solo debes recordar esto:
 
 El proyecto tiene dos partes separadas, por lo que necesitas abrir dos terminales 
 diferentes.
