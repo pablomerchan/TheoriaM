@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-ASESORIA_DB = "asesoria.db"
+ASESORIA_DB = os.path.join(os.path.dirname(__file__), "BDs", "asesoria.db")
 
 def seed():
     conn = sqlite3.connect(ASESORIA_DB)

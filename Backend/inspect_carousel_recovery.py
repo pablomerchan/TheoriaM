@@ -6,7 +6,7 @@ from datetime import datetime
 
 BASE_DIR = os.path.dirname(__file__)
 DB_NAME = 'carousel.db'
-DB_PATH = os.path.join(BASE_DIR, DB_NAME)
+DB_PATH = os.path.join(BASE_DIR, 'BDs', DB_NAME)
 
 def backup_db(path):
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')

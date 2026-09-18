@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-conn = sqlite3.connect('asesoria.db')
+conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'BDs', 'asesoria.db'))
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
 c.execute("PRAGMA foreign_keys = OFF")

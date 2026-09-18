@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-conn = sqlite3.connect('asesoria.db')
+conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'BDs', 'asesoria.db'))
 c = conn.cursor()
 
 c.execute("ALTER TABLE prendas_genericas RENAME TO tbl_carrusel_items")

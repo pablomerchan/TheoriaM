@@ -3,7 +3,7 @@ import sqlite3
 from typing import Optional, List, Dict, Any
 
 BASE_DIR = os.path.dirname(__file__)
-ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "asesoria.db"))
+ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "BDs", "asesoria.db"))
 
 def parse_id_usuario(val):
     if val is None:

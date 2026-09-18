@@ -1,6 +1,6 @@
 import sqlite3
 
-HELP_DB = "interactive_help.db"
+HELP_DB = os.path.join(os.path.dirname(__file__), "BDs", "interactive_help.db")
 
 conn = sqlite3.connect(HELP_DB)
 cursor = conn.cursor()

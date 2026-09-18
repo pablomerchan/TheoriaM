@@ -30,8 +30,8 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 # ── Configuración ──────────────────────────────────────────
-ASESORIA_DB = "asesoria.db"
-BACKUP_DB   = "asesoria_backup_pre_migration.db"
+ASESORIA_DB = os.path.join(os.path.dirname(__file__), "BDs", "asesoria.db")
+BACKUP_DB   = os.path.join(os.path.dirname(__file__), "BDs", "asesoria_backup_pre_migration.db")
 
 def log(msg, level="INFO"):
     icons = {"INFO": "ℹ", "OK": "✓", "SKIP": "·", "ERR": "✗", "WARN": "⚠"}

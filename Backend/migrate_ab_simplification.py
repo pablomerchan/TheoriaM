@@ -5,7 +5,7 @@ Migracion A+B:
 """
 import sqlite3
 
-DB = r"c:\Empresas\TheoriaM\src\Backend\asesoria.db"
+DB = os.path.join(os.path.dirname(__file__), "BDs", "asesoria.db")
 conn = sqlite3.connect(DB)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()

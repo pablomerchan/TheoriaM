@@ -51,11 +51,12 @@ app.add_middleware(
 #  Bases de datos
 # ─────────────────────────────────────────────
 BASE_DIR = os.path.dirname(__file__)
-CAROUSEL_DB = os.path.normpath(os.path.join(BASE_DIR, "carousel.db"))
-HELP_DB = os.path.normpath(os.path.join(BASE_DIR, "interactive_help.db"))
-MORFOLOGICOS_DB = os.path.normpath(os.path.join(BASE_DIR, "datos_morfologicos.db"))
-MAESTRAS_DB = os.path.normpath(os.path.join(BASE_DIR, "maestras_menus.db"))
-ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "asesoria.db"))
+DB_DIR = os.path.join(BASE_DIR, "BDs")
+CAROUSEL_DB = os.path.normpath(os.path.join(DB_DIR, "carousel.db"))
+HELP_DB = os.path.normpath(os.path.join(DB_DIR, "interactive_help.db"))
+MORFOLOGICOS_DB = os.path.normpath(os.path.join(DB_DIR, "datos_morfologicos.db"))
+MAESTRAS_DB = os.path.normpath(os.path.join(DB_DIR, "maestras_menus.db"))
+ASESORIA_DB = os.path.normpath(os.path.join(DB_DIR, "asesoria.db"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db

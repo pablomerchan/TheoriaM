@@ -1,7 +1,9 @@
+import os
 import sqlite3
 from fastapi import Request, HTTPException
 
-ASESORIA_DB = "asesoria.db"
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "BDs", "asesoria.db"))
 
 class AuthService:
     @staticmethod

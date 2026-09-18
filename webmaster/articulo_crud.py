@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 BASE_DIR = os.path.dirname(__file__)
-ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "Backend", "asesoria.db"))
+ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "Backend", "BDs", "asesoria.db"))
 
 ARTICULO_MARKER = "<!-- ARTICULO_MARKER -->"
 

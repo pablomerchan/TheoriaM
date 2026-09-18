@@ -1,5 +1,5 @@
 import sqlite3, json, os
-DB = os.path.join(os.path.dirname(__file__), 'carousel.db')
+DB = os.path.join(os.path.dirname(__file__), 'BDs', 'carousel.db')
 conn = sqlite3.connect(DB)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()

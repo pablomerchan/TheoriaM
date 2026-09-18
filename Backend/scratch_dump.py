@@ -1,10 +1,11 @@
+import os
 import sqlite3
 import sys
 
 sys.stdout.reconfigure(encoding='utf-8')
 
 def dump_articulos():
-    conn = sqlite3.connect('asesoria.db')
+    conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'BDs', 'asesoria.db'))
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     

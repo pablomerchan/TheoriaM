@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-ASESORIA_DB = "asesoria.db"
+ASESORIA_DB = os.path.join(os.path.dirname(__file__), "BDs", "asesoria.db")
 
 def fix_database():
     if not os.path.exists(ASESORIA_DB):
