@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" pages="9">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" pages="10">
   <diagram id="G3I-IpPNEaBhWHwF6x47" name="Primera asesoria">
     <mxGraphModel dx="1550" dy="736" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -1325,6 +1325,26 @@
         </mxCell>
         <mxCell id="kMlGJzYHsjIf-hBEpPeK-43" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;p data-path-to-node=&quot;12,0&quot;&gt;&lt;b data-path-to-node=&quot;12,0&quot; data-index-in-node=&quot;0&quot;&gt;¿Por qué te lo pedimos?&lt;/b&gt;&lt;/p&gt;&lt;p data-path-to-node=&quot;12,1&quot;&gt;La moda también es sentirte a gusto. Necesitamos saber qué texturas, cortes y siluetas te hacen sentir cómodo/a y seguro/a en tu propia piel.&lt;/p&gt;" vertex="1">
           <mxGeometry height="100" width="560" x="72.5" y="2520" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="Xr7Gry4lPsNEXSk4VqlE" name="Landin-Page">
+    <mxGraphModel dx="1255" dy="612" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="A-GVt3b2ZLzcNOo0-NIj-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="" vertex="1">
+          <mxGeometry height="280" width="280" x="220" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="A-GVt3b2ZLzcNOo0-NIj-2" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" value="" vertex="1">
+          <mxGeometry height="80" width="60" x="690" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="A-GVt3b2ZLzcNOo0-NIj-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="BD_landing_page" vertex="1">
+          <mxGeometry height="30" width="90" x="680" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="A-GVt3b2ZLzcNOo0-NIj-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="tbl_landing-page" vertex="1">
+          <mxGeometry height="30" width="120" x="700" y="240" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

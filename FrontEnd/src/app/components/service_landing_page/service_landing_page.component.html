@@ -1,0 +1,75 @@
+<main class="landing-page" aria-labelledby="landing-title">
+  <div class="loading-state" *ngIf="loading">Cargando contenido...</div>
+
+  <div class="error-state" *ngIf="!loading && error">
+    No fue posible cargar el contenido de la página.
+  </div>
+
+  <ng-container *ngIf="!loading && !error && hero as firstItem">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="TheorIA M">TheorIA M</a>
+      <nav class="site-nav" aria-label="Navegación principal">
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Asesoría de Moda</a>
+        <a href="#beneficios">Blog</a>
+        <button class="icon-button" type="button" aria-label="Buscar">⌕</button>
+        <button class="icon-button menu-button" type="button" aria-label="Abrir menú">☰</button>
+      </nav>
+    </header>
+
+    <section class="hero" id="inicio">
+      <div class="hero-copy">
+        <p class="eyebrow">ESTILO CON INTENCIÓN</p>
+        <h1 id="landing-title">{{ firstItem.titulo }}</h1>
+        <h2 *ngIf="firstItem.subtitulo">{{ firstItem.subtitulo }}</h2>
+        <p class="hero-description" *ngIf="firstItem.descripcion">{{ firstItem.descripcion }}</p>
+        <a
+          class="primary-button"
+          *ngIf="firstItem.boton_texto && firstItem.boton_url"
+          [href]="firstItem.boton_url">
+          {{ firstItem.boton_texto }}
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="hero-visual" *ngIf="firstItem.imagen_url">
+        <div class="hero-frame">
+          <img [src]="firstItem.imagen_url" [alt]="firstItem.titulo || 'Imagen de asesoría'" />
+        </div>
+        <span class="visual-note visual-note--top">Tu mejor versión</span>
+        <span class="visual-note visual-note--bottom">Hecho para ti</span>
+      </div>
+    </section>
+
+    <section class="cards-section" id="servicios" *ngIf="imageCards.length">
+      <div class="section-heading">
+        <p class="eyebrow">UNA GUÍA PERSONAL</p>
+        <h2>Todo lo que necesitas para vestir con confianza</h2>
+      </div>
+      <div class="card-grid">
+        <article class="feature-card" *ngFor="let card of imageCards">
+          <div class="card-image">
+            <img [src]="card.imagen_url!" [alt]="card.titulo || 'Servicio de asesoría'" loading="lazy" />
+          </div>
+          <div class="card-content">
+            <h3 *ngIf="card.titulo">{{ card.titulo }}</h3>
+            <p *ngIf="card.descripcion">{{ card.descripcion }}</p>
+            <a *ngIf="card.boton_texto && card.boton_url" [href]="card.boton_url" class="text-link">
+              {{ card.boton_texto }} <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="benefits-section" id="beneficios" *ngIf="descriptionBlocks.length">
+      <article class="benefit-block" *ngFor="let block of descriptionBlocks; let index = index">
+        <span class="benefit-number">0{{ index + 1 }}</span>
+        <div>
+          <h3 *ngIf="block.titulo">{{ block.titulo }}</h3>
+          <p *ngIf="block.subtitulo" class="benefit-subtitle">{{ block.subtitulo }}</p>
+          <p *ngIf="block.descripcion">{{ block.descripcion }}</p>
+        </div>
+      </article>
+    </section>
+  </ng-container>
+</main>

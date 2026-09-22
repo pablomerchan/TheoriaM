@@ -57,6 +57,7 @@ HELP_DB = os.path.normpath(os.path.join(DB_DIR, "interactive_help.db"))
 MORFOLOGICOS_DB = os.path.normpath(os.path.join(DB_DIR, "datos_morfologicos.db"))
 MAESTRAS_DB = os.path.normpath(os.path.join(DB_DIR, "maestras_menus.db"))
 ASESORIA_DB = os.path.normpath(os.path.join(DB_DIR, "asesoria.db"))
+LANDING_PAGE_DB = os.path.normpath(os.path.join(DB_DIR, "BD_landing_page"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
@@ -672,12 +673,95 @@ def init_asesoria_db():
     conn.commit()
     conn.close()
 
+
+# ─────────────────────────────────────────────
+#  Init: BD_landing_page
+# ─────────────────────────────────────────────
+def init_landing_page_db():
+    conn = sqlite3.connect(LANDING_PAGE_DB)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_landing_page (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT,
+            subtitulo TEXT,
+            descripcion TEXT,
+            imagen_url TEXT,
+            boton_texto TEXT,
+            boton_url TEXT,
+            visible BOOLEAN DEFAULT 1,
+            orden INTEGER DEFAULT 0
+        )
+    ''')
+    cursor.execute("SELECT COUNT(*) FROM tbl_landing_page")
+    if cursor.fetchone()[0] == 0:
+        contenido = [
+            (
+                "Asesoría Personalizada en Moda y Estilismo",
+                "Encuentra el estilo que mejor te representa",
+                "Con ayuda de nuestros expertos, descubre prendas, colores y combinaciones que hablan de ti.",
+                "/images/landpage/TuMejorVersion_carrusel.png",
+                "Obtener Asesoría",
+                "/datos-morfologicos",
+                1,
+                1
+            ),
+            (
+                "Consejos de estilo personalizados",
+                None,
+                "Recomendaciones pensadas para tu silueta, tus gustos y tu forma de vivir.",
+                "/images/landpage/1.QueMePongo.png",
+                None,
+                None,
+                1,
+                2
+            ),
+            (
+                "Recomendaciones para cada ocasión",
+                None,
+                "Ideas prácticas para crear looks seguros y versátiles en cada momento.",
+                "/images/landpage/2.MeInscribo.png",
+                None,
+                None,
+                1,
+                3
+            ),
+            (
+                "Análisis de color y morfología",
+                None,
+                "Conoce los tonos y las proporciones que realzan tu presencia natural.",
+                "/images/landpage/3.ReciboAsesoria.png",
+                None,
+                None,
+                1,
+                4
+            ),
+            (
+                "Tu imagen, con intención",
+                "Una guía hecha para ti",
+                "Convierte tus decisiones de estilo en una herramienta de expresión personal.",
+                None,
+                None,
+                None,
+                1,
+                5
+            )
+        ]
+        cursor.executemany('''
+            INSERT INTO tbl_landing_page
+                (titulo, subtitulo, descripcion, imagen_url, boton_texto, boton_url, visible, orden)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', contenido)
+    conn.commit()
+    conn.close()
+
 # Inicializar todas las bases de datos al arrancar
 init_carousel_db()
 init_help_db()
 init_morfologicos_db()
 init_maestras_db()
 init_asesoria_db()
+init_landing_page_db()
 
 
 # ─────────────────────────────────────────────
@@ -740,6 +824,22 @@ def get_carousel():
         slides.append(slide)
     conn.close()
     return slides
+
+
+# ═══════════════════════════════════════════════
+#  ENDPOINTS: Landing page
+# ═══════════════════════════════════════════════
+@app.get("/api/landing-page")
+def get_landing_page():
+    conn = sqlite3.connect(LANDING_PAGE_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            "SELECT * FROM tbl_landing_page WHERE visible = 1 ORDER BY orden ASC"
+        ).fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
 
 
 # ═══════════════════════════════════════════════
