@@ -7,8 +7,12 @@
 
   <ng-container *ngIf="!loading && !error && hero as firstItem">
     <header class="site-header">
-      <a class="brand" href="/" aria-label="TheorIA M">TheorIA M</a>
-      <!-- <p class="eyebrow">ESTILO CON INTENCIÓN</p> -->
+      <div class="brand-lockup">
+        <a class="brand" href="/" aria-label="TheorIA M">TheorIA M</a>
+        <p class="eyebrow">ESTILO CON INTENCIÓN</p>
+      </div>
+
+
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="#inicio">Inicio</a>
         <a href="#servicios">Asesoría de Moda</a>
@@ -16,7 +20,12 @@
         <button class="icon-button" type="button" aria-label="Buscar">⌕</button>
         <button class="icon-button menu-button" type="button" aria-label="Abrir menú">☰</button>
       </nav>
+      
     </header>
+
+
+    
+
 
     <section class="hero" id="inicio">
       <div class="hero-copy">
