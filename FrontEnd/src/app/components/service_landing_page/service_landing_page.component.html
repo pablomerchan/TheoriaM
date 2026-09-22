@@ -8,6 +8,7 @@
   <ng-container *ngIf="!loading && !error && hero as firstItem">
     <header class="site-header">
       <a class="brand" href="/" aria-label="TheorIA M">TheorIA M</a>
+      <!-- <p class="eyebrow">ESTILO CON INTENCIÓN</p> -->
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="#inicio">Inicio</a>
         <a href="#servicios">Asesoría de Moda</a>
@@ -19,7 +20,7 @@
 
     <section class="hero" id="inicio">
       <div class="hero-copy">
-        <p class="eyebrow">ESTILO CON INTENCIÓN</p>
+        <!-- <p class="eyebrow">ESTILO CON INTENCIÓN</p> -->
         <h1 id="landing-title">{{ firstItem.titulo }}</h1>
         <h2 *ngIf="firstItem.subtitulo">{{ firstItem.subtitulo }}</h2>
         <p class="hero-description" *ngIf="firstItem.descripcion">{{ firstItem.descripcion }}</p>
