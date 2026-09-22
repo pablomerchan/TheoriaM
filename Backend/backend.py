@@ -57,7 +57,7 @@ HELP_DB = os.path.normpath(os.path.join(DB_DIR, "interactive_help.db"))
 MORFOLOGICOS_DB = os.path.normpath(os.path.join(DB_DIR, "datos_morfologicos.db"))
 MAESTRAS_DB = os.path.normpath(os.path.join(DB_DIR, "maestras_menus.db"))
 ASESORIA_DB = os.path.normpath(os.path.join(DB_DIR, "asesoria.db"))
-LANDING_PAGE_DB = os.path.normpath(os.path.join(DB_DIR, "BD_landing_page"))
+LANDING_PAGE_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_landing_page"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
