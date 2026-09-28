@@ -1,0 +1,83 @@
+<main class="information-center">
+  <aside class="sidebar" aria-label="Navegación del centro de información">
+    <a class="brand" routerLink="/" aria-label="TheorIA M, inicio">
+      <span class="brand-mark" aria-hidden="true">T</span>
+      <span>TheorIA M</span>
+    </a>
+    <h1>{{ titulo }}</h1>
+
+    <label class="search-box">
+      <span aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        placeholder="Buscar"
+        aria-label="Buscar información"
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value" />
+    </label>
+
+    <nav class="section-nav" aria-label="Secciones">
+      <button
+        type="button"
+        class="nav-item home-item"
+        [class.active]="selectedSectionId === null"
+        (click)="seleccionarSeccion(null)">
+        <span class="nav-icon" aria-hidden="true">⌂</span>
+        <span>Inicio del Centro de información</span>
+      </button>
+      <button
+        type="button"
+        class="nav-item"
+        *ngFor="let seccion of secciones.slice(1)"
+        [class.active]="selectedSectionId === seccion.id"
+        (click)="seleccionarSeccion(seccion.id)">
+        <span class="nav-icon" aria-hidden="true">{{ seccion.icono || '◉' }}</span>
+        <span>{{ seccion.etiqueta }}</span>
+      </button>
+    </nav>
+  </aside>
+
+  <section class="content-area" aria-live="polite">
+    <div class="status-state" *ngIf="loading">Cargando contenido...</div>
+    <div class="status-state error-state" *ngIf="!loading && error">
+      No fue posible cargar el contenido del centro de información.
+    </div>
+
+    <ng-container *ngIf="!loading && !error">
+      <header class="page-intro">
+        <h2>{{ titulo }}</h2>
+        <p>{{ descripcion }}</p>
+      </header>
+
+      <section class="content-section" *ngFor="let seccion of seccionesMostradas">
+        <div class="section-heading">
+          <h3>{{ seccion.titulo }}</h3>
+          <p *ngIf="seccion.descripcion">{{ seccion.descripcion }}</p>
+        </div>
+
+        <div class="content-grid" *ngIf="seccion.contenidos.length; else noResults">
+          <article class="content-card" *ngFor="let contenido of seccion.contenidos">
+            <div class="card-image" *ngIf="contenido.imagen_url; else iconTile">
+              <img [src]="contenido.imagen_url" [alt]="contenido.titulo" loading="lazy" />
+            </div>
+            <ng-template #iconTile>
+              <div class="icon-tile" aria-hidden="true">{{ contenido.icono || seccion.icono || 'i' }}</div>
+            </ng-template>
+            <div class="card-copy">
+              <h4>{{ contenido.titulo }}</h4>
+              <p *ngIf="contenido.descripcion">{{ contenido.descripcion }}</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <ng-template #noResults>
+        <p class="empty-state">No hay contenidos publicados en esta sección.</p>
+      </ng-template>
+
+      <p class="empty-state" *ngIf="searchTerm && !seccionesMostradas.length">
+        No encontramos resultados para “{{ searchTerm }}”.
+      </p>
+    </ng-container>
+  </section>
+</main>

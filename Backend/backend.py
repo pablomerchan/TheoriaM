@@ -58,6 +58,7 @@ MORFOLOGICOS_DB = os.path.normpath(os.path.join(DB_DIR, "datos_morfologicos.db")
 MAESTRAS_DB = os.path.normpath(os.path.join(DB_DIR, "maestras_menus.db"))
 ASESORIA_DB = os.path.normpath(os.path.join(DB_DIR, "asesoria.db"))
 LANDING_PAGE_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_landing_page"))
+CENTRO_INFORMACION_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BDcentro_informacion"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
@@ -755,6 +756,82 @@ def init_landing_page_db():
     conn.commit()
     conn.close()
 
+
+def init_centro_informacion_db():
+    conn = sqlite3.connect(CENTRO_INFORMACION_DB)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_ci_configuracion (
+            id INTEGER PRIMARY KEY,
+            titulo TEXT NOT NULL,
+            descripcion TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_ci_secciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            etiqueta TEXT NOT NULL,
+            titulo TEXT NOT NULL,
+            descripcion TEXT,
+            icono TEXT,
+            orden INTEGER DEFAULT 0,
+            visible BOOLEAN DEFAULT 1
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_ci_contenidos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            seccion_id INTEGER NOT NULL,
+            titulo TEXT NOT NULL,
+            descripcion TEXT,
+            imagen_url TEXT,
+            icono TEXT,
+            orden INTEGER DEFAULT 0,
+            visible BOOLEAN DEFAULT 1,
+            FOREIGN KEY (seccion_id) REFERENCES tbl_ci_secciones(id)
+        )
+    ''')
+    cursor.execute("SELECT COUNT(*) FROM tbl_ci_configuracion")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute(
+            "INSERT INTO tbl_ci_configuracion (id, titulo, descripcion) VALUES (1, ?, ?)",
+            (
+                "Centro de información",
+                "Encuentra respuestas y recursos para conocer nuestros servicios y administrar tu experiencia en TheorIA M.",
+            ),
+        )
+    cursor.execute("SELECT COUNT(*) FROM tbl_ci_secciones")
+    if cursor.fetchone()[0] == 0:
+        secciones = [
+            ("Inicio del Centro de información", "Diseñamos nuestros servicios pensando en ti", "Conoce cómo cuidamos tu información y te acompañamos en cada decisión de estilo.", "⌂", 1, 1),
+            ("Temas de información", "Temas de información", "Respuestas sobre nuestros servicios, recomendaciones y el uso de tus datos.", "◉", 2, 1),
+            ("Más recursos", "Más recursos", "Guías y herramientas para aprovechar mejor tu experiencia.", "▣", 3, 1),
+            ("Artículos y políticas", "Artículos y políticas", "Consulta información importante sobre el uso de la plataforma.", "ⓘ", 4, 1),
+            ("Configuración", "Configuración", "Administra tus preferencias y la información de tu cuenta.", "⚙", 5, 1),
+        ]
+        cursor.executemany(
+            "INSERT INTO tbl_ci_secciones (etiqueta, titulo, descripcion, icono, orden, visible) VALUES (?, ?, ?, ?, ?, ?)",
+            secciones,
+        )
+        contenidos = [
+            (1, "Privacidad y tus datos", "Conoce qué información utilizamos para personalizar tu experiencia y cómo mantenerla bajo tu control.", "/images/landpage/TuEstiloSegunMorfologia.png", "◉", 1, 1),
+            (1, "Seguridad y protección", "Recomendaciones para proteger tu cuenta y disfrutar de nuestros servicios con tranquilidad.", "/images/landpage/TuMejorVersion_carrusel.png", "▣", 2, 1),
+            (2, "Recomendaciones personalizadas", "Descubre cómo tus preferencias ayudan a crear sugerencias de estilo más relevantes para ti.", "/images/landpage/LaImagenDeTusMetas1.png", "✦", 1, 1),
+            (2, "Asesoría de estilo", "Información sobre el análisis de color, morfología y las sugerencias de nuestros servicios.", "/images/landpage/3.ReciboAsesoria.png", "✧", 2, 1),
+            (3, "Guía de compras", "Encuentra ideas para elegir prendas y crear combinaciones que se adapten a tus necesidades.", "/images/landpage/1.QueMePongo.png", "▤", 1, 1),
+            (3, "Tu guardarropa digital", "Organiza tus prendas y consulta tus looks desde un mismo lugar.", "/images/landpage/2.MeInscribo.png", "▧", 2, 1),
+            (4, "Aviso de privacidad", "Consulta cómo se recopila, utiliza y protege la información que compartes con TheorIA M.", None, "◉", 1, 1),
+            (4, "Términos de uso", "Revisa las condiciones que aplican al utilizar los servicios y contenidos de la plataforma.", None, "ⓘ", 2, 1),
+            (5, "Preferencias de comunicación", "Elige cómo deseas recibir novedades, recomendaciones y comunicaciones del servicio.", None, "⚙", 1, 1),
+            (5, "Administración de cuenta", "Consulta las opciones disponibles para revisar y actualizar los datos de tu perfil.", None, "⌂", 2, 1),
+        ]
+        cursor.executemany(
+            "INSERT INTO tbl_ci_contenidos (seccion_id, titulo, descripcion, imagen_url, icono, orden, visible) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            contenidos,
+        )
+    conn.commit()
+    conn.close()
+
 # Inicializar todas las bases de datos al arrancar
 init_carousel_db()
 init_help_db()
@@ -762,6 +839,7 @@ init_morfologicos_db()
 init_maestras_db()
 init_asesoria_db()
 init_landing_page_db()
+init_centro_informacion_db()
 
 
 # ─────────────────────────────────────────────
@@ -838,6 +916,33 @@ def get_landing_page():
             "SELECT * FROM tbl_landing_page WHERE visible = 1 ORDER BY orden ASC"
         ).fetchall()
         return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+
+@app.get("/api/centro-informacion")
+def get_centro_informacion():
+    conn = sqlite3.connect(CENTRO_INFORMACION_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        configuracion = conn.execute(
+            "SELECT titulo, descripcion FROM tbl_ci_configuracion WHERE id = 1"
+        ).fetchone()
+        secciones = conn.execute(
+            "SELECT * FROM tbl_ci_secciones WHERE visible = 1 ORDER BY orden ASC"
+        ).fetchall()
+        resultado = []
+        for seccion in secciones:
+            contenidos = conn.execute(
+                "SELECT * FROM tbl_ci_contenidos WHERE seccion_id = ? AND visible = 1 ORDER BY orden ASC",
+                (seccion["id"],),
+            ).fetchall()
+            resultado.append({**dict(seccion), "contenidos": [dict(contenido) for contenido in contenidos]})
+        return {
+            "titulo": configuracion["titulo"] if configuracion else "Centro de información",
+            "descripcion": configuracion["descripcion"] if configuracion else "",
+            "secciones": resultado,
+        }
     finally:
         conn.close()
 
