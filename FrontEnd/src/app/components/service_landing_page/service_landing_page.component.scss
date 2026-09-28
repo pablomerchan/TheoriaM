@@ -22,7 +22,8 @@
 .site-header,
 .hero,
 .cards-section,
-.benefits-section {
+.benefits-section,
+.site-footer {
   width: min(1180px, calc(100% - 3rem));
   margin-inline: auto;
 }
@@ -278,6 +279,46 @@ h1 {
   font-weight: 700 !important;
 }
 
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 100px;
+  border-top: 1px solid rgba(38, 50, 56, 0.15);
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.footer-brand {
+  color: #263238;
+  font: 700 1.25rem/1 Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.06em;
+  text-decoration: none;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.footer-nav a,
+.footer-copyright {
+  margin: 0;
+  color: #6e6762;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.footer-nav a {
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  color: #bc594c;
+}
+
 @keyframes reveal {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
@@ -287,7 +328,8 @@ h1 {
   .site-header,
   .hero,
   .cards-section,
-  .benefits-section {
+  .benefits-section,
+  .site-footer {
     width: min(100% - 2rem, 560px);
   }
 
@@ -307,5 +349,18 @@ h1 {
   .card-grid,
   .benefits-section {
     grid-template-columns: 1fr;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
+    padding-block: 1.5rem;
+  }
+
+  .footer-nav {
+    justify-content: flex-start;
+    gap: 0.75rem 1.25rem;
   }
 }
