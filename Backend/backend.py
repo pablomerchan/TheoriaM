@@ -2,6 +2,9 @@ import os
 import sys
 import sqlite3
 import uuid
+import re
+import smtplib
+from email.message import EmailMessage
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
@@ -59,6 +62,7 @@ MAESTRAS_DB = os.path.normpath(os.path.join(DB_DIR, "maestras_menus.db"))
 ASESORIA_DB = os.path.normpath(os.path.join(DB_DIR, "asesoria.db"))
 LANDING_PAGE_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_landing_page"))
 CENTRO_INFORMACION_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BDcentro_informacion"))
+CENTRO_CONTACTO_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_centro_contacto"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
@@ -832,6 +836,50 @@ def init_centro_informacion_db():
     conn.commit()
     conn.close()
 
+
+def init_centro_contacto_db():
+    conn = sqlite3.connect(CENTRO_CONTACTO_DB)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_contacto_configuracion (
+            id INTEGER PRIMARY KEY,
+            titulo TEXT NOT NULL,
+            descripcion TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_contacto_destinatarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL UNIQUE,
+            activo BOOLEAN DEFAULT 1
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tbl_contacto_solicitudes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            correo TEXT NOT NULL,
+            asunto TEXT NOT NULL,
+            mensaje TEXT NOT NULL,
+            creado_en TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            notificacion_enviada BOOLEAN DEFAULT 0,
+            error_notificacion TEXT
+        )
+    ''')
+    cursor.execute(
+        "INSERT OR IGNORE INTO tbl_contacto_configuracion (id, titulo, descripcion) VALUES (1, ?, ?)",
+        (
+            "Hablemos de tu estilo",
+            "¿Tienes una pregunta o necesitas ayuda? Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo.",
+        ),
+    )
+    cursor.execute(
+        "INSERT OR IGNORE INTO tbl_contacto_destinatarios (email, activo) VALUES (?, 1)",
+        ("pablomerchan@gmail.com",),
+    )
+    conn.commit()
+    conn.close()
+
 # Inicializar todas las bases de datos al arrancar
 init_carousel_db()
 init_help_db()
@@ -840,6 +888,7 @@ init_maestras_db()
 init_asesoria_db()
 init_landing_page_db()
 init_centro_informacion_db()
+init_centro_contacto_db()
 
 
 # ─────────────────────────────────────────────
@@ -861,6 +910,13 @@ class DatosMorfologicosInput(BaseModel):
     medida_cintura_cm: Optional[float] = None
     medida_cadera_cm: Optional[float] = None
     medida_busto_cm: Optional[float] = None
+
+
+class CentroContactoInput(BaseModel):
+    nombre: str
+    correo: str
+    asunto: str
+    mensaje: str
 
 
 # ═══════════════════════════════════════════════
@@ -943,6 +999,81 @@ def get_centro_informacion():
             "descripcion": configuracion["descripcion"] if configuracion else "",
             "secciones": resultado,
         }
+    finally:
+        conn.close()
+
+
+@app.post("/api/centro-contacto")
+def crear_solicitud_contacto(solicitud: CentroContactoInput):
+    nombre = solicitud.nombre.strip()
+    correo = solicitud.correo.strip()
+    asunto = solicitud.asunto.strip()
+    mensaje = solicitud.mensaje.strip()
+    if not nombre or len(nombre) > 120:
+        raise HTTPException(status_code=422, detail="El nombre es obligatorio y debe tener máximo 120 caracteres.")
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", correo) or len(correo) > 254:
+        raise HTTPException(status_code=422, detail="Ingresa un correo electrónico válido.")
+    if not asunto or len(asunto) > 160:
+        raise HTTPException(status_code=422, detail="El asunto es obligatorio y debe tener máximo 160 caracteres.")
+    if not mensaje or len(mensaje) > 5000:
+        raise HTTPException(status_code=422, detail="El mensaje es obligatorio y debe tener máximo 5000 caracteres.")
+
+    conn = sqlite3.connect(CENTRO_CONTACTO_DB)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO tbl_contacto_solicitudes (nombre, correo, asunto, mensaje) VALUES (?, ?, ?, ?)",
+            (nombre, correo, asunto, mensaje),
+        )
+        solicitud_id = cursor.lastrowid
+        destinatarios = [
+            row[0] for row in cursor.execute(
+                "SELECT email FROM tbl_contacto_destinatarios WHERE activo = 1 ORDER BY id"
+            ).fetchall()
+        ]
+        conn.commit()
+
+        envio_exitoso = False
+        error_notificacion = "No hay destinatarios activos configurados."
+        host = os.getenv("CONTACT_SMTP_HOST")
+        usuario_smtp = os.getenv("CONTACT_SMTP_USER")
+        clave_smtp = os.getenv("CONTACT_SMTP_PASSWORD")
+        remitente = os.getenv("CONTACT_SMTP_FROM", usuario_smtp or "")
+
+        if host and remitente and destinatarios:
+            try:
+                correo_salida = EmailMessage()
+                correo_salida["Subject"] = f"Solicitud de contacto: {asunto}"
+                correo_salida["From"] = remitente
+                correo_salida["To"] = remitente
+                correo_salida["Bcc"] = ", ".join(destinatarios)
+                correo_salida["Reply-To"] = correo
+                correo_salida.set_content(
+                    f"Solicitud de contacto #{solicitud_id}\n\n"
+                    f"Nombre: {nombre}\nCorreo: {correo}\nAsunto: {asunto}\n\n{mensaje}"
+                )
+                puerto_smtp = int(os.getenv("CONTACT_SMTP_PORT", "587"))
+                usar_ssl = os.getenv("CONTACT_SMTP_SSL", "false").lower() in {"1", "true", "yes"}
+                cliente_smtp = smtplib.SMTP_SSL if usar_ssl else smtplib.SMTP
+                with cliente_smtp(host, puerto_smtp, timeout=15) as servidor:
+                    if not usar_ssl and os.getenv("CONTACT_SMTP_STARTTLS", "true").lower() in {"1", "true", "yes"}:
+                        servidor.starttls()
+                    if usuario_smtp and clave_smtp:
+                        servidor.login(usuario_smtp, clave_smtp)
+                    servidor.send_message(correo_salida, to_addrs=destinatarios)
+                envio_exitoso = True
+                error_notificacion = None
+            except Exception as error:
+                error_notificacion = str(error)[:1000]
+        elif not host:
+            error_notificacion = "SMTP no está configurado."
+
+        conn.execute(
+            "UPDATE tbl_contacto_solicitudes SET notificacion_enviada = ?, error_notificacion = ? WHERE id = ?",
+            (int(envio_exitoso), error_notificacion, solicitud_id),
+        )
+        conn.commit()
+        return {"id": solicitud_id, "notificacion_enviada": envio_exitoso}
     finally:
         conn.close()
 

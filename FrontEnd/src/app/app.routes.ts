@@ -6,12 +6,14 @@ import { WebmasterDashboardComponent } from './components/webmaster-dashboard/we
 import { WebmasterArticuloComponent } from './components/webmaster-articulo/webmaster-articulo.component';
 import { WebmasterArticuloAddComponent } from './components/webmaster-articulo/webmaster-articulo-add.component';
 import { CentroInformacionComponent } from './components/centro_informacion/centro_informacion.component';
+import { CentroContactoComponent } from './components/centro_contacto/centro_contacto.component';
 
 export const routes: Routes = [
   { path: '', component: ServiceLandingPageComponent },
   { path: 'datos-morfologicos', component: DatosMorfologicosComponent },
   { path: 'asesoria', component: AsesoriaComponent },
   { path: 'ctrinfo', component: CentroInformacionComponent },
+  { path: 'centro-contacto', component: CentroContactoComponent },
   { path: 'webmaster', component: WebmasterDashboardComponent },
   { path: 'webmaster/articulos', component: WebmasterArticuloComponent },
   { path: 'webmaster/articulos/nuevo', component: WebmasterArticuloAddComponent },

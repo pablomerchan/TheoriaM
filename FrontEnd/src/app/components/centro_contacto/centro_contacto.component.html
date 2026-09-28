@@ -1,0 +1,70 @@
+<main class="contact-page">
+  <header class="contact-header">
+    <a class="wordmark" href="/" aria-label="TheorIA M, inicio">
+      <span class="wordmark-icon" aria-hidden="true">T</span>
+      <span>TheorIA M</span>
+    </a>
+    <a class="back-link" href="/ctrinfo">Centro de información <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <section class="contact-layout" aria-labelledby="contact-title">
+    <div class="contact-intro">
+      <p class="eyebrow">ESTAMOS PARA ESCUCHARTE</p>
+      <h1 id="contact-title">Hablemos de tu estilo.</h1>
+      <p class="intro-copy">Cuéntanos qué necesitas. Leemos cada mensaje y nuestro equipo te responderá lo antes posible.</p>
+
+      <div class="contact-note">
+        <span class="note-mark" aria-hidden="true">✳</span>
+        <p>¿Tienes dudas sobre asesorías, compras o tu guardarropa? Este es el lugar.</p>
+      </div>
+    </div>
+
+    <section class="form-panel" aria-label="Formulario de contacto">
+      <div *ngIf="enviado" class="form-alert success-alert" role="status">
+        <strong>Tu mensaje quedó registrado.</strong>
+        <span>{{ avisoCorreo }}</span>
+      </div>
+      <div *ngIf="error" class="form-alert error-alert" role="alert">{{ error }}</div>
+
+      <form [formGroup]="form" (ngSubmit)="enviarSolicitud()" novalidate>
+        <div class="field-row">
+          <div class="field">
+            <label for="contact-name">Nombre</label>
+            <input id="contact-name" type="text" formControlName="nombre" autocomplete="name" maxlength="120" placeholder="Tu nombre" />
+            <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">Escribe tu nombre.</small>
+          </div>
+          <div class="field">
+            <label for="contact-email">Correo electrónico</label>
+            <input id="contact-email" type="email" formControlName="correo" autocomplete="email" maxlength="254" placeholder="nombre@correo.com" />
+            <small *ngIf="form.controls.correo.touched && form.controls.correo.invalid">Escribe un correo válido.</small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="contact-subject">Asunto</label>
+          <input id="contact-subject" type="text" formControlName="asunto" maxlength="160" placeholder="¿Sobre qué quieres hablar?" />
+          <small *ngIf="form.controls.asunto.touched && form.controls.asunto.invalid">El asunto es obligatorio.</small>
+        </div>
+
+        <div class="field">
+          <label for="contact-message">Mensaje</label>
+          <textarea id="contact-message" formControlName="mensaje" rows="6" maxlength="5000" placeholder="Escribe aquí tu mensaje..."></textarea>
+          <small *ngIf="form.controls.mensaje.touched && form.controls.mensaje.invalid">Escribe un mensaje.</small>
+        </div>
+
+        <div class="form-actions">
+          <span class="privacy-note">Usaremos tus datos solo para responder a esta solicitud.</span>
+          <button type="submit" [disabled]="enviando">
+            {{ enviando ? 'Enviando...' : 'Enviar mensaje' }}
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </form>
+    </section>
+  </section>
+
+  <footer class="contact-footer">
+    <span>© 2026 TheorIA M</span>
+    <span>Un estilo que habla de ti.</span>
+  </footer>
+</main>
