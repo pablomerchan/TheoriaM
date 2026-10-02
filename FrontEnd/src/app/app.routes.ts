@@ -7,6 +7,8 @@ import { WebmasterArticuloComponent } from './components/webmaster-articulo/webm
 import { WebmasterArticuloAddComponent } from './components/webmaster-articulo/webmaster-articulo-add.component';
 import { CentroInformacionComponent } from './components/centro_informacion/centro_informacion.component';
 import { CentroContactoComponent } from './components/centro_contacto/centro_contacto.component';
+import { NuevoUsuarioComponent } from './components/nuevo-usuario/nuevo-usuario.component';
+import { IniciarSesionComponent } from './components/iniciar-sesion/iniciar-sesion.component';
 
 export const routes: Routes = [
   { path: '', component: ServiceLandingPageComponent },
@@ -14,6 +16,8 @@ export const routes: Routes = [
   { path: 'asesoria', component: AsesoriaComponent },
   { path: 'ctrinfo', component: CentroInformacionComponent },
   { path: 'centro-contacto', component: CentroContactoComponent },
+  { path: 'nuevo-usuario', component: NuevoUsuarioComponent },
+  { path: 'iniciar-sesion', component: IniciarSesionComponent },
   { path: 'webmaster', component: WebmasterDashboardComponent },
   { path: 'webmaster/articulos', component: WebmasterArticuloComponent },
   { path: 'webmaster/articulos/nuevo', component: WebmasterArticuloAddComponent },

@@ -1,0 +1,47 @@
+:host {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  color: #1c1e21;
+  font-family: Arial, sans-serif;
+}
+
+.sesion-page {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: #000;
+}
+
+.sesion-panel {
+  width: min(440px, 100%);
+  padding: 28px;
+  background: #fff;
+}
+
+.sesion-panel h1 {
+  margin: 0 0 14px;
+  font-size: 25px;
+}
+
+.sesion-panel p {
+  margin: 0 0 23px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.sesion-panel a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 45px;
+  padding: 0 20px;
+  border-radius: 24px;
+  color: #fff;
+  background: #0866e9;
+  text-decoration: none;
+  font-weight: 600;
+}

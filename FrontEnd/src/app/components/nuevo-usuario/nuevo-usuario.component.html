@@ -1,0 +1,136 @@
+<main class="registro-page">
+  <section class="registro-panel" aria-labelledby="registro-titulo">
+    <h1 id="registro-titulo" class="registro-titulo" *ngIf="formulario">{{ formulario.titulo }}</h1>
+
+    <p *ngIf="cargando" class="estado" role="status">Cargando formulario...</p>
+    <p *ngIf="error && !formulario" class="estado error" role="alert">{{ error }}</p>
+
+    <ng-container *ngIf="formulario as config">
+      <div *ngIf="enviado" class="estado exito" role="status">
+        <strong>{{ config.textos['registro_exitoso'] }}</strong>
+        <span>{{ config.textos['registro_pendiente'] }}</span>
+      </div>
+      <p *ngIf="error" class="estado error" role="alert">{{ error }}</p>
+
+      <form [formGroup]="form" (ngSubmit)="enviarRegistro()" novalidate>
+        <div class="campo">
+          <div class="etiqueta-ayuda">
+            <label for="nuevo-nombre">{{ config.textos['nombre'] }}</label>
+            <label for="nuevo-apellidos">{{ config.textos['apellidos'] }}</label>
+            <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'nombre'"
+              aria-label="Ayuda para nombre y apellidos" (click)="alternarAyuda('nombre')">?</button>
+          </div>
+          <p *ngIf="ayudaVisible === 'nombre'" class="texto-ayuda" role="tooltip">{{ config.ayudas['nombre'] }}</p>
+          <div class="fila-nombre">
+            <input id="nuevo-nombre" type="text" formControlName="nombre" autocomplete="given-name"
+              [placeholder]="config.textos['placeholder_nombre']" maxlength="120" />
+            <input id="nuevo-apellidos" type="text" formControlName="apellidos" autocomplete="family-name"
+              [placeholder]="config.textos['placeholder_apellidos']" maxlength="120" />
+          </div>
+          <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">{{ config.textos['error_nombre'] }}</small>
+          <small *ngIf="form.controls.apellidos.touched && form.controls.apellidos.invalid">{{ config.textos['error_apellidos'] }}</small>
+        </div>
+
+        <div class="campo">
+          <div class="etiqueta-ayuda">
+            <label for="nuevo-seudonimo">{{ config.textos['seudonimo'] }}</label>
+            <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'seudonimo'"
+              aria-label="Ayuda para seudónimo" (click)="alternarAyuda('seudonimo')">?</button>
+          </div>
+          <p *ngIf="ayudaVisible === 'seudonimo'" class="texto-ayuda" role="tooltip">{{ config.ayudas['seudonimo'] }}</p>
+          <input id="nuevo-seudonimo" type="text" formControlName="seudonimo" autocomplete="nickname"
+            [placeholder]="config.textos['placeholder_seudonimo']" maxlength="50" />
+          <small *ngIf="form.controls.seudonimo.touched && form.controls.seudonimo.invalid">{{ config.textos['error_seudonimo'] }}</small>
+        </div>
+
+        <section class="datos-personales" aria-label="Datos personales">
+          <div class="campo">
+            <div class="etiqueta-ayuda">
+              <label for="dia-nacimiento">{{ config.textos['fecha_nacimiento'] }}</label>
+              <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'fecha_nacimiento'"
+                aria-label="Ayuda para fecha de nacimiento" (click)="alternarAyuda('fecha_nacimiento')">?</button>
+            </div>
+            <p *ngIf="ayudaVisible === 'fecha_nacimiento'" class="texto-ayuda" role="tooltip">{{ config.ayudas['fecha_nacimiento'] }}</p>
+            <div class="fila-fecha">
+              <select id="dia-nacimiento" formControlName="dia_nacimiento" [attr.aria-label]="config.textos['dia']">
+                <option value="">{{ config.textos['dia'] }}</option>
+                <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+              </select>
+              <select formControlName="mes_nacimiento" [attr.aria-label]="config.textos['mes']">
+                <option value="">{{ config.textos['mes'] }}</option>
+                <option *ngFor="let mes of meses" [value]="mes">{{ config.textos['mes_' + mes] }}</option>
+              </select>
+              <select formControlName="anio_nacimiento" [attr.aria-label]="config.textos['anio']">
+                <option value="">{{ config.textos['anio'] }}</option>
+                <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+              </select>
+            </div>
+            <small *ngIf="(form.controls.dia_nacimiento.touched || form.controls.mes_nacimiento.touched || form.controls.anio_nacimiento.touched)
+              && (form.controls.dia_nacimiento.invalid || form.controls.mes_nacimiento.invalid || form.controls.anio_nacimiento.invalid)">
+              {{ config.textos['error_fecha'] }}
+            </small>
+          </div>
+
+          <div class="campo genero-campo">
+            <div class="etiqueta-ayuda">
+              <label for="nuevo-genero">{{ config.textos['genero'] }}</label>
+              <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'genero'"
+                aria-label="Ayuda para género" (click)="alternarAyuda('genero')">?</button>
+            </div>
+            <p *ngIf="ayudaVisible === 'genero'" class="texto-ayuda" role="tooltip">{{ config.ayudas['genero'] }}</p>
+            <select id="nuevo-genero" formControlName="genero">
+              <option value="">{{ config.textos['selecciona_genero'] }}</option>
+              <option *ngFor="let opcion of opcionesGenero" [value]="opcion">{{ config.textos['genero_' + opcion.replace('prefiero_no_decirlo', 'no_decir')] }}</option>
+            </select>
+          </div>
+        </section>
+
+        <div class="campo">
+          <div class="etiqueta-ayuda">
+            <label for="nuevo-contacto">{{ config.textos['contacto'] }}</label>
+            <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'contacto'"
+              aria-label="Ayuda para número móvil o correo" (click)="alternarAyuda('contacto')">?</button>
+          </div>
+          <p *ngIf="ayudaVisible === 'contacto'" class="texto-ayuda" role="tooltip">{{ config.ayudas['contacto'] }}</p>
+          <input id="nuevo-contacto" type="text" formControlName="contacto" autocomplete="email"
+            [placeholder]="config.textos['placeholder_contacto']" maxlength="254" />
+          <small *ngIf="form.controls.contacto.touched && form.controls.contacto.invalid">{{ config.textos['error_contacto'] }}</small>
+        </div>
+
+        <div class="campo">
+          <div class="etiqueta-ayuda">
+            <label for="nuevo-contrasena">{{ config.textos['contrasena'] }}</label>
+            <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'contrasena'"
+              aria-label="Ayuda para contraseña" (click)="alternarAyuda('contrasena')">?</button>
+          </div>
+          <p *ngIf="ayudaVisible === 'contrasena'" class="texto-ayuda" role="tooltip">{{ config.ayudas['contrasena'] }}</p>
+          <input id="nuevo-contrasena" type="password" formControlName="contrasena" autocomplete="new-password"
+            [placeholder]="config.textos['placeholder_contrasena']" maxlength="128" />
+          <small *ngIf="form.controls.contrasena.touched && form.controls.contrasena.invalid">{{ config.textos['error_contrasena'] }}</small>
+        </div>
+
+        <div class="campo">
+          <div class="etiqueta-ayuda">
+            <label for="confirmar-contrasena">{{ config.textos['confirmar_contrasena'] }}</label>
+            <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'confirmar_contrasena'"
+              aria-label="Ayuda para confirmar contraseña" (click)="alternarAyuda('confirmar_contrasena')">?</button>
+          </div>
+          <p *ngIf="ayudaVisible === 'confirmar_contrasena'" class="texto-ayuda" role="tooltip">{{ config.ayudas['confirmar_contrasena'] }}</p>
+          <input id="confirmar-contrasena" type="password" formControlName="confirmar_contrasena" autocomplete="new-password"
+            [placeholder]="config.textos['placeholder_confirmar_contrasena']" maxlength="128" />
+          <small *ngIf="form.controls.confirmar_contrasena.touched && form.controls.confirmar_contrasena.invalid">
+            {{ config.textos['error_confirmar_contrasena'] }}
+          </small>
+          <small *ngIf="form.hasError('contrasenasNoCoinciden') && form.controls.confirmar_contrasena.touched">
+            {{ config.textos['error_contrasenas_no_coinciden'] }}
+          </small>
+        </div>
+
+        <button class="boton-enviar" type="submit" [disabled]="enviando">
+          {{ enviando ? config.textos['enviando'] : config.textos['enviar'] }}
+        </button>
+        <a class="boton-iniciar-sesion" routerLink="/iniciar-sesion">{{ config.textos['iniciar_sesion'] }}</a>
+      </form>
+    </ng-container>
+  </section>
+</main>

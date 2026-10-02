@@ -3,7 +3,10 @@ import sys
 import sqlite3
 import uuid
 import re
+import hashlib
+import secrets
 import smtplib
+from datetime import date
 from email.message import EmailMessage
 from typing import Optional
 
@@ -63,6 +66,10 @@ ASESORIA_DB = os.path.normpath(os.path.join(DB_DIR, "asesoria.db"))
 LANDING_PAGE_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_landing_page"))
 CENTRO_INFORMACION_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BDcentro_informacion"))
 CENTRO_CONTACTO_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_centro_contacto"))
+FORMULARIO_NUEVO_USUARIO_DB = os.path.normpath(
+    os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_formulario_nuevo_usuario")
+)
+TMP_NEW_USER_DB = os.path.normpath(os.path.join(DB_DIR, "BD_Tmp_newUser"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
@@ -880,6 +887,126 @@ def init_centro_contacto_db():
     conn.commit()
     conn.close()
 
+
+def init_nuevo_usuario_dbs():
+    os.makedirs(os.path.dirname(FORMULARIO_NUEVO_USUARIO_DB), exist_ok=True)
+    os.makedirs(os.path.dirname(TMP_NEW_USER_DB), exist_ok=True)
+
+    textos = [
+        ("titulo", "Empieza a usar TheorIA M, crea tu cuenta."),
+        ("nombre", "Nombre"),
+        ("placeholder_nombre", "Nombre"),
+        ("apellidos", "Apellidos"),
+        ("placeholder_apellidos", "Apellidos"),
+        ("seudonimo", "Seudónimo"),
+        ("placeholder_seudonimo", "Seudónimo"),
+        ("fecha_nacimiento", "Fecha de nacimiento"),
+        ("dia", "Día"),
+        ("mes", "Mes"),
+        ("anio", "Año"),
+        ("mes_1", "Enero"),
+        ("mes_2", "Febrero"),
+        ("mes_3", "Marzo"),
+        ("mes_4", "Abril"),
+        ("mes_5", "Mayo"),
+        ("mes_6", "Junio"),
+        ("mes_7", "Julio"),
+        ("mes_8", "Agosto"),
+        ("mes_9", "Septiembre"),
+        ("mes_10", "Octubre"),
+        ("mes_11", "Noviembre"),
+        ("mes_12", "Diciembre"),
+        ("genero", "Género"),
+        ("selecciona_genero", "Selecciona tu género"),
+        ("genero_mujer", "Mujer"),
+        ("genero_hombre", "Hombre"),
+        ("genero_no_binario", "No binario"),
+        ("genero_no_decir", "Prefiero no decirlo"),
+        ("contacto", "Número de móvil o correo electrónico"),
+        ("placeholder_contacto", "Número de móvil o correo electrónico"),
+        ("contrasena", "Contraseña"),
+        ("placeholder_contrasena", "Contraseña"),
+        ("confirmar_contrasena", "Confirmar Contraseña"),
+        ("placeholder_confirmar_contrasena", "Contraseña"),
+        ("enviar", "Enviar"),
+        ("enviando", "Enviando..."),
+        ("iniciar_sesion", "Ya tengo una cuenta"),
+        ("registro_exitoso", "Tu solicitud de registro quedó guardada."),
+        ("registro_pendiente", "La activación de tu cuenta estará disponible cuando se conecte el backend."),
+        ("error_carga", "No fue posible cargar el formulario. Inténtalo de nuevo más tarde."),
+        ("error_envio", "No fue posible guardar tus datos. Inténtalo de nuevo."),
+        ("error_nombre", "Escribe tu nombre."),
+        ("error_apellidos", "Escribe tus apellidos."),
+        ("error_seudonimo", "Escribe un seudónimo."),
+        ("error_fecha", "Selecciona una fecha de nacimiento válida."),
+        ("error_genero", "Selecciona una opción válida."),
+        ("error_contacto", "Escribe un correo válido o un número de móvil."),
+        ("error_contrasena", "La contraseña debe tener entre 8 y 128 caracteres."),
+        ("error_confirmar_contrasena", "Confirma tu contraseña."),
+        ("error_contrasenas_no_coinciden", "Las contraseñas no coinciden."),
+        ("login_titulo", "Inicio de sesión"),
+        ("login_pendiente", "El inicio de sesión estará disponible cuando se integre el backend de usuarios."),
+        ("crear_cuenta", "Crear una cuenta"),
+    ]
+    ayudas = [
+        ("nombre", "Usa el nombre y los apellidos con los que quieres identificar tu cuenta."),
+        ("seudonimo", "Elige un nombre corto para mostrar en tu perfil."),
+        ("fecha_nacimiento", "Usamos esta fecha para personalizar tu experiencia."),
+        ("genero", "Este dato es opcional y se usa para personalizar algunas recomendaciones."),
+        ("contacto", "Usa un correo electrónico o un móvil válido para identificar tu cuenta."),
+        ("contrasena", "Elige una contraseña de entre 8 y 128 caracteres. Se guarda de forma protegida."),
+        ("confirmar_contrasena", "Vuelve a escribir la misma contraseña para confirmar que es correcta."),
+    ]
+
+    conn = sqlite3.connect(FORMULARIO_NUEVO_USUARIO_DB)
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS textos_formulario (
+                clave TEXT PRIMARY KEY,
+                texto TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS ayudas_formulario (
+                campo TEXT PRIMARY KEY,
+                texto TEXT NOT NULL
+            )
+        """)
+        conn.executemany(
+            "INSERT OR IGNORE INTO textos_formulario (clave, texto) VALUES (?, ?)",
+            textos,
+        )
+        conn.executemany(
+            "INSERT OR IGNORE INTO ayudas_formulario (campo, texto) VALUES (?, ?)",
+            ayudas,
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    conn = sqlite3.connect(TMP_NEW_USER_DB)
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS tbl_new_user_queue (
+                id TEXT PRIMARY KEY,
+                nombre TEXT NOT NULL,
+                apellidos TEXT NOT NULL,
+                seudonimo TEXT NOT NULL,
+                dia_nacimiento INTEGER NOT NULL,
+                mes_nacimiento INTEGER NOT NULL,
+                anio_nacimiento INTEGER NOT NULL,
+                genero TEXT,
+                contacto TEXT NOT NULL,
+                password_salt TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                estado TEXT NOT NULL DEFAULT 'pendiente',
+                creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+    finally:
+        conn.close()
+
 # Inicializar todas las bases de datos al arrancar
 init_carousel_db()
 init_help_db()
@@ -889,6 +1016,7 @@ init_asesoria_db()
 init_landing_page_db()
 init_centro_informacion_db()
 init_centro_contacto_db()
+init_nuevo_usuario_dbs()
 
 
 # ─────────────────────────────────────────────
@@ -917,6 +1045,108 @@ class CentroContactoInput(BaseModel):
     correo: str
     asunto: str
     mensaje: str
+
+
+class NuevoUsuarioInput(BaseModel):
+    nombre: str
+    apellidos: str
+    seudonimo: str
+    dia_nacimiento: int
+    mes_nacimiento: int
+    anio_nacimiento: int
+    genero: Optional[str] = None
+    contacto: str
+    contrasena: str
+    confirmar_contrasena: str
+
+
+@app.get("/api/nuevo-usuario/formulario")
+def get_formulario_nuevo_usuario():
+    conn = sqlite3.connect(FORMULARIO_NUEVO_USUARIO_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        textos = {
+            row["clave"]: row["texto"]
+            for row in conn.execute("SELECT clave, texto FROM textos_formulario")
+        }
+        ayudas = {
+            row["campo"]: row["texto"]
+            for row in conn.execute("SELECT campo, texto FROM ayudas_formulario")
+        }
+        return {"titulo": textos["titulo"], "textos": textos, "ayudas": ayudas}
+    finally:
+        conn.close()
+
+
+@app.post("/api/nuevo-usuario", status_code=201)
+def crear_nuevo_usuario(registro: NuevoUsuarioInput):
+    nombre = registro.nombre.strip()
+    apellidos = registro.apellidos.strip()
+    seudonimo = registro.seudonimo.strip()
+    contacto = registro.contacto.strip()
+    if not nombre or len(nombre) > 120:
+        raise HTTPException(status_code=422, detail="El nombre es obligatorio y debe tener máximo 120 caracteres.")
+    if not apellidos or len(apellidos) > 120:
+        raise HTTPException(status_code=422, detail="Los apellidos son obligatorios y deben tener máximo 120 caracteres.")
+    if not seudonimo or len(seudonimo) > 50:
+        raise HTTPException(status_code=422, detail="El seudónimo es obligatorio y debe tener máximo 50 caracteres.")
+
+    try:
+        nacimiento = date(registro.anio_nacimiento, registro.mes_nacimiento, registro.dia_nacimiento)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail="La fecha de nacimiento no es válida.") from error
+    if nacimiento > date.today():
+        raise HTTPException(status_code=422, detail="La fecha de nacimiento no puede ser futura.")
+
+    generos_validos = {"mujer", "hombre", "no_binario", "prefiero_no_decirlo"}
+    if registro.genero and registro.genero not in generos_validos:
+        raise HTTPException(status_code=422, detail="Selecciona una opción de género válida.")
+
+    correo_valido = re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", contacto) is not None
+    movil_normalizado = re.sub(r"[\s().-]", "", contacto)
+    movil_valido = re.fullmatch(r"\+?\d{7,15}", movil_normalizado) is not None
+    if len(contacto) > 254 or not (correo_valido or movil_valido):
+        raise HTTPException(status_code=422, detail="Ingresa un correo válido o un número de móvil.")
+    if len(registro.contrasena) < 8 or len(registro.contrasena) > 128:
+        raise HTTPException(status_code=422, detail="La contraseña debe tener entre 8 y 128 caracteres.")
+    if registro.contrasena != registro.confirmar_contrasena:
+        raise HTTPException(status_code=422, detail="Las contraseñas no coinciden.")
+
+    password_salt = secrets.token_bytes(16)
+    password_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        registro.contrasena.encode("utf-8"),
+        password_salt,
+        600_000,
+    )
+    usuario_id = str(uuid.uuid4())
+    conn = sqlite3.connect(TMP_NEW_USER_DB)
+    try:
+        conn.execute(
+            """
+            INSERT INTO tbl_new_user_queue (
+                id, nombre, apellidos, seudonimo, dia_nacimiento, mes_nacimiento,
+                anio_nacimiento, genero, contacto, password_salt, password_hash
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                usuario_id,
+                nombre,
+                apellidos,
+                seudonimo,
+                registro.dia_nacimiento,
+                registro.mes_nacimiento,
+                registro.anio_nacimiento,
+                registro.genero or None,
+                contacto,
+                password_salt.hex(),
+                password_hash.hex(),
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return {"id": usuario_id, "estado": "pendiente"}
 
 
 # ═══════════════════════════════════════════════

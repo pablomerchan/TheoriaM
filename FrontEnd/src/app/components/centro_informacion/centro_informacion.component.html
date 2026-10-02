@@ -4,7 +4,7 @@
       <span class="brand-mark" aria-hidden="true">T</span>
       <span>TheorIA M</span>
     </a>
-    <h1>{{ titulo }}</h1>
+    <h1 [innerHTML]="titulo"></h1>
 
     <label class="search-box">
       <span aria-hidden="true">⌕</span>
@@ -32,7 +32,7 @@
         [class.active]="selectedSectionId === seccion.id"
         (click)="seleccionarSeccion(seccion.id)">
         <span class="nav-icon" aria-hidden="true">{{ seccion.icono || '◉' }}</span>
-        <span>{{ seccion.etiqueta }}</span>
+        <span [innerHTML]="seccion.etiqueta"></span>
       </button>
     </nav>
   </aside>
@@ -45,14 +45,14 @@
 
     <ng-container *ngIf="!loading && !error">
       <header class="page-intro">
-        <h2>{{ titulo }}</h2>
-        <p>{{ descripcion }}</p>
+        <h2 [innerHTML]="titulo"></h2>
+        <p [innerHTML]="descripcion"></p>
       </header>
 
       <section class="content-section" *ngFor="let seccion of seccionesMostradas">
         <div class="section-heading">
-          <h3>{{ seccion.titulo }}</h3>
-          <p *ngIf="seccion.descripcion">{{ seccion.descripcion }}</p>
+          <h3 [innerHTML]="seccion.titulo"></h3>
+          <p *ngIf="seccion.descripcion" [innerHTML]="seccion.descripcion"></p>
         </div>
 
         <div class="content-grid" *ngIf="seccion.contenidos.length; else noResults">
@@ -64,8 +64,8 @@
               <div class="icon-tile" aria-hidden="true">{{ contenido.icono || seccion.icono || 'i' }}</div>
             </ng-template>
             <div class="card-copy">
-              <h4>{{ contenido.titulo }}</h4>
-              <p *ngIf="contenido.descripcion">{{ contenido.descripcion }}</p>
+              <h4 [innerHTML]="contenido.titulo"></h4>
+              <p *ngIf="contenido.descripcion" [innerHTML]="contenido.descripcion"></p>
             </div>
           </article>
         </div>
