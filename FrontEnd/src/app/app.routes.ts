@@ -9,9 +9,11 @@ import { CentroInformacionComponent } from './components/centro_informacion/cent
 import { CentroContactoComponent } from './components/centro_contacto/centro_contacto.component';
 import { NuevoUsuarioComponent } from './components/nuevo-usuario/nuevo-usuario.component';
 import { IniciarSesionComponent } from './components/iniciar-sesion/iniciar-sesion.component';
+import { CaracteristicasFisicasComponent } from './pages/caracteristicas-fisicas/caracteristicas-fisicas.component';
 
 export const routes: Routes = [
   { path: '', component: ServiceLandingPageComponent },
+  { path: 'cf', component: CaracteristicasFisicasComponent },
   { path: 'datos-morfologicos', component: DatosMorfologicosComponent },
   { path: 'asesoria', component: AsesoriaComponent },
   { path: 'ci', component: CentroInformacionComponent },

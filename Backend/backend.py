@@ -69,6 +69,10 @@ CENTRO_CONTACTO_DB = os.path.normpath(os.path.join(BASE_DIR, "..", "FrontEnd", "
 FORMULARIO_NUEVO_USUARIO_DB = os.path.normpath(
     os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_formulario_nuevo_usuario")
 )
+CARACTERISTICAS_FISICAS_DESCRIPTIVE_DB = os.path.normpath(
+    os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_caracteristicas_fisicas")
+)
+CARACTERISTICAS_FISICAS_HELP_DB = os.path.normpath(os.path.join(DB_DIR, "caracteristicas_fisicas"))
 TMP_NEW_USER_DB = os.path.normpath(os.path.join(DB_DIR, "BD_Tmp_newUser"))
 
 # ─────────────────────────────────────────────
@@ -193,6 +197,79 @@ def init_help_db():
         cursor.executemany('''
             INSERT INTO datos_personales (campo, titulo, texto, imageUrl, videoUrl, orden)
             VALUES (?, ?, ?, ?, ?, ?)
+        ''', ayudas)
+        conn.commit()
+    conn.close()
+
+# ─────────────────────────────────────────────
+#  Init: características físicas - textos descriptivos y ayudas
+# ─────────────────────────────────────────────
+def init_caracteristicas_fisicas_dbs():
+    conn = sqlite3.connect(CARACTERISTICAS_FISICAS_DESCRIPTIVE_DB)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS textos_descriptivos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            clave TEXT NOT NULL UNIQUE,
+            titulo TEXT NOT NULL,
+            contenido_html TEXT NOT NULL,
+            orden INTEGER DEFAULT 0
+        )
+    ''')
+    cursor.execute("SELECT COUNT(*) FROM textos_descriptivos")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('''
+            INSERT INTO textos_descriptivos (clave, titulo, contenido_html, orden)
+            VALUES (?, ?, ?, ?)
+        ''', (
+            "introduccion",
+            "Características físicas",
+            '<p>Al completar tus características físicas podremos personalizar mejor las recomendaciones de tu perfil. '
+            'Para obtener más información sobre el uso de tus datos, consulta nuestra '
+            '<a href="/politica-de-privacidad">Política de privacidad</a>.</p>',
+            1
+        ))
+        conn.commit()
+    conn.close()
+
+    conn = sqlite3.connect(CARACTERISTICAS_FISICAS_HELP_DB)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS textos_ayuda (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            campo TEXT NOT NULL UNIQUE,
+            titulo TEXT NOT NULL,
+            contenido_html TEXT NOT NULL,
+            orden INTEGER DEFAULT 0
+        )
+    ''')
+    cursor.execute("SELECT COUNT(*) FROM textos_ayuda")
+    if cursor.fetchone()[0] == 0:
+        ayudas = [
+            ("color_piel", "Color de piel",
+             '<p>Selecciona el tono que mejor represente tu piel en luz natural.</p>'
+             '<img src="https://images.unsplash.com/photo-1617577255197-a4dc2e3a1bd2?auto=format&fit=crop&q=80&w=600" '
+             'alt="Ejemplo de tonos de piel">', 1),
+            ("color_ojos", "Color de ojos",
+             '<p>Elige el color predominante de tu iris, sin lentes de contacto de color.</p>'
+             '<img src="https://images.unsplash.com/photo-1508341591423-4347099e1f19?auto=format&fit=crop&q=80&w=600" '
+             'alt="Ejemplo de color de ojos">', 2),
+            ("color_cabello", "Color de cabello",
+             '<p>Indica tu color natural de cabello. Si lo tiñes, considera el color de raíz.</p>'
+             '<img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600" '
+             'alt="Ejemplo de color de cabello">', 3),
+            ("ubicacion_principal", "Ubicación principal",
+             "<p>Selecciona la ciudad donde resides la mayor parte del tiempo.</p>", 4),
+            ("ubicacion_secundaria", "Ubicación secundaria",
+             "<p>Si corresponde, indica una segunda ciudad de residencia o estancia frecuente.</p>", 5),
+            ("peso_kg", "Peso en kilogramos",
+             "<p>Registra tu peso actual en kilogramos. Puedes usar decimales.</p>", 6),
+            ("estatura_cm", "Estatura en centímetros",
+             "<p>Ingresa tu estatura en centímetros, sin calzado.</p>", 7)
+        ]
+        cursor.executemany('''
+            INSERT INTO textos_ayuda (campo, titulo, contenido_html, orden)
+            VALUES (?, ?, ?, ?)
         ''', ayudas)
         conn.commit()
     conn.close()
@@ -1010,6 +1087,7 @@ def init_nuevo_usuario_dbs():
 # Inicializar todas las bases de datos al arrancar
 init_carousel_db()
 init_help_db()
+init_caracteristicas_fisicas_dbs()
 init_morfologicos_db()
 init_maestras_db()
 init_asesoria_db()
@@ -1335,6 +1413,35 @@ def get_help_by_campo(campo: str):
     if not row:
         raise HTTPException(status_code=404, detail=f"No hay ayuda para el campo '{campo}'")
     return dict(row)
+
+
+# ═══════════════════════════════════════════════
+#  ENDPOINTS: Características físicas - textos
+# ═══════════════════════════════════════════════
+@app.get("/api/caracteristicas-fisicas/textos-descriptivos")
+def get_textos_descriptivos_caracteristicas_fisicas():
+    conn = sqlite3.connect(CARACTERISTICAS_FISICAS_DESCRIPTIVE_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            "SELECT * FROM textos_descriptivos ORDER BY orden ASC"
+        ).fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+
+@app.get("/api/caracteristicas-fisicas/textos-ayuda")
+def get_textos_ayuda_caracteristicas_fisicas():
+    conn = sqlite3.connect(CARACTERISTICAS_FISICAS_HELP_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            "SELECT * FROM textos_ayuda ORDER BY orden ASC"
+        ).fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
 
 
 # ═══════════════════════════════════════════════

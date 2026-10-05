@@ -1,0 +1,101 @@
+<main class="physical-page">
+  <header class="site-header">
+    <a class="brand" routerLink="/" aria-label="TheorIA M, inicio">TheorIA M</a>
+    <nav aria-label="Navegación principal">
+      <a routerLink="/asesoria">Sugerencias</a>
+      <a routerLink="/is">Iniciar sesión</a>
+      <a routerLink="/nu">Registrarse</a>
+    </nav>
+  </header>
+
+  <section class="profile-panel" aria-labelledby="page-title">
+    <h1 id="page-title">Características físicas</h1>
+
+    <div *ngIf="textoIntroduccion" class="introduction" [innerHTML]="textoIntroduccion.contenido_html"></div>
+    <div *ngIf="errorMsg" class="message error-message" role="alert">{{ errorMsg }}</div>
+    <div *ngIf="guardadoExitoso" class="message success-message" role="status">
+      Tu perfil se guardó correctamente.
+    </div>
+
+    <form (ngSubmit)="guardarPerfil()" #profileForm="ngForm">
+      <div class="form-field">
+        <label for="color-piel">Color de piel</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre el color de piel"
+          [attr.aria-expanded]="ayudasVisibles.has('color_piel')" (click)="toggleAyuda('color_piel')">?</button>
+        <select id="color-piel" name="color_piel" [(ngModel)]="form.color_piel">
+          <option value="" disabled>Selecciona tu tono de piel...</option>
+          <option *ngFor="let opcion of opcionesColorPiel" [value]="opcion">{{ opcion }}</option>
+        </select>
+        <div *ngIf="ayudasVisibles.has('color_piel')" class="help-panel" [innerHTML]="textosAyuda.get('color_piel')?.contenido_html"></div>
+      </div>
+
+      <div class="form-field">
+        <label for="color-ojos">Color de ojos</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre el color de ojos"
+          [attr.aria-expanded]="ayudasVisibles.has('color_ojos')" (click)="toggleAyuda('color_ojos')">?</button>
+        <select id="color-ojos" name="color_ojos" [(ngModel)]="form.color_ojos">
+          <option value="" disabled>Selecciona tu color de ojos...</option>
+          <option *ngFor="let opcion of opcionesColorOjos" [value]="opcion">{{ opcion }}</option>
+        </select>
+        <div *ngIf="ayudasVisibles.has('color_ojos')" class="help-panel" [innerHTML]="textosAyuda.get('color_ojos')?.contenido_html"></div>
+      </div>
+
+      <div class="form-field">
+        <label for="color-cabello">Color de cabello</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre el color de cabello"
+          [attr.aria-expanded]="ayudasVisibles.has('color_cabello')" (click)="toggleAyuda('color_cabello')">?</button>
+        <select id="color-cabello" name="color_cabello" [(ngModel)]="form.color_cabello">
+          <option value="" disabled>Selecciona tu color de cabello...</option>
+          <option *ngFor="let opcion of opcionesColorCabello" [value]="opcion">{{ opcion }}</option>
+        </select>
+        <div *ngIf="ayudasVisibles.has('color_cabello')" class="help-panel" [innerHTML]="textosAyuda.get('color_cabello')?.contenido_html"></div>
+      </div>
+
+      <div class="form-field">
+        <label for="ubicacion-principal">Ubicación principal</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre la ubicación principal"
+          [attr.aria-expanded]="ayudasVisibles.has('ubicacion_principal')" (click)="toggleAyuda('ubicacion_principal')">?</button>
+        <select id="ubicacion-principal" name="ubicacion_principal" [(ngModel)]="form.ubicacion_principal">
+          <option value="" disabled>Selecciona tu ubicación principal...</option>
+          <option *ngFor="let opcion of opcionesUbicaciones" [value]="opcion">{{ opcion }}</option>
+        </select>
+        <div *ngIf="ayudasVisibles.has('ubicacion_principal')" class="help-panel" [innerHTML]="textosAyuda.get('ubicacion_principal')?.contenido_html"></div>
+      </div>
+
+      <div class="form-field">
+        <label for="ubicacion-secundaria">Ubicación secundaria</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre la ubicación secundaria"
+          [attr.aria-expanded]="ayudasVisibles.has('ubicacion_secundaria')" (click)="toggleAyuda('ubicacion_secundaria')">?</button>
+        <select id="ubicacion-secundaria" name="ubicacion_secundaria" [(ngModel)]="form.ubicacion_secundaria">
+          <option value="" disabled>Selecciona tu ubicación secundaria...</option>
+          <option *ngFor="let opcion of opcionesUbicaciones" [value]="opcion">{{ opcion }}</option>
+        </select>
+        <div *ngIf="ayudasVisibles.has('ubicacion_secundaria')" class="help-panel" [innerHTML]="textosAyuda.get('ubicacion_secundaria')?.contenido_html"></div>
+      </div>
+
+      <div class="form-field numeric-field">
+        <label for="peso-kg">Peso en kilogramos</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre el peso"
+          [attr.aria-expanded]="ayudasVisibles.has('peso_kg')" (click)="toggleAyuda('peso_kg')">?</button>
+        <input id="peso-kg" name="peso_kg" type="number" min="0" step="0.1" [(ngModel)]="form.peso_kg">
+        <div *ngIf="ayudasVisibles.has('peso_kg')" class="help-panel" [innerHTML]="textosAyuda.get('peso_kg')?.contenido_html"></div>
+      </div>
+
+      <div class="form-field numeric-field">
+        <label for="estatura-cm">Estatura en centímetros</label>
+        <button type="button" class="help-button" aria-label="Ayuda sobre la estatura"
+          [attr.aria-expanded]="ayudasVisibles.has('estatura_cm')" (click)="toggleAyuda('estatura_cm')">?</button>
+        <input id="estatura-cm" name="estatura_cm" type="number" min="0" step="0.1" [(ngModel)]="form.estatura_cm">
+        <div *ngIf="ayudasVisibles.has('estatura_cm')" class="help-panel" [innerHTML]="textosAyuda.get('estatura_cm')?.contenido_html"></div>
+      </div>
+
+      <footer class="form-actions">
+        <button type="button" class="button secondary" [disabled]="!previousRoute" (click)="navegarA(previousRoute)">Anterior</button>
+        <button type="submit" class="button primary" [disabled]="enviando || profileForm.invalid">
+          {{ enviando ? 'Guardando...' : 'Guardar perfil' }}
+        </button>
+        <button type="button" class="button secondary" [disabled]="!nextRoute" (click)="navegarA(nextRoute)">Siguiente</button>
+      </footer>
+    </form>
+  </section>
+</main>
