@@ -4,7 +4,7 @@ import os
 import csv
 from datetime import datetime
 
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 DB_NAME = 'carousel.db'
 DB_PATH = os.path.join(BASE_DIR, 'BDs', DB_NAME)
 

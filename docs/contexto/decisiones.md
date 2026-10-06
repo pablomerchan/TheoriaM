@@ -492,9 +492,11 @@ POST /api/v1/datos-morfologicos
 **Archivos Migraciones**:
 ```
 Backend/
-├── migrate_asesoria_schema.py
-├── migrate_add_columns_tbl_carrusel.py
-└── seed_guia_compras.py
+└── services/
+    └── herramientas_mantenimiento/
+        ├── migrate_asesoria_schema.py
+        ├── migrate_add_columns_tbl_carrusel.py
+        └── seed_guia_compras.py
 ```
 
 **Justificación**:

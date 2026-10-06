@@ -14,9 +14,10 @@ src/
 │   ├── backend.py             # Punto de entrada principal
 │   ├── services/              # Lógica de negocio
 │   │   ├── auth_service.py
-│   │   └── contenidos_personalizados_service.py
+│   │   ├── contenidos_personalizados_service.py
+│   │   └── herramientas_mantenimiento/ # Scripts auxiliares
+│   │       └── scripts de mantenimiento, migración y pruebas
 │   ├── [*.db]                 # Bases de datos SQLite
-│   └── [scripts_*.py]         # Scripts de migración y seeding
 │
 ├── FrontEnd/                   # Aplicación Angular
 │   ├── package.json

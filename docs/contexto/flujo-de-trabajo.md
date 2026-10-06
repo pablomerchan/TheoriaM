@@ -251,7 +251,7 @@ En `asesoria.component.html`, agregar:
 ### 2.3 Desarrollo Backend
 
 #### Paso 1: Crear Tabla en BD (si es necesario)
-**Archivo**: `Backend/migrate_paleta_cromatica.py`
+**Archivo**: `Backend/services/herramientas_mantenimiento/migrate_paleta_cromatica.py`
 
 ```python
 import sqlite3
@@ -282,7 +282,7 @@ if __name__ == '__main__':
 
 **Ejecutar**:
 ```bash
-python migrate_paleta_cromatica.py
+python Backend/services/herramientas_mantenimiento/migrate_paleta_cromatica.py
 ```
 
 ✅ Commit: `git commit -m "db: crear tabla tbl_paleta_cromatica"`
@@ -517,7 +517,7 @@ git commit -m "fix: validar slides antes de renderizar en carousel"
 **Paso 1: Crear Script de Migración**
 ```bash
 # Nombre: migrate_YYYY_MM_DD_descripcion.py
-touch Backend/migrate_2026_06_22_agregar_created_at_paleta.py
+touch Backend/services/herramientas_mantenimiento/migrate_2026_06_22_agregar_created_at_paleta.py
 ```
 
 **Paso 2: Escribir Migración**
@@ -549,7 +549,7 @@ if __name__ == '__main__':
 **Paso 3: Ejecutar en Local**
 ```bash
 cd Backend
-python migrate_2026_06_22_agregar_created_at_paleta.py
+python services/herramientas_mantenimiento/migrate_2026_06_22_agregar_created_at_paleta.py
 ```
 
 **Verificar**:
@@ -864,7 +864,7 @@ npm test
 
 **Crear archivo test**:
 ```bash
-touch Backend/test_paleta_service.py
+touch Backend/services/herramientas_mantenimiento/test_paleta_service.py
 ```
 
 **Escribir test**:
@@ -886,7 +886,7 @@ if __name__ == '__main__':
 **Ejecutar tests**:
 ```bash
 cd Backend
-python -m pytest test_paleta_service.py -v
+python -m pytest services/herramientas_mantenimiento/test_paleta_service.py -v
 ```
 
 ---
@@ -1229,12 +1229,12 @@ Tras resolver emergencia:
 | **Crear Feature** | `git checkout -b feature/nombre` | - |
 | **Build Frontend** | `npm run build` | `FrontEnd/` |
 | **Tests Frontend** | `npm test` | `FrontEnd/src/**/*.spec.ts` |
-| **Tests Backend** | `python -m pytest` | `Backend/test_*.py` |
+| **Tests Backend** | `python -m pytest` | `Backend/services/herramientas_mantenimiento/test_*.py` |
 | **Ver Swagger** | `http://localhost:8000/docs` | - |
 | **Ver App** | `http://localhost:4200` | - |
 | **Formatear TS** | `npx prettier --write .` | `FrontEnd/src/` |
 | **Formatear Python** | `black .` | `Backend/` |
-| **Migrar BD** | `python migrate_*.py` | `Backend/migrate_*.py` |
+| **Migrar BD** | `python Backend/services/herramientas_mantenimiento/migrate_*.py` | `Backend/services/herramientas_mantenimiento/` |
 | **Push Feature** | `git push origin feature/nombre` | - |
 | **Build Prod** | `npm run build` | `FrontEnd/` |
 | **Deploy Prod** | `heroku deploy --app theoriamm-prod` | - |

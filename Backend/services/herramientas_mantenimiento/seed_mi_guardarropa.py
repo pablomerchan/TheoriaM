@@ -2,7 +2,7 @@ import os
 import sqlite3
 import json
 
-conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'BDs', 'asesoria.db'))
+conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), '..', '..', 'BDs', 'asesoria.db'))
 c = conn.cursor()
 
 # 1. Definir los parámetros
