@@ -71,25 +71,13 @@
             </small>
           </div>
 
-          <div class="campo genero-campo">
-            <div class="etiqueta-ayuda">
-              <label for="nuevo-genero">{{ config.textos['genero'] }}</label>
-              <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'genero'"
-                aria-label="Ayuda para género" (click)="alternarAyuda('genero')">?</button>
-            </div>
-            <p *ngIf="ayudaVisible === 'genero'" class="texto-ayuda" role="tooltip">{{ config.ayudas['genero'] }}</p>
-            <select id="nuevo-genero" formControlName="genero">
-              <option value="">{{ config.textos['selecciona_genero'] }}</option>
-              <option *ngFor="let opcion of opcionesGenero" [value]="opcion">{{ config.textos['genero_' + opcion.replace('prefiero_no_decirlo', 'no_decir')] }}</option>
-            </select>
-          </div>
         </section>
 
         <div class="campo">
           <div class="etiqueta-ayuda">
             <label for="nuevo-contacto">{{ config.textos['contacto'] }}</label>
             <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'contacto'"
-              aria-label="Ayuda para número móvil o correo" (click)="alternarAyuda('contacto')">?</button>
+              aria-label="Ayuda para correo electrónico" (click)="alternarAyuda('contacto')">?</button>
           </div>
           <p *ngIf="ayudaVisible === 'contacto'" class="texto-ayuda" role="tooltip">{{ config.ayudas['contacto'] }}</p>
           <input id="nuevo-contacto" type="text" formControlName="contacto" autocomplete="email"
