@@ -1,3 +1,4 @@
+@use 'sass:map';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 // ── Tokens ─────────────────────────────────────────────────────
@@ -30,7 +31,7 @@ $themes: (
 
 // Función para obtener color del tema
 @function theme-color($key) {
-  @return map-get(map-get($themes, dark), $key);
+  @return map.get(map.get($themes, dark), $key);
 }
 
 $bg: var(--bg, #0f0f13);
@@ -53,16 +54,16 @@ $danger: var(--danger, #ef4444);
   transition: background 0.3s ease, color 0.3s ease;
 
   &.light-mode {
-    --bg: #{map-get(map-get($themes, light), bg)};
-    --surface: #{map-get(map-get($themes, light), surface)};
-    --surface-2: #{map-get(map-get($themes, light), surface-2)};
-    --border: #{map-get(map-get($themes, light), border)};
-    --accent: #{map-get(map-get($themes, light), accent)};
-    --accent-2: #{map-get(map-get($themes, light), accent-2)};
-    --text: #{map-get(map-get($themes, light), text)};
-    --text-muted: #{map-get(map-get($themes, light), text-muted)};
-    --success: #{map-get(map-get($themes, light), success)};
-    --danger: #{map-get(map-get($themes, light), danger)};
+    --bg: #{map.get(map.get($themes, light), bg)};
+    --surface: #{map.get(map.get($themes, light), surface)};
+    --surface-2: #{map.get(map.get($themes, light), surface-2)};
+    --border: #{map.get(map.get($themes, light), border)};
+    --accent: #{map.get(map.get($themes, light), accent)};
+    --accent-2: #{map.get(map.get($themes, light), accent-2)};
+    --text: #{map.get(map.get($themes, light), text)};
+    --text-muted: #{map.get(map.get($themes, light), text-muted)};
+    --success: #{map.get(map.get($themes, light), success)};
+    --danger: #{map.get(map.get($themes, light), danger)};
     --header-bg: rgba(248, 249, 250, 0.85);
   }
 }

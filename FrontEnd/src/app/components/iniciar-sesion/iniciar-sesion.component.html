@@ -1,7 +1,49 @@
 <main class="sesion-page">
   <section class="sesion-panel" aria-labelledby="sesion-titulo">
-    <h1 id="sesion-titulo">Inicio de sesión</h1>
-    <p>El inicio de sesión estará disponible cuando se integre el backend de usuarios.</p>
-    <a routerLink="/nuevo-usuario">Crear una cuenta</a>
+    <h1 id="sesion-titulo" *ngIf="formulario">{{ formulario.titulo }}</h1>
+    <p *ngIf="cargando" role="status">Cargando formulario...</p>
+    <p *ngIf="error && !formulario" class="error" role="alert">{{ error }}</p>
+
+    <ng-container *ngIf="formulario as config">
+      <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+
+      <form [formGroup]="form" (ngSubmit)="enviarLogin()" novalidate>
+        <div class="campo">
+          <label for="sesion-identificador">{{ config.textos['identificador'] }}</label>
+          <input
+            id="sesion-identificador"
+            type="text"
+            formControlName="identificador"
+            [placeholder]="config.textos['placeholder_identificador']"
+            maxlength="254"
+            autocomplete="username"
+          />
+          <small *ngIf="form.controls.identificador.touched && form.controls.identificador.invalid">
+            {{ config.textos['error_identificador'] }}
+          </small>
+        </div>
+
+        <div class="campo">
+          <label for="sesion-contrasena">{{ config.textos['contrasena'] }}</label>
+          <input
+            id="sesion-contrasena"
+            type="password"
+            formControlName="contrasena"
+            [placeholder]="config.textos['placeholder_contrasena']"
+            maxlength="128"
+            autocomplete="current-password"
+          />
+          <small *ngIf="form.controls.contrasena.touched && form.controls.contrasena.invalid">
+            {{ config.textos['error_contrasena'] }}
+          </small>
+        </div>
+
+        <button class="boton-enviar" type="submit" [disabled]="enviando">
+          {{ enviando ? config.textos['entrando'] : config.textos['entrar'] }}
+        </button>
+      </form>
+
+      <a class="boton-crear-cuenta" routerLink="/nuevo-usuario">{{ config.textos['crear_cuenta'] }}</a>
+    </ng-container>
   </section>
 </main>

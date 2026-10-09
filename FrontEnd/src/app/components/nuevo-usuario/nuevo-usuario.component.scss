@@ -89,8 +89,7 @@
 
 .campo > input,
 .fila-nombre input,
-.fila-fecha select,
-.genero-campo select {
+.fila-fecha select {
   box-sizing: border-box;
   width: 100%;
   min-height: 52px;
@@ -105,8 +104,7 @@
 
 .campo > input:focus,
 .fila-nombre input:focus,
-.fila-fecha select:focus,
-.genero-campo select:focus {
+.fila-fecha select:focus {
   border-color: #e34862;
   box-shadow: 0 0 0 1px #e34862;
 }
@@ -139,15 +137,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.fila-fecha select,
-.genero-campo select {
+.fila-fecha select {
   min-height: 74px;
   border-radius: 20px;
   font-size: 18px;
-}
-
-.genero-campo select {
-  min-height: 68px;
 }
 
 .campo small {

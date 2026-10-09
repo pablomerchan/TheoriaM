@@ -1,0 +1,4 @@
+fastapi
+pydantic
+pyodbc>=5.2,<6
+uvicorn

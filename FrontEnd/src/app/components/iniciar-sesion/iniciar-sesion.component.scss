@@ -33,15 +33,65 @@
   line-height: 1.5;
 }
 
-.sesion-panel a {
+form {
+  display: grid;
+  gap: 18px;
+}
+
+.campo {
+  display: grid;
+  gap: 8px;
+}
+
+.campo label {
+  font-weight: 600;
+}
+
+.campo input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid #d9dce1;
+  border-radius: 14px;
+  color: #344054;
+  background: #fff;
+  font: 15px Arial, sans-serif;
+}
+
+.campo input:focus {
+  border-color: #e34862;
+  box-shadow: 0 0 0 1px #e34862;
+}
+
+.campo small,
+.error {
+  color: #8e2333;
+  font-size: 13px;
+}
+
+.boton-enviar,
+.boton-crear-cuenta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 45px;
   padding: 0 20px;
+  border: 0;
   border-radius: 24px;
   color: #fff;
   background: #0866e9;
   text-decoration: none;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-crear-cuenta {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.boton-enviar:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }

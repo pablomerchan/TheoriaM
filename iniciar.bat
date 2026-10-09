@@ -1,5 +1,5 @@
 cd C:\Empresas\TheoriaM\src\backend\
-python C:\Empresas\TheoriaM\src\backend\backend.py
+C:\Empresas\TheoriaM\src\.venv\Scripts\python.exe C:\Empresas\TheoriaM\src\backend\backend.py
 
 
 cd C:\Empresas\TheoriaM\src\frontend\

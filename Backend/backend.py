@@ -6,6 +6,7 @@ import re
 import hashlib
 import secrets
 import smtplib
+import pyodbc
 from datetime import date
 from email.message import EmailMessage
 from typing import Optional
@@ -21,6 +22,12 @@ if ROOT not in sys.path:
 
 from services.auth_service import AuthService
 from services.contenidos_personalizados_service import ContenidosPersonalizadosService
+from services.usuarios_sql_service import (
+    UsuarioDuplicadoError,
+    crear_usuario,
+    obtener_usuario_activo,
+    registrar_intento_login,
+)
 
 from webmaster.articulo_crud import (
     Articulo as WC_Articulo,
@@ -73,7 +80,6 @@ CARACTERISTICAS_FISICAS_DESCRIPTIVE_DB = os.path.normpath(
     os.path.join(BASE_DIR, "..", "FrontEnd", "BDs", "BD_caracteristicas_fisicas")
 )
 CARACTERISTICAS_FISICAS_HELP_DB = os.path.normpath(os.path.join(DB_DIR, "caracteristicas_fisicas"))
-TMP_NEW_USER_DB = os.path.normpath(os.path.join(DB_DIR, "BD_Tmp_newUser"))
 
 # ─────────────────────────────────────────────
 #  Init: carousel.db
@@ -967,7 +973,6 @@ def init_centro_contacto_db():
 
 def init_nuevo_usuario_dbs():
     os.makedirs(os.path.dirname(FORMULARIO_NUEVO_USUARIO_DB), exist_ok=True)
-    os.makedirs(os.path.dirname(TMP_NEW_USER_DB), exist_ok=True)
 
     textos = [
         ("titulo", "Empieza a usar TheorIA M, crea tu cuenta."),
@@ -993,14 +998,8 @@ def init_nuevo_usuario_dbs():
         ("mes_10", "Octubre"),
         ("mes_11", "Noviembre"),
         ("mes_12", "Diciembre"),
-        ("genero", "Género"),
-        ("selecciona_genero", "Selecciona tu género"),
-        ("genero_mujer", "Mujer"),
-        ("genero_hombre", "Hombre"),
-        ("genero_no_binario", "No binario"),
-        ("genero_no_decir", "Prefiero no decirlo"),
-        ("contacto", "Número de móvil o correo electrónico"),
-        ("placeholder_contacto", "Número de móvil o correo electrónico"),
+        ("contacto", "Correo electrónico"),
+        ("placeholder_contacto", "Correo electrónico"),
         ("contrasena", "Contraseña"),
         ("placeholder_contrasena", "Contraseña"),
         ("confirmar_contrasena", "Confirmar Contraseña"),
@@ -1009,29 +1008,33 @@ def init_nuevo_usuario_dbs():
         ("enviando", "Enviando..."),
         ("iniciar_sesion", "Ya tengo una cuenta"),
         ("registro_exitoso", "Tu solicitud de registro quedó guardada."),
-        ("registro_pendiente", "La activación de tu cuenta estará disponible cuando se conecte el backend."),
+        ("registro_pendiente", "Tu cuenta ya está activa. Puedes iniciar sesión."),
         ("error_carga", "No fue posible cargar el formulario. Inténtalo de nuevo más tarde."),
         ("error_envio", "No fue posible guardar tus datos. Inténtalo de nuevo."),
         ("error_nombre", "Escribe tu nombre."),
         ("error_apellidos", "Escribe tus apellidos."),
         ("error_seudonimo", "Escribe un seudónimo."),
         ("error_fecha", "Selecciona una fecha de nacimiento válida."),
-        ("error_genero", "Selecciona una opción válida."),
-        ("error_contacto", "Escribe un correo válido o un número de móvil."),
+        ("error_contacto", "Escribe un correo electrónico válido."),
         ("error_contrasena", "La contraseña debe tener entre 8 y 128 caracteres."),
         ("error_confirmar_contrasena", "Confirma tu contraseña."),
         ("error_contrasenas_no_coinciden", "Las contraseñas no coinciden."),
+        ("error_usuario_duplicado", "Ese correo o seudónimo ya están registrados."),
         ("login_titulo", "Inicio de sesión"),
         ("login_pendiente", "El inicio de sesión estará disponible cuando se integre el backend de usuarios."),
+        ("identificador", "Email o seudónimo"),
+        ("placeholder_identificador", "Email o seudónimo"),
+        ("error_identificador", "Escribe tu email o seudónimo."),
+        ("entrar", "Entrar"),
+        ("entrando", "Entrando..."),
         ("crear_cuenta", "Crear una cuenta"),
     ]
     ayudas = [
         ("nombre", "Usa el nombre y los apellidos con los que quieres identificar tu cuenta."),
         ("seudonimo", "Elige un nombre corto para mostrar en tu perfil."),
         ("fecha_nacimiento", "Usamos esta fecha para personalizar tu experiencia."),
-        ("genero", "Este dato es opcional y se usa para personalizar algunas recomendaciones."),
         ("contacto", "Usa un correo electrónico o un móvil válido para identificar tu cuenta."),
-        ("contrasena", "Elige una contraseña de entre 8 y 128 caracteres. Se guarda de forma protegida."),
+        ("contrasena", "Elige una contraseña de entre 8 y 128 caracteres."),
         ("confirmar_contrasena", "Vuelve a escribir la misma contraseña para confirmar que es correcta."),
     ]
 
@@ -1057,29 +1060,6 @@ def init_nuevo_usuario_dbs():
             "INSERT OR IGNORE INTO ayudas_formulario (campo, texto) VALUES (?, ?)",
             ayudas,
         )
-        conn.commit()
-    finally:
-        conn.close()
-
-    conn = sqlite3.connect(TMP_NEW_USER_DB)
-    try:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS tbl_new_user_queue (
-                id TEXT PRIMARY KEY,
-                nombre TEXT NOT NULL,
-                apellidos TEXT NOT NULL,
-                seudonimo TEXT NOT NULL,
-                dia_nacimiento INTEGER NOT NULL,
-                mes_nacimiento INTEGER NOT NULL,
-                anio_nacimiento INTEGER NOT NULL,
-                genero TEXT,
-                contacto TEXT NOT NULL,
-                password_salt TEXT NOT NULL,
-                password_hash TEXT NOT NULL,
-                estado TEXT NOT NULL DEFAULT 'pendiente',
-                creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
         conn.commit()
     finally:
         conn.close()
@@ -1132,10 +1112,18 @@ class NuevoUsuarioInput(BaseModel):
     dia_nacimiento: int
     mes_nacimiento: int
     anio_nacimiento: int
-    genero: Optional[str] = None
     contacto: str
     contrasena: str
     confirmar_contrasena: str
+
+
+class IniciarSesionInput(BaseModel):
+    identificador: str
+    contrasena: str
+
+
+def validar_politica_contrasena(contrasena: str) -> bool:
+    return 8 <= len(contrasena) <= 128
 
 
 @app.get("/api/nuevo-usuario/formulario")
@@ -1151,7 +1139,12 @@ def get_formulario_nuevo_usuario():
             row["campo"]: row["texto"]
             for row in conn.execute("SELECT campo, texto FROM ayudas_formulario")
         }
-        return {"titulo": textos["titulo"], "textos": textos, "ayudas": ayudas}
+        textos["contacto"] = "Correo electrónico"
+        textos["placeholder_contacto"] = "Correo electrónico"
+        textos["error_contacto"] = "Escribe un correo electrónico válido."
+        textos["registro_pendiente"] = "Tu cuenta ya está activa. Puedes iniciar sesión."
+        ayudas["contacto"] = "Usa el correo electrónico que utilizarás para identificar tu cuenta."
+        return {"titulo": textos.get("titulo", "Empieza a usar TheorIA M, crea tu cuenta."), "textos": textos, "ayudas": ayudas}
     finally:
         conn.close()
 
@@ -1176,16 +1169,10 @@ def crear_nuevo_usuario(registro: NuevoUsuarioInput):
     if nacimiento > date.today():
         raise HTTPException(status_code=422, detail="La fecha de nacimiento no puede ser futura.")
 
-    generos_validos = {"mujer", "hombre", "no_binario", "prefiero_no_decirlo"}
-    if registro.genero and registro.genero not in generos_validos:
-        raise HTTPException(status_code=422, detail="Selecciona una opción de género válida.")
-
     correo_valido = re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", contacto) is not None
-    movil_normalizado = re.sub(r"[\s().-]", "", contacto)
-    movil_valido = re.fullmatch(r"\+?\d{7,15}", movil_normalizado) is not None
-    if len(contacto) > 254 or not (correo_valido or movil_valido):
-        raise HTTPException(status_code=422, detail="Ingresa un correo válido o un número de móvil.")
-    if len(registro.contrasena) < 8 or len(registro.contrasena) > 128:
+    if len(contacto) > 254 or not correo_valido:
+        raise HTTPException(status_code=422, detail="Ingresa un correo electrónico válido.")
+    if not validar_politica_contrasena(registro.contrasena):
         raise HTTPException(status_code=422, detail="La contraseña debe tener entre 8 y 128 caracteres.")
     if registro.contrasena != registro.confirmar_contrasena:
         raise HTTPException(status_code=422, detail="Las contraseñas no coinciden.")
@@ -1197,34 +1184,86 @@ def crear_nuevo_usuario(registro: NuevoUsuarioInput):
         password_salt,
         600_000,
     )
-    usuario_id = str(uuid.uuid4())
-    conn = sqlite3.connect(TMP_NEW_USER_DB)
+    usuario_id = uuid.uuid4()
     try:
-        conn.execute(
-            """
-            INSERT INTO tbl_new_user_queue (
-                id, nombre, apellidos, seudonimo, dia_nacimiento, mes_nacimiento,
-                anio_nacimiento, genero, contacto, password_salt, password_hash
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                usuario_id,
-                nombre,
-                apellidos,
-                seudonimo,
-                registro.dia_nacimiento,
-                registro.mes_nacimiento,
-                registro.anio_nacimiento,
-                registro.genero or None,
-                contacto,
-                password_salt.hex(),
-                password_hash.hex(),
-            ),
+        crear_usuario(
+            usuario_id,
+            nombre,
+            apellidos,
+            seudonimo,
+            nacimiento,
+            contacto,
+            password_hash,
+            password_salt,
         )
-        conn.commit()
+    except UsuarioDuplicadoError as error:
+        raise HTTPException(status_code=409, detail="Ese correo o seudónimo ya están registrados.") from error
+    except pyodbc.Error as error:
+        raise HTTPException(status_code=503, detail="No fue posible guardar el registro en SQL Server.") from error
+    return {"id": str(usuario_id), "estado": "activo"}
+
+
+@app.get("/api/iniciar-sesion/formulario")
+def get_formulario_iniciar_sesion():
+    conn = sqlite3.connect(FORMULARIO_NUEVO_USUARIO_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        textos = {
+            row["clave"]: row["texto"]
+            for row in conn.execute("SELECT clave, texto FROM textos_formulario")
+        }
+        ayudas = {
+            row["campo"]: row["texto"]
+            for row in conn.execute("SELECT campo, texto FROM ayudas_formulario")
+        }
+        textos.setdefault("titulo", "Inicio de sesión")
+        textos.setdefault("identificador", "Email o seudónimo")
+        textos.setdefault("placeholder_identificador", "Email o seudónimo")
+        textos.setdefault("error_identificador", "Escribe tu email o seudónimo.")
+        textos.setdefault("entrar", "Entrar")
+        textos.setdefault("entrando", "Entrando...")
+        textos.setdefault("crear_cuenta", "Crear una cuenta")
+        textos.setdefault("error_envio", "No fue posible iniciar sesión.")
+        return {"titulo": textos.get("login_titulo", textos.get("titulo", "Inicio de sesión")), "textos": textos, "ayudas": ayudas}
     finally:
         conn.close()
-    return {"id": usuario_id, "estado": "pendiente"}
+
+
+@app.post("/api/iniciar-sesion")
+def iniciar_sesion(registro: IniciarSesionInput, request: Request):
+    identificador = registro.identificador.strip()
+    contrasena = registro.contrasena
+    direccion_ip = request.client.host if request.client else None
+    if not identificador or len(identificador) > 254:
+        registrar_intento_login(identificador, False, direccion_ip, "Identificador inválido.")
+        raise HTTPException(status_code=422, detail="El email o seudónimo es obligatorio.")
+    if not validar_politica_contrasena(contrasena):
+        registrar_intento_login(identificador, False, direccion_ip, "Contraseña con formato inválido.")
+        raise HTTPException(status_code=422, detail="La contraseña debe tener entre 8 y 128 caracteres.")
+
+    try:
+        usuario = obtener_usuario_activo(identificador)
+    except pyodbc.Error as error:
+        registrar_intento_login(identificador, False, direccion_ip, "Error al validar las credenciales.")
+        raise HTTPException(status_code=503, detail="No fue posible validar las credenciales.") from error
+
+    if usuario is None:
+        registrar_intento_login(identificador, False, direccion_ip, "Credenciales inválidas.")
+        raise HTTPException(status_code=401, detail="Credenciales inválidas.")
+
+    password_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        contrasena.encode("utf-8"),
+        usuario["salt"],
+        600_000,
+    )
+    if not secrets.compare_digest(password_hash, usuario["password_hash"]):
+        registrar_intento_login(identificador, False, direccion_ip, "Credenciales inválidas.")
+        raise HTTPException(status_code=401, detail="Credenciales inválidas.")
+
+    registrar_intento_login(identificador, True, direccion_ip, "Inicio de sesión exitoso.")
+    token = secrets.token_urlsafe(32)
+    return {"token": token, "expires_in": 3600, "redirectTo": "/"}
 
 
 # ═══════════════════════════════════════════════
