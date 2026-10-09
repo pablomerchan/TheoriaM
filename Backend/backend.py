@@ -1263,7 +1263,13 @@ def iniciar_sesion(registro: IniciarSesionInput, request: Request):
 
     registrar_intento_login(identificador, True, direccion_ip, "Inicio de sesión exitoso.")
     token = secrets.token_urlsafe(32)
-    return {"token": token, "expires_in": 3600, "redirectTo": "/"}
+    return {
+        "token": token,
+        "expires_in": 3600,
+        "redirectTo": "/",
+        "id": str(usuario["id"]),
+        "seudonimo": usuario["seudonimo"],
+    }
 
 
 # ═══════════════════════════════════════════════

@@ -135,7 +135,7 @@ def obtener_usuario_activo(identificador: str) -> dict[str, Any] | None:
         try:
             cursor.execute(
                 """
-                SELECT IdUsr, password_hash, salt
+                SELECT IdUsr, seudonimo, password_hash, salt
                 FROM tm_userdata.tbl_usuarios
                 WHERE (LOWER(email) = LOWER(?) OR LOWER(seudonimo) = LOWER(?))
                   AND LOWER(estado) = LOWER(?)
@@ -149,8 +149,9 @@ def obtener_usuario_activo(identificador: str) -> dict[str, Any] | None:
                 return None
             return {
                 "id": usuario[0],
-                "password_hash": bytes(usuario[1]),
-                "salt": bytes(usuario[2]),
+                "seudonimo": usuario[1],
+                "password_hash": bytes(usuario[2]),
+                "salt": bytes(usuario[3]),
             }
         finally:
             cursor.close()

@@ -13,9 +13,11 @@ interface IniciarSesionFormulario {
 }
 
 interface IniciarSesionRespuesta {
-  token?: string;
+  token: string;
   redirectTo?: string;
   expires_in?: number;
+  id: string;
+  seudonimo: string;
 }
 
 @Component({
@@ -70,10 +72,9 @@ export class IniciarSesionComponent implements OnInit {
       contrasena: valores.contrasena
     }).subscribe({
       next: (respuesta) => {
-        const token = respuesta.token;
-        if (token) {
-          localStorage.setItem('theoriam_token', token);
-        }
+        localStorage.setItem('theoriam_token', respuesta.token);
+        localStorage.setItem('theoriam_usuario_id', respuesta.id);
+        localStorage.setItem('theoriam_seudonimo', respuesta.seudonimo);
 
         const destino = respuesta.redirectTo ?? '/';
         // TODO: definir la ruta final tras iniciar sesión.
