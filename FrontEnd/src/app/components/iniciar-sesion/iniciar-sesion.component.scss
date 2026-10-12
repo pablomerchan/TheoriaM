@@ -64,6 +64,17 @@ form {
   box-shadow: 0 0 0 1px #e34862;
 }
 
+.recordar-usuario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recordar-usuario input {
+  width: auto;
+  min-height: auto;
+}
+
 .campo small,
 .error {
   color: #8e2333;

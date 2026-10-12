@@ -1,0 +1,109 @@
+<div class="pagina-caracteristicas">
+  <header class="encabezado">
+    <a class="marca" routerLink="/" aria-label="TheorIA M, inicio">
+      <span class="marca-nombre">{{ configuracion?.textos?.['logo'] || 'TheorIA M' }}</span>
+      <span class="marca-slogan">{{ configuracion?.textos?.['slogan'] || 'ESTILO CON INTENCIÓN' }}</span>
+    </a>
+
+    <nav
+      *ngIf="configuracion as config"
+      class="navegacion"
+      [attr.aria-label]="config.textos['menu_aria']"
+    >
+      <a *ngFor="let elemento of config.menu" [routerLink]="elemento.ruta">{{ elemento.etiqueta }}</a>
+    </nav>
+  </header>
+
+  <main class="contenido">
+    <p *ngIf="cargando" class="estado" role="status">
+      {{ configuracion?.textos?.['estado_cargando'] || 'Cargando formulario...' }}
+    </p>
+
+    <p *ngIf="error && !cargando" class="mensaje error" role="alert">{{ error }}</p>
+
+    <ng-container *ngIf="!cargando">
+      <ng-container *ngIf="configuracion as config">
+        <h1>{{ config.saludo }}</h1>
+
+        <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+          <section
+            *ngFor="let campo of config.campos"
+            class="campo"
+            [class.campo-numero]="campo.tipo === 'number'"
+          >
+            <div class="titulo-campo">
+              <label [for]="'caracteristica-' + campo.clave">{{ campo.etiqueta }}</label>
+              <button
+                class="boton-ayuda"
+                type="button"
+                [attr.aria-label]="config.textos['ayuda_aria'] + ' ' + campo.etiqueta"
+                [attr.aria-expanded]="ayudaVisible(campo.clave)"
+                (click)="mostrarAyuda(campo.clave)"
+              >
+                {{ config.textos['icono_ayuda'] || '?' }}
+              </button>
+
+              <div *ngIf="ayudaVisible(campo.clave)" class="ayuda" role="note">
+                <div [innerHTML]="campo.ayuda_html"></div>
+              </div>
+            </div>
+
+            <select
+              *ngIf="campo.tipo === 'dropdown'"
+              [id]="'caracteristica-' + campo.clave"
+              [formControlName]="campo.clave"
+              [required]="campo.requerido"
+            >
+              <option [ngValue]="null" disabled>{{ campo.placeholder }}</option>
+              <option *ngFor="let opcion of campo.opciones" [value]="opcion.valor">
+                {{ opcion.etiqueta }}
+              </option>
+            </select>
+
+            <input
+              *ngIf="campo.tipo === 'number'"
+              [id]="'caracteristica-' + campo.clave"
+              type="number"
+              [formControlName]="campo.clave"
+              [placeholder]="campo.placeholder"
+              [attr.min]="campo.minimo"
+              [attr.max]="campo.maximo"
+              [attr.step]="campo.paso"
+              [required]="campo.requerido"
+            />
+
+            <small
+              *ngIf="form.controls[campo.clave]?.touched && form.controls[campo.clave]?.invalid"
+              class="validacion"
+              role="alert"
+            >
+              {{
+                form.controls[campo.clave]?.hasError('required')
+                  ? config.textos['error_requerido']
+                  : config.textos['error_rango']
+              }}
+            </small>
+
+            <p *ngIf="campo.clave === 'color_piel' && config.textos['aviso_privacidad']" class="aviso-privacidad">
+              {{ config.textos['aviso_privacidad'] }}
+            </p>
+          </section>
+
+          <div class="acciones">
+            <a class="boton boton-secundario" [routerLink]="rutaAnterior">
+              {{ config.textos['anterior'] }}
+            </a>
+            <button class="boton boton-guardar" type="submit" [disabled]="cargando || guardando">
+              {{ guardando ? config.textos['guardando'] : config.textos['guardar'] }}
+            </button>
+            <button class="boton boton-secundario" type="button" disabled>
+              {{ config.textos['siguiente'] }}
+            </button>
+          </div>
+        </form>
+
+        <p *ngIf="mensaje" class="mensaje exito" role="status">{{ mensaje }}</p>
+      </ng-container>
+    </ng-container>
+  </main>
+</div>

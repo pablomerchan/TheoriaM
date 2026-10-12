@@ -1,11 +1,44 @@
 import os
 import sqlite3
+import threading
+import time
 from fastapi import Request, HTTPException
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 ASESORIA_DB = os.path.normpath(os.path.join(BASE_DIR, "BDs", "asesoria.db"))
 
+
 class AuthService:
+    _sessions: dict[str, tuple[str, str, float]] = {}
+    _sessions_lock = threading.Lock()
+
+    @classmethod
+    def register_session(
+        cls,
+        token: str,
+        user_id: str,
+        seudonimo: str,
+        expires_in: int = 3600,
+    ) -> None:
+        with cls._sessions_lock:
+            cls._sessions[token] = (user_id, seudonimo, time.monotonic() + expires_in)
+
+    @classmethod
+    def get_authenticated_session(cls, request: Request) -> dict[str, str] | None:
+        auth_header = request.headers.get("Authorization", "")
+        scheme, _, token = auth_header.partition(" ")
+        if scheme.lower() != "bearer" or not token:
+            return None
+
+        with cls._sessions_lock:
+            session = cls._sessions.get(token)
+            if session is None:
+                return None
+            if session[2] <= time.monotonic():
+                del cls._sessions[token]
+                return None
+            return {"user_id": session[0], "seudonimo": session[1]}
+
     @staticmethod
     def get_current_user_id(request: Request) -> str:
         """

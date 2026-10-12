@@ -38,6 +38,11 @@
           </small>
         </div>
 
+        <label class="recordar-usuario">
+          <input type="checkbox" formControlName="recordarUsuario" />
+          {{ config.textos['recordar_usuario'] || 'Recordar usuario' }}
+        </label>
+
         <button class="boton-enviar" type="submit" [disabled]="enviando">
           {{ enviando ? config.textos['entrando'] : config.textos['entrar'] }}
         </button>

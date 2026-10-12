@@ -28,6 +28,10 @@ from services.usuarios_sql_service import (
     obtener_usuario_activo,
     registrar_intento_login,
 )
+from routes.caracteristicas_fisicas import (
+    inicializar_contenido_caracteristicas,
+    router as caracteristicas_fisicas_router,
+)
 
 from webmaster.articulo_crud import (
     Articulo as WC_Articulo,
@@ -1075,6 +1079,8 @@ init_landing_page_db()
 init_centro_informacion_db()
 init_centro_contacto_db()
 init_nuevo_usuario_dbs()
+inicializar_contenido_caracteristicas()
+app.include_router(caracteristicas_fisicas_router)
 
 
 # ─────────────────────────────────────────────
@@ -1263,10 +1269,11 @@ def iniciar_sesion(registro: IniciarSesionInput, request: Request):
 
     registrar_intento_login(identificador, True, direccion_ip, "Inicio de sesión exitoso.")
     token = secrets.token_urlsafe(32)
+    AuthService.register_session(token, str(usuario["id"]), usuario["seudonimo"])
     return {
         "token": token,
         "expires_in": 3600,
-        "redirectTo": "/",
+        "redirectTo": "/cf",
         "id": str(usuario["id"]),
         "seudonimo": usuario["seudonimo"],
     }
