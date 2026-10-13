@@ -74,7 +74,7 @@ def obtener_configuracion(request: Request) -> dict[str, Any]:
 def obtener_caracteristicas(request: Request) -> dict[str, Any] | None:
     session = _usuario_autenticado(request)
     try:
-        return caracteristicas_service.obtener(session["user_id"])
+        return caracteristicas_service.obtener(session["seudonimo"])
     except Exception as error:
         logger.exception("No fue posible cargar las características físicas guardadas.")
         raise _error_persistencia() from error
@@ -88,7 +88,7 @@ def guardar_caracteristicas(
     session = _usuario_autenticado(request)
     try:
         mensaje = caracteristicas_service.guardar(
-            session["user_id"],
+            session["seudonimo"],
             datos.model_dump(),
         )
         return {"mensaje": mensaje}

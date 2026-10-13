@@ -54,6 +54,7 @@ export class CaracteristicasFisicasComponent implements OnInit {
   configuracion: ConfiguracionCaracteristicas | null = null;
   rutaAnterior = '/nuevo-usuario';
   cargando = true;
+  cargandoValores = false;
   guardando = false;
   error = '';
   mensaje = '';
@@ -73,6 +74,9 @@ export class CaracteristicasFisicasComponent implements OnInit {
         this.configuracion = configuracion;
         this.rutaAnterior = configuracion.textos['ruta_anterior'] || this.rutaAnterior;
         this.crearControles(configuracion.campos);
+        this.cargando = false;
+        this.cargandoValores = true;
+        this.form.disable();
         this.http.get<ValoresCaracteristicas | null>(this.apiUrl, { headers }).subscribe({
           next: (valores) => {
             if (valores) {
@@ -80,7 +84,8 @@ export class CaracteristicasFisicasComponent implements OnInit {
                 this.form.controls[campo.clave]?.setValue(valores[campo.clave] ?? null);
               }
             }
-            this.cargando = false;
+            this.cargandoValores = false;
+            this.form.enable();
           },
           error: (error: HttpErrorResponse) => {
             console.error('No fue posible cargar las características físicas guardadas:', error);
@@ -89,7 +94,8 @@ export class CaracteristicasFisicasComponent implements OnInit {
               return;
             }
             this.error = this.obtenerDetalleError(error) || configuracion.textos['error_carga'];
-            this.cargando = false;
+            this.cargandoValores = false;
+            this.form.enable();
           }
         });
       },
@@ -119,7 +125,7 @@ export class CaracteristicasFisicasComponent implements OnInit {
   }
 
   guardar(): void {
-    if (this.form.invalid || this.guardando || !this.configuracion) {
+    if (this.form.invalid || this.guardando || this.cargandoValores || !this.configuracion) {
       this.form.markAllAsTouched();
       return;
     }

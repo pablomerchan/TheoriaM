@@ -25,7 +25,16 @@
       <ng-container *ngIf="configuracion as config">
         <h1>{{ config.saludo }}</h1>
 
-        <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <form
+          [formGroup]="form"
+          (ngSubmit)="guardar()"
+          [attr.aria-busy]="cargandoValores"
+          novalidate
+        >
+          <p *ngIf="cargandoValores" class="estado" role="status">
+            Cargando tus características guardadas...
+          </p>
+
           <section
             *ngFor="let campo of config.campos"
             class="campo"
@@ -93,7 +102,11 @@
             <a class="boton boton-secundario" [routerLink]="rutaAnterior">
               {{ config.textos['anterior'] }}
             </a>
-            <button class="boton boton-guardar" type="submit" [disabled]="cargando || guardando">
+            <button
+              class="boton boton-guardar"
+              type="submit"
+              [disabled]="cargando || cargandoValores || guardando"
+            >
               {{ guardando ? config.textos['guardando'] : config.textos['guardar'] }}
             </button>
             <button class="boton boton-secundario" type="button" disabled>
