@@ -149,8 +149,16 @@ form {
   object-fit: contain;
 }
 
-.boton-mostrar-ayuda {
+.acciones-ayuda {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-top: 10px;
+}
+
+.boton-mostrar-ayuda,
+.boton-cerrar-ayuda {
   padding: 0;
   border: 0;
   color: #4054b2;
@@ -159,7 +167,8 @@ form {
   cursor: pointer;
 }
 
-.boton-mostrar-ayuda:focus-visible {
+.boton-mostrar-ayuda:focus-visible,
+.boton-cerrar-ayuda:focus-visible {
   outline: 2px solid #5262bd;
   outline-offset: 2px;
 }

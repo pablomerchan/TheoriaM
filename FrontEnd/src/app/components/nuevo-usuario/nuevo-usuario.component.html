@@ -20,7 +20,7 @@
             <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'nombre'"
               aria-label="Ayuda para nombre y apellidos" (click)="alternarAyuda('nombre')">?</button>
           </div>
-          <p *ngIf="ayudaVisible === 'nombre'" class="texto-ayuda" role="tooltip">{{ config.ayudas['nombre'] }}</p>
+          <div *ngIf="ayudaVisible === 'nombre'" class="texto-ayuda" role="tooltip" [innerHTML]="config.ayudas['nombre']"></div>
           <div class="fila-nombre">
             <input id="nuevo-nombre" type="text" formControlName="nombre" autocomplete="given-name"
               [placeholder]="config.textos['placeholder_nombre']" maxlength="120" />
@@ -37,7 +37,7 @@
             <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'seudonimo'"
               aria-label="Ayuda para seudónimo" (click)="alternarAyuda('seudonimo')">?</button>
           </div>
-          <p *ngIf="ayudaVisible === 'seudonimo'" class="texto-ayuda" role="tooltip">{{ config.ayudas['seudonimo'] }}</p>
+          <div *ngIf="ayudaVisible === 'seudonimo'" class="texto-ayuda" role="tooltip" [innerHTML]="config.ayudas['seudonimo']"></div>
           <input id="nuevo-seudonimo" type="text" formControlName="seudonimo" autocomplete="nickname"
             [placeholder]="config.textos['placeholder_seudonimo']" maxlength="50" />
           <small *ngIf="form.controls.seudonimo.touched && form.controls.seudonimo.invalid">{{ config.textos['error_seudonimo'] }}</small>
@@ -50,7 +50,7 @@
               <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'fecha_nacimiento'"
                 aria-label="Ayuda para fecha de nacimiento" (click)="alternarAyuda('fecha_nacimiento')">?</button>
             </div>
-            <p *ngIf="ayudaVisible === 'fecha_nacimiento'" class="texto-ayuda" role="tooltip">{{ config.ayudas['fecha_nacimiento'] }}</p>
+            <div *ngIf="ayudaVisible === 'fecha_nacimiento'" class="texto-ayuda" role="tooltip" [innerHTML]="config.ayudas['fecha_nacimiento']"></div>
             <div class="fila-fecha">
               <select id="dia-nacimiento" formControlName="dia_nacimiento" [attr.aria-label]="config.textos['dia']">
                 <option value="">{{ config.textos['dia'] }}</option>
@@ -79,7 +79,7 @@
             <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'contacto'"
               aria-label="Ayuda para correo electrónico" (click)="alternarAyuda('contacto')">?</button>
           </div>
-          <p *ngIf="ayudaVisible === 'contacto'" class="texto-ayuda" role="tooltip">{{ config.ayudas['contacto'] }}</p>
+          <div *ngIf="ayudaVisible === 'contacto'" class="texto-ayuda" role="tooltip" [innerHTML]="config.ayudas['contacto']"></div>
           <input id="nuevo-contacto" type="text" formControlName="contacto" autocomplete="email"
             [placeholder]="config.textos['placeholder_contacto']" maxlength="254" />
           <small *ngIf="form.controls.contacto.touched && form.controls.contacto.invalid">{{ config.textos['error_contacto'] }}</small>
@@ -91,7 +91,7 @@
             <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'contrasena'"
               aria-label="Ayuda para contraseña" (click)="alternarAyuda('contrasena')">?</button>
           </div>
-          <p *ngIf="ayudaVisible === 'contrasena'" class="texto-ayuda" role="tooltip">{{ config.ayudas['contrasena'] }}</p>
+          <div *ngIf="ayudaVisible === 'contrasena'" class="texto-ayuda" role="tooltip" [innerHTML]="config.ayudas['contrasena']"></div>
           <input id="nuevo-contrasena" type="password" formControlName="contrasena" autocomplete="new-password"
             [placeholder]="config.textos['placeholder_contrasena']" maxlength="128" />
           <small *ngIf="form.controls.contrasena.touched && form.controls.contrasena.invalid">{{ config.textos['error_contrasena'] }}</small>
@@ -103,7 +103,7 @@
             <button type="button" class="boton-ayuda" [attr.aria-expanded]="ayudaVisible === 'confirmar_contrasena'"
               aria-label="Ayuda para confirmar contraseña" (click)="alternarAyuda('confirmar_contrasena')">?</button>
           </div>
-          <p *ngIf="ayudaVisible === 'confirmar_contrasena'" class="texto-ayuda" role="tooltip">{{ config.ayudas['confirmar_contrasena'] }}</p>
+          <div *ngIf="ayudaVisible === 'confirmar_contrasena'" class="texto-ayuda" role="tooltip" [innerHTML]="config.ayudas['confirmar_contrasena']"></div>
           <input id="confirmar-contrasena" type="password" formControlName="confirmar_contrasena" autocomplete="new-password"
             [placeholder]="config.textos['placeholder_confirmar_contrasena']" maxlength="128" />
           <small *ngIf="form.controls.confirmar_contrasena.touched && form.controls.confirmar_contrasena.invalid">

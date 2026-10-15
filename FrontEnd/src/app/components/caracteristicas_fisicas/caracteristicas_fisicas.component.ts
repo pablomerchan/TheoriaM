@@ -147,6 +147,10 @@ export class CaracteristicasFisicasComponent implements OnInit {
     return this.ayudasExpandidas.has(clave);
   }
 
+  tieneMasContenido(elemento: HTMLElement): boolean {
+    return elemento.scrollHeight > 140;
+  }
+
   guardar(): void {
     if (this.form.invalid || this.guardando || this.cargandoValores || !this.configuracion) {
       this.form.markAllAsTouched();

@@ -66,19 +66,30 @@
               [id]="'ayuda-' + campo.clave"
               role="note"
             >
-              <div class="ayuda-contenido" [innerHTML]="campo.ayuda_html"></div>
-              <button
-                class="boton-mostrar-ayuda"
-                type="button"
-                [attr.aria-expanded]="ayudaExpandida(campo.clave)"
-                (click)="alternarAyudaExpandida(campo.clave)"
-              >
-                {{
-                  ayudaExpandida(campo.clave)
-                    ? config.textos['ayuda_mostrar_menos']
-                    : config.textos['ayuda_mostrar_mas']
-                }}
-              </button>
+              <div #contenidoAyuda class="ayuda-contenido" [innerHTML]="campo.ayuda_html"></div>
+              <div class="acciones-ayuda">
+                <button
+                  *ngIf="tieneMasContenido(contenidoAyuda)"
+                  class="boton-mostrar-ayuda"
+                  type="button"
+                  [attr.aria-expanded]="ayudaExpandida(campo.clave)"
+                  (click)="alternarAyudaExpandida(campo.clave)"
+                >
+                  {{
+                    ayudaExpandida(campo.clave)
+                      ? config.textos['ayuda_mostrar_menos']
+                      : config.textos['ayuda_mostrar_mas']
+                  }}
+                </button>
+                <button
+                  class="boton-cerrar-ayuda"
+                  type="button"
+                  [attr.aria-label]="'Cerrar ayuda de ' + campo.etiqueta"
+                  (click)="mostrarAyuda(campo.clave)"
+                >
+                  Cerrar ayuda
+                </button>
+              </div>
             </div>
 
             <select
