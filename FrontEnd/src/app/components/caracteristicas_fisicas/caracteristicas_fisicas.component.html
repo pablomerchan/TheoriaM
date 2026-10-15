@@ -1,8 +1,12 @@
 <div class="pagina-caracteristicas">
+  <!-- FrontEnd/BDs/BD_caracteristicas_fisicas es la fuente de configuración del formulario. -->
+  <!-- Los datos personales se leen y guardan en SQL Server,
+       [TheoriaM].[tm_userdata].[caracteristicas_fisicas], por IdReg.
+       La API obtiene IdReg de la sesión autenticada; el seudónimo no es clave. -->
   <header class="encabezado">
-    <a class="marca" routerLink="/" aria-label="TheorIA M, inicio">
-      <span class="marca-nombre">{{ configuracion?.textos?.['logo'] || 'TheorIA M' }}</span>
-      <span class="marca-slogan">{{ configuracion?.textos?.['slogan'] || 'ESTILO CON INTENCIÓN' }}</span>
+    <a class="marca" routerLink="/" [attr.aria-label]="configuracion?.textos?.['logo_aria']">
+      <span class="marca-nombre">{{ configuracion?.textos?.['logo'] }}</span>
+      <span class="marca-slogan">{{ configuracion?.textos?.['slogan'] }}</span>
     </a>
 
     <nav
@@ -16,14 +20,15 @@
 
   <main class="contenido">
     <p *ngIf="cargando" class="estado" role="status">
-      {{ configuracion?.textos?.['estado_cargando'] || 'Cargando formulario...' }}
+      {{ configuracion?.textos?.['estado_cargando'] }}
     </p>
 
     <p *ngIf="error && !cargando" class="mensaje error" role="alert">{{ error }}</p>
 
     <ng-container *ngIf="!cargando">
       <ng-container *ngIf="configuracion as config">
-        <h1>{{ config.saludo }}</h1>
+        <h1>{{ config.textos['titulo'] }}</h1>
+        <p>{{ config.saludo }}</p>
 
         <form
           [formGroup]="form"
@@ -32,7 +37,7 @@
           novalidate
         >
           <p *ngIf="cargandoValores" class="estado" role="status">
-            Cargando tus características guardadas...
+            {{ config.textos['estado_cargando_valores'] }}
           </p>
 
           <section
@@ -47,14 +52,33 @@
                 type="button"
                 [attr.aria-label]="config.textos['ayuda_aria'] + ' ' + campo.etiqueta"
                 [attr.aria-expanded]="ayudaVisible(campo.clave)"
+                [attr.aria-controls]="'ayuda-' + campo.clave"
                 (click)="mostrarAyuda(campo.clave)"
               >
-                {{ config.textos['icono_ayuda'] || '?' }}
+                {{ config.textos['icono_ayuda'] }}
               </button>
+            </div>
 
-              <div *ngIf="ayudaVisible(campo.clave)" class="ayuda" role="note">
-                <div [innerHTML]="campo.ayuda_html"></div>
-              </div>
+            <div
+              *ngIf="ayudaVisible(campo.clave)"
+              class="ayuda"
+              [class.ayuda-expandida]="ayudaExpandida(campo.clave)"
+              [id]="'ayuda-' + campo.clave"
+              role="note"
+            >
+              <div class="ayuda-contenido" [innerHTML]="campo.ayuda_html"></div>
+              <button
+                class="boton-mostrar-ayuda"
+                type="button"
+                [attr.aria-expanded]="ayudaExpandida(campo.clave)"
+                (click)="alternarAyudaExpandida(campo.clave)"
+              >
+                {{
+                  ayudaExpandida(campo.clave)
+                    ? config.textos['ayuda_mostrar_menos']
+                    : config.textos['ayuda_mostrar_mas']
+                }}
+              </button>
             </div>
 
             <select
@@ -93,9 +117,6 @@
               }}
             </small>
 
-            <p *ngIf="campo.clave === 'color_piel' && config.textos['aviso_privacidad']" class="aviso-privacidad">
-              {{ config.textos['aviso_privacidad'] }}
-            </p>
           </section>
 
           <div class="acciones">

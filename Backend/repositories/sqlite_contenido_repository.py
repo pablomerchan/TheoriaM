@@ -1,5 +1,4 @@
 import html
-import os
 import sqlite3
 from contextlib import closing
 from html.parser import HTMLParser
@@ -82,17 +81,22 @@ def sanitizar_ayuda(contenido: str) -> str:
 
 class SqliteContenidoRepository:
     def __init__(self, database_path: str | Path | None = None) -> None:
-        configured_path = database_path or os.environ.get(
-            "THEORIAM_CARACTERISTICAS_FISICAS_DB"
-        )
-        self.database_path = Path(configured_path) if configured_path else (
-            BASE_DIR / "BDs" / "caracteristicas_fisicas"
+        self.database_path = Path(database_path) if database_path else (
+            BASE_DIR.parent / "FrontEnd" / "BDs" / "BD_caracteristicas_fisicas"
         )
 
     def inicializar(self) -> None:
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(sqlite3.connect(self.database_path)) as connection:
             connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+            columnas_campos = {
+                row[1]
+                for row in connection.execute("PRAGMA table_info(campos)")
+            }
+            if "ayuda_html" in columnas_campos:
+                connection.execute("ALTER TABLE campos DROP COLUMN ayuda_html")
+            connection.execute("DROP TABLE IF EXISTS textos_descriptivos")
+            connection.commit()
 
     def get_configuracion(self, seudonimo: str) -> dict[str, Any]:
         with closing(self._connect()) as connection:
@@ -103,10 +107,12 @@ class SqliteContenidoRepository:
             saludo = textos["saludo"].replace("{seudonimo}", seudonimo)
             campos = connection.execute(
                 """
-                SELECT clave, orden, tipo, etiqueta, placeholder, ayuda_html,
-                       requerido, minimo, maximo, paso
-                FROM campos
-                ORDER BY orden
+                SELECT campo.clave, campo.orden, campo.tipo, campo.etiqueta,
+                       campo.placeholder, ayuda.contenido_html AS ayuda_html,
+                       campo.requerido, campo.minimo, campo.maximo, campo.paso
+                FROM campos AS campo
+                LEFT JOIN textos_ayuda AS ayuda ON ayuda.campo = campo.clave
+                ORDER BY campo.orden
                 """
             ).fetchall()
             opciones = connection.execute(
@@ -135,7 +141,7 @@ class SqliteContenidoRepository:
                     "tipo": campo["tipo"],
                     "etiqueta": campo["etiqueta"],
                     "placeholder": campo["placeholder"],
-                    "ayuda_html": sanitizar_ayuda(campo["ayuda_html"]),
+                    "ayuda_html": sanitizar_ayuda(campo["ayuda_html"] or ""),
                     "requerido": bool(campo["requerido"]),
                     "minimo": campo["minimo"],
                     "maximo": campo["maximo"],

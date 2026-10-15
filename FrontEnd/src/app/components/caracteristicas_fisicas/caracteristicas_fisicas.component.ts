@@ -52,13 +52,14 @@ export class CaracteristicasFisicasComponent implements OnInit {
 
   readonly form = new FormRecord<FormControl<string | number | null>>({});
   configuracion: ConfiguracionCaracteristicas | null = null;
-  rutaAnterior = '/nuevo-usuario';
+  rutaAnterior: string | null = null;
   cargando = true;
   cargandoValores = false;
   guardando = false;
   error = '';
   mensaje = '';
   private readonly ayudasVisibles = new Set<string>();
+  private readonly ayudasExpandidas = new Set<string>();
 
   ngOnInit(): void {
     const token = this.obtenerToken();
@@ -72,7 +73,7 @@ export class CaracteristicasFisicasComponent implements OnInit {
     this.http.get<ConfiguracionCaracteristicas>(`${this.apiUrl}/configuracion`, { headers }).subscribe({
       next: (configuracion) => {
         this.configuracion = configuracion;
-        this.rutaAnterior = configuracion.textos['ruta_anterior'] || this.rutaAnterior;
+        this.rutaAnterior = configuracion.textos['ruta_anterior'];
         this.crearControles(configuracion.campos);
         this.cargando = false;
         this.cargandoValores = true;
@@ -81,7 +82,18 @@ export class CaracteristicasFisicasComponent implements OnInit {
           next: (valores) => {
             if (valores) {
               for (const campo of configuracion.campos) {
-                this.form.controls[campo.clave]?.setValue(valores[campo.clave] ?? null);
+                const valor = valores[campo.clave] ?? null;
+                const valorNormalizado =
+                  campo.tipo === 'dropdown' && typeof valor === 'string'
+                    ? campo.opciones.find(
+                        (opcion) =>
+                          opcion.valor.trim().toLocaleLowerCase() ===
+                            valor.trim().toLocaleLowerCase() ||
+                          opcion.etiqueta.trim().toLocaleLowerCase() ===
+                            valor.trim().toLocaleLowerCase()
+                      )?.valor ?? valor
+                    : valor;
+                this.form.controls[campo.clave]?.setValue(valorNormalizado);
               }
             }
             this.cargandoValores = false;
@@ -105,8 +117,7 @@ export class CaracteristicasFisicasComponent implements OnInit {
           this.redirigirALogin();
           return;
         }
-        this.error = this.obtenerDetalleError(error)
-          || 'No fue posible cargar el formulario. Inténtalo de nuevo más tarde.';
+        this.error = this.obtenerDetalleError(error);
         this.cargando = false;
       }
     });
@@ -122,6 +133,18 @@ export class CaracteristicasFisicasComponent implements OnInit {
 
   ayudaVisible(clave: string): boolean {
     return this.ayudasVisibles.has(clave);
+  }
+
+  alternarAyudaExpandida(clave: string): void {
+    if (this.ayudasExpandidas.has(clave)) {
+      this.ayudasExpandidas.delete(clave);
+    } else {
+      this.ayudasExpandidas.add(clave);
+    }
+  }
+
+  ayudaExpandida(clave: string): boolean {
+    return this.ayudasExpandidas.has(clave);
   }
 
   guardar(): void {

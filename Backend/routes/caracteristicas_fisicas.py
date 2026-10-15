@@ -1,10 +1,7 @@
 import logging
-import os
-from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
 
 from repositories.sqlite_contenido_repository import SqliteContenidoRepository
 from repositories.sql_server_caracteristicas_repository import (
@@ -18,23 +15,12 @@ from services.caracteristicas_fisicas_service import (
 
 
 logger = logging.getLogger(__name__)
-contenido_repository = SqliteContenidoRepository(
-    os.environ.get("THEORIAM_CARACTERISTICAS_FISICAS_DB")
-    or Path(__file__).resolve().parents[1] / "BDs" / "caracteristicas_fisicas"
-)
+contenido_repository = SqliteContenidoRepository()
 caracteristicas_service = CaracteristicasFisicasService(
     contenido_repository,
     SqlServerCaracteristicasRepository(),
 )
 router = APIRouter(prefix="/api/caracteristicas-fisicas", tags=["caracteristicas-fisicas"])
-
-
-class CaracteristicasFisicasInput(BaseModel):
-    sexo: str | None = None
-    color_piel: str | None = None
-    peso_kg: float | None = None
-    estatura_cm: float | None = None
-    color_cabello: str | None = None
 
 
 def inicializar_contenido_caracteristicas() -> None:
@@ -74,7 +60,7 @@ def obtener_configuracion(request: Request) -> dict[str, Any]:
 def obtener_caracteristicas(request: Request) -> dict[str, Any] | None:
     session = _usuario_autenticado(request)
     try:
-        return caracteristicas_service.obtener(session["seudonimo"])
+        return caracteristicas_service.obtener(session["user_id"])
     except Exception as error:
         logger.exception("No fue posible cargar las características físicas guardadas.")
         raise _error_persistencia() from error
@@ -82,14 +68,15 @@ def obtener_caracteristicas(request: Request) -> dict[str, Any] | None:
 
 @router.post("")
 def guardar_caracteristicas(
-    datos: CaracteristicasFisicasInput,
+    datos: dict[str, Any],
     request: Request,
 ) -> dict[str, str]:
     session = _usuario_autenticado(request)
     try:
         mensaje = caracteristicas_service.guardar(
+            session["user_id"],
             session["seudonimo"],
-            datos.model_dump(),
+            datos,
         )
         return {"mensaje": mensaje}
     except ErrorValidacionCaracteristicas as error:

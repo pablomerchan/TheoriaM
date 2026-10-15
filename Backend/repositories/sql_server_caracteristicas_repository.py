@@ -4,7 +4,7 @@ from services.usuarios_sql_service import abrir_conexion
 
 
 class SqlServerCaracteristicasRepository:
-    def obtener(self, seudonimo: str) -> dict[str, Any] | None:
+    def obtener(self, id_reg: str) -> dict[str, Any] | None:
         connection = abrir_conexion("users_database")
         try:
             cursor = connection.cursor()
@@ -12,10 +12,10 @@ class SqlServerCaracteristicasRepository:
                 cursor.execute(
                     """
                     SELECT sexo, color_piel, peso_kg, estatura_cm, color_cabello
-                    FROM tm_userdata.caracteristicas_fisicas
-                    WHERE seudonimo = ?
+                    FROM [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+                    WHERE IdReg = ?
                     """,
-                    seudonimo,
+                    id_reg,
                 )
                 row = cursor.fetchone()
                 if row is None:
@@ -32,24 +32,25 @@ class SqlServerCaracteristicasRepository:
         finally:
             connection.close()
 
-    def guardar(self, seudonimo: str, valores: dict[str, Any]) -> None:
+    def guardar(self, id_reg: str, seudonimo: str, valores: dict[str, Any]) -> None:
         connection = abrir_conexion("users_database")
         try:
             cursor = connection.cursor()
             try:
                 cursor.execute(
                     """
-                    UPDATE tm_userdata.caracteristicas_fisicas WITH (UPDLOCK, HOLDLOCK)
+                    UPDATE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+                        WITH (UPDLOCK, HOLDLOCK)
                     SET sexo = ?, color_piel = ?, peso_kg = ?, estatura_cm = ?,
                         color_cabello = ?
-                    WHERE seudonimo = ?;
+                    WHERE IdReg = ?;
                     IF @@ROWCOUNT = 0
                     BEGIN
-                        INSERT INTO tm_userdata.caracteristicas_fisicas (
+                        INSERT INTO [TheoriaM].[tm_userdata].[caracteristicas_fisicas] (
                             IdReg, seudonimo, sexo, color_piel, peso_kg, estatura_cm,
                             color_cabello, clima_principal, clima_secundario
                         ) VALUES (
-                            NEWID(), ?, ?, ?, ?, ?, ?, N'No especificado', N'No especificado'
+                            ?, ?, ?, ?, ?, ?, ?, N'No especificado', N'No especificado'
                         );
                     END;
                     """,
@@ -58,7 +59,8 @@ class SqlServerCaracteristicasRepository:
                     valores["peso_kg"],
                     valores["estatura_cm"],
                     valores["color_cabello"],
-                    seudonimo,
+                    id_reg,
+                    id_reg,
                     seudonimo,
                     valores["sexo"],
                     valores["color_piel"],

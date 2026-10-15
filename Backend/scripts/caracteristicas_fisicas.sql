@@ -12,7 +12,6 @@ BEGIN
         clima_principal NVARCHAR(200) NOT NULL,
         clima_secundario NVARCHAR(200) NOT NULL,
         CONSTRAINT PK_caracteristicas_fisicas PRIMARY KEY (IdReg),
-        CONSTRAINT UQ_caracteristicas_fisicas_seudonimo UNIQUE (seudonimo),
         CONSTRAINT CK_caracteristicas_fisicas_peso_kg
             CHECK (peso_kg BETWEEN 20 AND 500),
         CONSTRAINT CK_caracteristicas_fisicas_estatura_cm
@@ -60,7 +59,7 @@ BEGIN
             ADD CONSTRAINT PK_caracteristicas_fisicas PRIMARY KEY (IdReg);
     END;
 
-    IF NOT EXISTS (
+    IF EXISTS (
         SELECT 1
         FROM [TheoriaM].sys.key_constraints
         WHERE parent_object_id =
@@ -69,9 +68,32 @@ BEGIN
     )
     BEGIN
         ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
-            ADD CONSTRAINT UQ_caracteristicas_fisicas_seudonimo
-            UNIQUE (seudonimo);
+            DROP CONSTRAINT UQ_caracteristicas_fisicas_seudonimo;
     END;
+
+    ;WITH usuarios_con_seudonimo_unico AS (
+        SELECT IdUsr, seudonimo
+        FROM (
+            SELECT
+                IdUsr,
+                seudonimo,
+                COUNT_BIG(*) OVER (PARTITION BY LOWER(seudonimo)) AS cantidad
+            FROM [TheoriaM].[tm_userdata].[tbl_usuarios]
+        ) AS usuarios
+        WHERE cantidad = 1
+    )
+    UPDATE caracteristicas
+    SET IdReg = usuario.IdUsr
+    FROM [TheoriaM].[tm_userdata].[caracteristicas_fisicas] AS caracteristicas
+    INNER JOIN usuarios_con_seudonimo_unico AS usuario
+        ON LOWER(caracteristicas.seudonimo) = LOWER(usuario.seudonimo)
+    WHERE caracteristicas.IdReg <> usuario.IdUsr
+      AND NOT EXISTS (
+          SELECT 1
+          FROM [TheoriaM].[tm_userdata].[caracteristicas_fisicas] AS existente
+          WHERE existente.IdReg = usuario.IdUsr
+            AND existente.IdReg <> caracteristicas.IdReg
+      );
 
     IF NOT EXISTS (
         SELECT 1

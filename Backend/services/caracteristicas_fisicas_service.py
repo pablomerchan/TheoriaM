@@ -25,10 +25,10 @@ class CaracteristicasFisicasService:
     def obtener_configuracion(self, seudonimo: str) -> dict[str, Any]:
         return self.contenido.get_configuracion(seudonimo)
 
-    def obtener(self, seudonimo: str) -> dict[str, Any] | None:
-        return self.caracteristicas.obtener(seudonimo)
+    def obtener(self, id_reg: str) -> dict[str, Any] | None:
+        return self.caracteristicas.obtener(id_reg)
 
-    def guardar(self, seudonimo: str, valores: dict[str, Any]) -> str:
+    def guardar(self, id_reg: str, seudonimo: str, valores: dict[str, Any]) -> str:
         campos = self.contenido.get_campos()
         valores_validos: dict[str, Any] = {}
 
@@ -73,7 +73,7 @@ class CaracteristicasFisicasService:
                 )
             valores_validos[clave] = valor_numerico
 
-        self.caracteristicas.guardar(seudonimo, valores_validos)
+        self.caracteristicas.guardar(id_reg, seudonimo, valores_validos)
         return self.contenido.get_texto("guardado")
 
     def mensaje(self, clave: str) -> str:
