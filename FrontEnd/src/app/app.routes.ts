@@ -11,15 +11,12 @@ import { CaracteristicasFisicasComponent } from './components/caracteristicas_fi
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: ServiceLandingPageComponent },
-  { path: 'ci', component: CentroInformacionComponent },
-  { path: 'centro-contacto', component: CentroContactoComponent },
-  { path: 'nuevo-usuario', component: NuevoUsuarioComponent },
-  { path: 'nu', component: NuevoUsuarioComponent },
-  { path: 'iniciar-sesion', component: IniciarSesionComponent },
-  { path: 'is', component: IniciarSesionComponent },
-  { path: 'cf', component: CaracteristicasFisicasComponent, canActivate: [authGuard] },
-  { path: 'caracteristicas-fisicas', component: CaracteristicasFisicasComponent, canActivate: [authGuard] },
+  { path: '', component: ServiceLandingPageComponent }, //Raiz
+  { path: 'ci', component: CentroInformacionComponent }, // Centro informacion
+  { path: 'cc', component: CentroContactoComponent }, // Centro de contacto
+  { path: 'nu', component: NuevoUsuarioComponent }, // Nuevo usuario
+  { path: 'is', component: IniciarSesionComponent }, // Iniciar sesion
+  { path: 'cf', component: CaracteristicasFisicasComponent, canActivate: [authGuard] }, // Caracteristicas fisicas
   { path: 'webmaster', component: WebmasterDashboardComponent },
   { path: 'webmaster/articulos', component: WebmasterArticuloComponent },
   { path: 'webmaster/articulos/nuevo', component: WebmasterArticuloAddComponent },
