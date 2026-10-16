@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { environment } from '../../../environments/environment';
+import { SessionService } from '../../core/session.service';
 
 interface IniciarSesionFormulario {
   titulo: string;
@@ -32,6 +33,7 @@ export class IniciarSesionComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly sessionService = inject(SessionService);
   private readonly apiUrl = `${environment.apiBaseUrl}/iniciar-sesion`;
 
   readonly form = this.formBuilder.group({
@@ -89,9 +91,10 @@ export class IniciarSesionComponent implements OnInit {
         } else {
           localStorage.removeItem('theoriam_usuario_recordado');
         }
-        localStorage.setItem('theoriam_token', respuesta.token);
-        localStorage.setItem('theoriam_usuario_id', respuesta.id);
-        localStorage.setItem('theoriam_seudonimo', respuesta.seudonimo);
+        this.sessionService.establecerSesion(
+          respuesta.token,
+          { id: respuesta.id, seudonimo: respuesta.seudonimo }
+        );
 
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
         const destino = returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')

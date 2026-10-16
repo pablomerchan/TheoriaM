@@ -1,0 +1,17 @@
+@if (imagen(); as imagenFeed) {
+  <figure
+    class="image-block"
+    [style.aspect-ratio]="imagenFeed.ancho + ' / ' + imagenFeed.alto"
+  >
+    <img
+      [ngSrc]="imagenFeed.url"
+      [alt]="imagenFeed.alt"
+      [width]="imagenFeed.ancho"
+      [height]="imagenFeed.alto"
+      loading="lazy"
+      sizes="100vw"
+    />
+  </figure>
+} @else {
+  <p class="block-error" role="alert">{{ textoInvalido() }}</p>
+}

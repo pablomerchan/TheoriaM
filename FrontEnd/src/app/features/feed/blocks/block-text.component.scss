@@ -1,0 +1,16 @@
+.text-block {
+  overflow-wrap: anywhere;
+}
+
+.text-block :first-child {
+  margin-top: 0;
+}
+
+.text-block :last-child {
+  margin-bottom: 0;
+}
+
+.block-error {
+  margin: 0;
+  color: #8b1e1e;
+}

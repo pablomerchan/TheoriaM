@@ -1,0 +1,38 @@
+@if (video(); as videoFeed) {
+  <figure class="video-block" [style.aspect-ratio]="videoFeed.ancho + ' / ' + videoFeed.alto">
+    <video
+      #videoElement
+      controls
+      preload="none"
+      playsinline
+      [width]="videoFeed.ancho"
+      [height]="videoFeed.alto"
+      [attr.poster]="videoFeed.poster"
+    >
+      <source [src]="videoFeed.url" />
+      @if (videoFeed.subtitulosUrl) {
+        <track
+          kind="captions"
+          srclang="es"
+          [label]="texto('feed.video.captions')"
+          [src]="videoFeed.subtitulosUrl"
+        />
+      }
+    </video>
+  </figure>
+
+  @if (videoFeed.transcripcion) {
+    <details class="video-transcript">
+      <summary>{{ texto('feed.video.transcript') }}</summary>
+      <p>{{ videoFeed.transcripcion }}</p>
+    </details>
+  }
+
+  @if (!videoFeed.subtitulosUrl && !videoFeed.transcripcion) {
+    <p class="video-accessibility-error" role="status">
+      {{ texto('feed.video.accessibilityMissing') }}
+    </p>
+  }
+} @else {
+  <p class="video-accessibility-error" role="alert">{{ texto('feed.video.invalid') }}</p>
+}

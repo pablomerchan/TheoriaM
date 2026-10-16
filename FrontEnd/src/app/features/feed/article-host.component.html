@@ -1,0 +1,43 @@
+<article
+  class="feed-article"
+  role="article"
+  [attr.aria-posinset]="posicion"
+  [attr.aria-setsize]="totalArticulos"
+>
+  <header class="article-header">
+    <h2>{{ articulo.titulo }}</h2>
+    <time [attr.datetime]="articulo.publicado_en">
+      {{ articulo.publicado_en | date: 'dd/MM/yyyy' }}
+    </time>
+  </header>
+
+  @for (bloque of articulo.bloques; track bloque.id) {
+    <section class="article-block" [style.aspect-ratio]="aspectoBloque(bloque)">
+      @defer (on viewport) {
+        @switch (bloque.tipo) {
+          @case ('texto') {
+            <app-block-text [payload]="bloque.payload" />
+          }
+          @case ('imagen') {
+            <app-block-image [payload]="bloque.payload" />
+          }
+          @case ('video') {
+            <app-block-video [payload]="bloque.payload" />
+          }
+          @case ('form') {
+            <app-block-form [articuloId]="articulo.id" [formId]="formId(bloque)" />
+          }
+          @default {
+            <p class="unsupported-block" role="status">
+              {{ texto('feed.block.unavailable') }}
+            </p>
+          }
+        }
+      } @placeholder {
+        <div class="block-placeholder" aria-hidden="true"></div>
+      } @loading (minimum 100ms) {
+        <p class="block-placeholder" role="status">{{ texto('feed.block.loading') }}</p>
+      }
+    </section>
+  }
+</article>

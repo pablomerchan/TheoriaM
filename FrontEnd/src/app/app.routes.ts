@@ -17,6 +17,17 @@ export const routes: Routes = [
   { path: 'nu', component: NuevoUsuarioComponent }, // Nuevo usuario
   { path: 'is', component: IniciarSesionComponent }, // Iniciar sesion
   { path: 'cf', component: CaracteristicasFisicasComponent, canActivate: [authGuard] }, // Caracteristicas fisicas
+  {
+    path: 'feed',
+    loadComponent: () =>
+      import('./features/feed/feed-shell.component').then((module) => module.FeedShellComponent),
+    canActivate: [authGuard],
+    children: [{
+      path: '',
+      loadComponent: () =>
+        import('./features/feed/feed-container.component').then((module) => module.FeedContainerComponent)
+    }]
+  },
   { path: 'webmaster', component: WebmasterDashboardComponent },
   { path: 'webmaster/articulos', component: WebmasterArticuloComponent },
   { path: 'webmaster/articulos/nuevo', component: WebmasterArticuloAddComponent },

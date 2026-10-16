@@ -1,0 +1,44 @@
+.video-block {
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #101215;
+}
+
+.video-block video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-transcript {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #f0f2f5;
+}
+
+.video-transcript summary {
+  min-height: 44px;
+  padding-block: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.video-transcript p {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+}
+
+.video-accessibility-error {
+  margin: 0;
+  color: #8b1e1e;
+}
+
+@media (prefers-color-scheme: dark) {
+  .video-transcript {
+    color: #f2f4f7;
+    background: #343a44;
+  }
+}

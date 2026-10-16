@@ -1,0 +1,113 @@
+<div
+  class="feed-shell"
+  [class.mobile]="estructura() === 'mobile'"
+  [class.tablet]="estructura() === 'tablet'"
+>
+  <aside class="sidebar">
+    <a class="brand" routerLink="/feed">{{ texto('feed.brand') }}</a>
+    @if (errorMenu(); as mensajeError) {
+      <p role="alert">{{ mensajeError }}</p>
+    }
+
+    @if (estructura() !== 'mobile') {
+      @if (saludo(); as bienvenida) {
+        <p class="saludo">{{ bienvenida }}</p>
+      }
+    }
+
+    @if (estructura() === 'mobile') {
+      <nav class="mobile-navigation" [attr.aria-label]="texto('feed.menu.label')">
+        @for (opcion of opcionesPrincipales(); track opcion.id) {
+          <button
+            class="menu-button"
+            type="button"
+            [attr.aria-label]="opcion.etiqueta"
+            [attr.title]="opcion.etiqueta"
+            (click)="seleccionar(opcion)"
+          >
+            <span class="menu-icon" aria-hidden="true">{{ opcion.icono }}</span>
+            <span class="menu-label">{{ opcion.etiqueta }}</span>
+          </button>
+        }
+
+        @if (opcionesAdicionales().length > 0) {
+          <button
+            class="menu-button"
+            type="button"
+            [attr.aria-label]="texto('feed.menu.more')"
+            [attr.aria-expanded]="masAbierto()"
+            (click)="alternarMas()"
+          >
+            <span class="menu-icon" aria-hidden="true">⋯</span>
+            <span class="menu-label">{{ texto('feed.menu.more') }}</span>
+          </button>
+
+          @if (masAbierto()) {
+            <div class="more-menu">
+              @for (opcion of opcionesAdicionales(); track opcion.id) {
+                <button
+                  class="menu-button"
+                  type="button"
+                  [attr.aria-label]="opcion.etiqueta"
+                  (click)="seleccionar(opcion)"
+                >
+                  <span class="menu-icon" aria-hidden="true">{{ opcion.icono }}</span>
+                  <span class="menu-label">{{ opcion.etiqueta }}</span>
+                </button>
+              }
+            </div>
+          }
+        }
+      </nav>
+    } @else {
+      <nav class="desktop-navigation" [attr.aria-label]="texto('feed.menu.label')">
+        @for (opcion of opciones(); track opcion.id) {
+          <button
+            class="menu-button"
+            type="button"
+            [attr.aria-label]="opcion.etiqueta"
+            [attr.title]="estructura() === 'tablet' ? opcion.etiqueta : null"
+            (click)="seleccionar(opcion)"
+          >
+            <span class="menu-icon" aria-hidden="true">{{ opcion.icono }}</span>
+            @if (estructura() === 'desktop') {
+              <span class="menu-label">{{ opcion.etiqueta }}</span>
+            }
+          </button>
+        }
+      </nav>
+    }
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      @if (estructura() === 'mobile') {
+        <p class="brand">{{ texto('feed.brand') }}</p>
+      }
+      @if (estructura() !== 'desktop') {
+        @if (saludo(); as bienvenida) {
+          <h1>{{ bienvenida }}</h1>
+        }
+      }
+    </header>
+
+    <main class="feed-content">
+      <router-outlet />
+    </main>
+  </div>
+
+  @if (panelAbierto()) {
+    <aside class="side-panel" aria-labelledby="feed-panel-title">
+      <button
+        class="panel-close"
+        type="button"
+        [attr.aria-label]="texto('feed.panel.close')"
+        (click)="cerrarPanel()"
+      >
+        ×
+      </button>
+      <h2 id="feed-panel-title">{{ tituloPanel() }}</h2>
+      <p>{{ texto('feed.panel.description') }}</p>
+    </aside>
+  }
+</div>

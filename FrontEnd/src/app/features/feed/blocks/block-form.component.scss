@@ -1,0 +1,103 @@
+.form-block {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.form-block h3,
+.form-block p {
+  margin: 0;
+}
+
+.form-block form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.form-field label {
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #9ba4af;
+  border-radius: 0.5rem;
+  color: inherit;
+  background: #fff;
+  font: inherit;
+}
+
+.form-field textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.form-field input:focus-visible,
+.form-field textarea:focus-visible,
+.form-field select:focus-visible,
+.form-button:focus-visible {
+  outline: 3px solid #315ca8;
+  outline-offset: 2px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+
+.checkbox-field input {
+  width: 1.25rem;
+  min-height: 1.25rem;
+}
+
+.field-error,
+.form-error {
+  color: #8b1e1e;
+}
+
+.form-status {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #f0f2f5;
+}
+
+.form-button {
+  justify-self: start;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.65rem 1.1rem;
+  border: 0;
+  border-radius: 0.6rem;
+  color: #fff;
+  background: #315ca8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.form-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    border-color: #555e6a;
+    background: #171a1f;
+  }
+
+  .form-status {
+    background: #343a44;
+  }
+}

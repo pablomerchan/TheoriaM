@@ -32,6 +32,8 @@ from routes.caracteristicas_fisicas import (
     inicializar_contenido_caracteristicas,
     router as caracteristicas_fisicas_router,
 )
+from routes.feed_routes import router as feed_router
+from routes.formularios_routes import router as formularios_router
 
 from webmaster.articulo_crud import (
     Articulo as WC_Articulo,
@@ -55,10 +57,16 @@ def parse_id_usuario(val):
 
 app = FastAPI()
 
-# Configurar CORS para permitir que Angular (localhost:4200) consulte la API
+cors_origins = [
+    origin.strip()
+    for origin in os.environ.get(
+        "THEORIAM_CORS_ORIGINS", "http://localhost:4200"
+    ).split(",")
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -85,6 +93,7 @@ FORMULARIO_NUEVO_USUARIO_DB = os.path.normpath(
 #  Init: carousel.db
 # ─────────────────────────────────────────────
 def init_carousel_db():
+    os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(CAROUSEL_DB)
     cursor = conn.cursor()
     cursor.execute('''
@@ -1003,6 +1012,8 @@ init_centro_contacto_db()
 init_nuevo_usuario_dbs()
 inicializar_contenido_caracteristicas()
 app.include_router(caracteristicas_fisicas_router)
+app.include_router(feed_router)
+app.include_router(formularios_router)
 
 
 # ─────────────────────────────────────────────

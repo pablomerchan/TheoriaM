@@ -1,0 +1,122 @@
+@if (cargando()) {
+  <p class="form-status" role="status">{{ texto('feed.form.status.loading') }}</p>
+}
+
+@if (mensajeError(); as error) {
+  <p class="form-error" role="alert">{{ error }}</p>
+}
+
+@if (!cargando() && definicion(); as formulario) {
+  <section class="form-block" [attr.aria-labelledby]="controlId('titulo')">
+    <h3 [id]="controlId('titulo')">{{ texto(formulario.claveTitulo) }}</h3>
+    <p>{{ texto(formulario.claveDescripcion) }}</p>
+
+    <p class="form-status" [attr.role]="estado() === 'error' ? 'alert' : 'status'">
+      {{ textoEstado() }}
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      @for (campo of formulario.campos; track campo.clave) {
+        <div class="form-field">
+          @switch (campo.tipo) {
+            @case ('texto') {
+              <label [for]="controlId(campo.clave)">{{ texto(campo.claveEtiqueta) }}</label>
+              <input
+                [id]="controlId(campo.clave)"
+                type="text"
+                [formControlName]="campo.clave"
+                [required]="campo.requerido"
+                [attr.maxlength]="campo.maxLength ?? null"
+                [attr.aria-invalid]="controlInvalido(campo)"
+                [attr.aria-describedby]="
+                  controlInvalido(campo) ? controlId(campo.clave + '-error') : null
+                "
+              />
+            }
+            @case ('areaTexto') {
+              <label [for]="controlId(campo.clave)">{{ texto(campo.claveEtiqueta) }}</label>
+              <textarea
+                [id]="controlId(campo.clave)"
+                [formControlName]="campo.clave"
+                [required]="campo.requerido"
+                [attr.maxlength]="campo.maxLength ?? null"
+                [attr.aria-invalid]="controlInvalido(campo)"
+                [attr.aria-describedby]="
+                  controlInvalido(campo) ? controlId(campo.clave + '-error') : null
+                "
+              ></textarea>
+            }
+            @case ('numero') {
+              <label [for]="controlId(campo.clave)">{{ texto(campo.claveEtiqueta) }}</label>
+              <input
+                [id]="controlId(campo.clave)"
+                type="number"
+                [formControlName]="campo.clave"
+                [required]="campo.requerido"
+                [attr.min]="campo.minimo ?? null"
+                [attr.max]="campo.maximo ?? null"
+                [attr.step]="campo.paso ?? null"
+                [attr.aria-invalid]="controlInvalido(campo)"
+                [attr.aria-describedby]="
+                  controlInvalido(campo) ? controlId(campo.clave + '-error') : null
+                "
+              />
+            }
+            @case ('seleccion') {
+              <label [for]="controlId(campo.clave)">{{ texto(campo.claveEtiqueta) }}</label>
+              <select
+                [id]="controlId(campo.clave)"
+                [formControlName]="campo.clave"
+                [required]="campo.requerido"
+                [attr.aria-invalid]="controlInvalido(campo)"
+                [attr.aria-describedby]="
+                  controlInvalido(campo) ? controlId(campo.clave + '-error') : null
+                "
+              >
+                <option value="">{{ texto('feed.form.choose') }}</option>
+                @for (opcion of campo.opciones; track opcion.valor) {
+                  <option [value]="opcion.valor">{{ texto(opcion.claveEtiqueta) }}</option>
+                }
+              </select>
+            }
+            @case ('casilla') {
+              <label class="checkbox-field" [for]="controlId(campo.clave)">
+                <input
+                  [id]="controlId(campo.clave)"
+                  type="checkbox"
+                  [formControlName]="campo.clave"
+                  [required]="campo.requerido"
+                  [attr.aria-invalid]="controlInvalido(campo)"
+                  [attr.aria-describedby]="
+                    controlInvalido(campo) ? controlId(campo.clave + '-error') : null
+                  "
+                />
+                {{ texto(campo.claveEtiqueta) }}
+              </label>
+            }
+          }
+
+          @if (controlInvalido(campo)) {
+            <p class="field-error" [id]="controlId(campo.clave + '-error')">
+              {{ texto('feed.form.invalid') }}
+            </p>
+          }
+        </div>
+      }
+
+      @if (respuestaExistente() && !editando()) {
+        <button class="form-button" type="button" (click)="editar()">
+          {{ texto('feed.form.edit') }}
+        </button>
+      } @else {
+        <button
+          class="form-button"
+          type="submit"
+          [disabled]="cargando() || estado() === 'guardando'"
+        >
+          {{ texto(estado() === 'guardando' ? 'feed.form.status.saving' : 'feed.form.save') }}
+        </button>
+      }
+    </form>
+  </section>
+}

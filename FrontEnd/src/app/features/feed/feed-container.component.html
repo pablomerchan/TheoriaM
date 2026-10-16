@@ -1,0 +1,41 @@
+<section class="feed-container">
+  <div
+    class="article-list"
+    role="feed"
+    [attr.aria-label]="texto('feed.articles.label')"
+    [attr.aria-busy]="cargando()"
+  >
+    @for (articulo of articulos(); track articulo.id; let indice = $index) {
+      <app-article-host
+        [articulo]="articulo"
+        [posicion]="indice + 1"
+        [totalArticulos]="finDeLista() ? articulos().length : -1"
+      />
+    }
+  </div>
+
+  @if (cargando()) {
+    <p class="status" role="status">{{ texto('feed.loading') }}</p>
+  }
+
+  @if (error(); as mensajeError) {
+    <p class="error" role="alert">{{ mensajeError }}</p>
+  }
+
+  @if (articulos().length === 0 && finDeLista()) {
+    <p class="status" role="status">{{ texto('feed.empty') }}</p>
+  } @else if (finDeLista()) {
+    <p class="status" role="status">{{ texto('feed.end') }}</p>
+  } @else {
+    <button class="load-more" type="button" [disabled]="cargando()" (click)="cargarMas()">
+      {{ error() ? texto('feed.retry') : texto('feed.loadMore') }}
+    </button>
+    <div
+      class="scroll-sentinel"
+      aria-hidden="true"
+      appInfiniteScroll
+      [appInfiniteScrollDisabled]="cargando() || finDeLista() || !!error()"
+      (appInfiniteScroll)="cargarMas()"
+    ></div>
+  }
+</section>

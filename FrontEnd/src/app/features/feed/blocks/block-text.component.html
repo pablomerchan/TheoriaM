@@ -1,0 +1,5 @@
+@if (contenido(); as html) {
+  <div class="text-block" [innerHTML]="html"></div>
+} @else {
+  <p class="block-error" role="alert">{{ textoInvalido() }}</p>
+}

@@ -40,6 +40,7 @@ logs/
 # Python env files
 .env
 .env.*
+!.env.example
 
 # ----- Node / Frontend -----
 node_modules/
@@ -88,4 +89,3 @@ credentials/
 *.swo
 *.bkp
 .*.bkp
-
