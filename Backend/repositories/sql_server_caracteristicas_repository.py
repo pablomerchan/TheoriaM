@@ -12,8 +12,8 @@ class SqlServerCaracteristicasRepository:
                 cursor.execute(
                     """
                     SELECT sexo, color_piel, peso_kg, estatura_cm, color_cabello
-                    FROM [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
-                    WHERE IdReg = ?
+                    FROM [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
+                    WHERE IdUsr = ?
                     """,
                     id_reg,
                 )
@@ -39,15 +39,15 @@ class SqlServerCaracteristicasRepository:
             try:
                 cursor.execute(
                     """
-                    UPDATE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+                    UPDATE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
                         WITH (UPDLOCK, HOLDLOCK)
                     SET sexo = ?, color_piel = ?, peso_kg = ?, estatura_cm = ?,
                         color_cabello = ?
-                    WHERE IdReg = ?;
+                    WHERE IdUsr = ?;
                     IF @@ROWCOUNT = 0
                     BEGIN
-                        INSERT INTO [TheoriaM].[tm_userdata].[caracteristicas_fisicas] (
-                            IdReg, seudonimo, sexo, color_piel, peso_kg, estatura_cm,
+                        INSERT INTO [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas] (
+                            IdUsr, seudonimo, sexo, color_piel, peso_kg, estatura_cm,
                             color_cabello, clima_principal, clima_secundario
                         ) VALUES (
                             ?, ?, ?, ?, ?, ?, ?, N'No especificado', N'No especificado'

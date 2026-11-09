@@ -6,6 +6,7 @@
     </div>
     <nav>
       <ul>
+        <li><a routerLink="/webmaster/feed" routerLinkActive="active">Publicar en Feed</a></li>
         <li><a routerLink="/webmaster-articulos" routerLinkActive="active">Artículos</a></li>
         <li><a routerLink="/webmaster-articulos/nuevo" routerLinkActive="active">Agregar artículo</a></li>
       </ul>
@@ -19,6 +20,11 @@
     </div>
 
     <section class="cards">
+      <article class="card">
+        <h3>Feed personalizado</h3>
+        <p>Publica artículos y decide qué usuarios pueden verlos según sus atributos.</p>
+        <a routerLink="/webmaster/feed" class="button">Administrar Feed</a>
+      </article>
       <article class="card">
         <h3>Artículos</h3>
         <p>Lista y administra todos los artículos del sitio.</p>

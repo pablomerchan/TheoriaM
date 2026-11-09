@@ -1,7 +1,7 @@
-IF OBJECT_ID(N'[TheoriaM].[tm_userdata].[caracteristicas_fisicas]', N'U') IS NULL
+IF OBJECT_ID(N'[TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]', N'U') IS NULL
 BEGIN
-    CREATE TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas] (
-        IdReg UNIQUEIDENTIFIER NOT NULL
+    CREATE TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas] (
+        IdUsr UNIQUEIDENTIFIER NOT NULL
             CONSTRAINT DF_caracteristicas_fisicas_IdReg DEFAULT NEWID(),
         seudonimo NVARCHAR(200) NOT NULL,
         sexo NVARCHAR(40) NOT NULL,
@@ -11,7 +11,7 @@ BEGIN
         color_cabello NVARCHAR(200) NOT NULL,
         clima_principal NVARCHAR(200) NOT NULL,
         clima_secundario NVARCHAR(200) NOT NULL,
-        CONSTRAINT PK_caracteristicas_fisicas PRIMARY KEY (IdReg),
+        CONSTRAINT PK_caracteristicas_fisicas PRIMARY KEY (IdUsr),
         CONSTRAINT CK_caracteristicas_fisicas_peso_kg
             CHECK (peso_kg BETWEEN 20 AND 500),
         CONSTRAINT CK_caracteristicas_fisicas_estatura_cm
@@ -20,13 +20,13 @@ BEGIN
 END;
 GO
 
-IF OBJECT_ID(N'[TheoriaM].[tm_userdata].[caracteristicas_fisicas]', N'U') IS NOT NULL
+IF OBJECT_ID(N'[TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]', N'U') IS NOT NULL
 BEGIN
-    ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+    ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
         ALTER COLUMN sexo NVARCHAR(40) NOT NULL;
-    ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+    ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
         ALTER COLUMN peso_kg DECIMAL(6, 2) NOT NULL;
-    ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+    ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
         ALTER COLUMN estatura_cm DECIMAL(5, 2) NOT NULL;
 
     IF NOT EXISTS (
@@ -38,36 +38,36 @@ BEGIN
         INNER JOIN [TheoriaM].sys.tables AS t ON t.object_id = c.object_id
         INNER JOIN [TheoriaM].sys.schemas AS s ON s.schema_id = t.schema_id
         WHERE s.name = N'tm_userdata'
-          AND t.name = N'caracteristicas_fisicas'
-          AND c.name = N'IdReg'
+          AND t.name = N'tbl_caracteristicas_fisicas'
+          AND c.name = N'IdUsr'
     )
     BEGIN
-        ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+        ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
             ADD CONSTRAINT DF_caracteristicas_fisicas_IdReg
-            DEFAULT NEWID() FOR IdReg;
+            DEFAULT NEWID() FOR IdUsr;
     END;
 
     IF NOT EXISTS (
         SELECT 1
         FROM [TheoriaM].sys.key_constraints
         WHERE parent_object_id =
-            OBJECT_ID(N'[TheoriaM].[tm_userdata].[caracteristicas_fisicas]')
+            OBJECT_ID(N'[TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]')
           AND type = N'PK'
     )
     BEGIN
-        ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
-            ADD CONSTRAINT PK_caracteristicas_fisicas PRIMARY KEY (IdReg);
+        ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
+            ADD CONSTRAINT PK_caracteristicas_fisicas PRIMARY KEY (IdUsr);
     END;
 
     IF EXISTS (
         SELECT 1
         FROM [TheoriaM].sys.key_constraints
         WHERE parent_object_id =
-            OBJECT_ID(N'[TheoriaM].[tm_userdata].[caracteristicas_fisicas]')
+            OBJECT_ID(N'[TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]')
           AND name = N'UQ_caracteristicas_fisicas_seudonimo'
     )
     BEGIN
-        ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+        ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
             DROP CONSTRAINT UQ_caracteristicas_fisicas_seudonimo;
     END;
 
@@ -83,27 +83,27 @@ BEGIN
         WHERE cantidad = 1
     )
     UPDATE caracteristicas
-    SET IdReg = usuario.IdUsr
-    FROM [TheoriaM].[tm_userdata].[caracteristicas_fisicas] AS caracteristicas
+    SET IdUsr = usuario.IdUsr
+    FROM [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas] AS caracteristicas
     INNER JOIN usuarios_con_seudonimo_unico AS usuario
         ON LOWER(caracteristicas.seudonimo) = LOWER(usuario.seudonimo)
-    WHERE caracteristicas.IdReg <> usuario.IdUsr
+    WHERE caracteristicas.IdUsr <> usuario.IdUsr
       AND NOT EXISTS (
           SELECT 1
-          FROM [TheoriaM].[tm_userdata].[caracteristicas_fisicas] AS existente
-          WHERE existente.IdReg = usuario.IdUsr
-            AND existente.IdReg <> caracteristicas.IdReg
+          FROM [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas] AS existente
+          WHERE existente.IdUsr = usuario.IdUsr
+            AND existente.IdUsr <> caracteristicas.IdUsr
       );
 
     IF NOT EXISTS (
         SELECT 1
         FROM [TheoriaM].sys.check_constraints
         WHERE parent_object_id =
-            OBJECT_ID(N'[TheoriaM].[tm_userdata].[caracteristicas_fisicas]')
+            OBJECT_ID(N'[TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]')
           AND name = N'CK_caracteristicas_fisicas_peso_kg'
     )
     BEGIN
-        ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+        ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
             ADD CONSTRAINT CK_caracteristicas_fisicas_peso_kg
             CHECK (peso_kg BETWEEN 20 AND 500);
     END;
@@ -112,11 +112,11 @@ BEGIN
         SELECT 1
         FROM [TheoriaM].sys.check_constraints
         WHERE parent_object_id =
-            OBJECT_ID(N'[TheoriaM].[tm_userdata].[caracteristicas_fisicas]')
+            OBJECT_ID(N'[TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]')
           AND name = N'CK_caracteristicas_fisicas_estatura_cm'
     )
     BEGIN
-        ALTER TABLE [TheoriaM].[tm_userdata].[caracteristicas_fisicas]
+        ALTER TABLE [TheoriaM].[tm_userdata].[tbl_caracteristicas_fisicas]
             ADD CONSTRAINT CK_caracteristicas_fisicas_estatura_cm
             CHECK (estatura_cm BETWEEN 80 AND 250);
     END;
@@ -127,7 +127,7 @@ BEGIN
     END;
 
     GRANT SELECT, INSERT, UPDATE
-        ON OBJECT::[tm_userdata].[caracteristicas_fisicas]
+        ON OBJECT::[tm_userdata].[tbl_caracteristicas_fisicas]
         TO [usuario_web];
 
     SELECT
@@ -138,7 +138,7 @@ BEGIN
     INNER JOIN [TheoriaM].sys.tables AS t ON t.object_id = c.object_id
     INNER JOIN [TheoriaM].sys.schemas AS s ON s.schema_id = t.schema_id
     WHERE s.name = N'tm_userdata'
-      AND t.name = N'caracteristicas_fisicas'
+      AND t.name = N'tbl_caracteristicas_fisicas'
     ORDER BY c.column_id;
 END;
 GO

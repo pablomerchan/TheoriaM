@@ -1,0 +1,156 @@
+<main class="feed-admin">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">WEBMASTER · PUBLICACIÓN</p>
+      <h1>Administrar artículos del Feed</h1>
+      <p>Publica contenido y define qué perfiles pueden verlo.</p>
+    </div>
+    <a routerLink="/webmaster" class="back-link">Volver a Webmaster</a>
+  </header>
+
+  <div *ngIf="error" class="notice error" role="alert">{{ error }}</div>
+  <div *ngIf="mensaje" class="notice success" role="status">{{ mensaje }}</div>
+
+  <div class="workspace">
+    <section class="article-list">
+      <div class="list-heading">
+        <h2>Artículos del Feed</h2>
+        <button type="button" class="secondary" (click)="nuevo()">Nuevo</button>
+      </div>
+      <p *ngIf="cargando">Cargando artículos…</p>
+      <p *ngIf="!cargando && articulos.length === 0" class="empty">
+        Aún no hay artículos. Crea uno para publicarlo en el Feed.
+      </p>
+      <button
+        *ngFor="let articulo of articulos"
+        type="button"
+        class="article-row"
+        [class.selected]="seleccionado?.id === articulo.id"
+        (click)="editar(articulo)"
+      >
+        <span class="article-title">{{ articulo.titulo }}</span>
+        <span class="article-meta">
+          {{ etiquetaEstado(articulo.estado) }} · {{ resumenReglas(articulo) }}
+        </span>
+      </button>
+    </section>
+
+    <section class="editor">
+      <h2>{{ seleccionado ? 'Editar artículo' : 'Crear artículo' }}</h2>
+      <p class="helper">
+        Este panel administra el Feed nuevo; no modifica los artículos del módulo anterior.
+      </p>
+
+      <label>
+        Título
+        <input [(ngModel)]="titulo" maxlength="200" placeholder="Ej. Consejos para elegir colores" />
+      </label>
+
+      <label *ngIf="!seleccionado || seleccionado.contenido_editable">
+        Contenido (HTML)
+        <textarea
+          [(ngModel)]="contenido"
+          rows="9"
+          placeholder="<p>Escribe el contenido del artículo</p>"
+        ></textarea>
+      </label>
+      <p *ngIf="seleccionado && !seleccionado.contenido_editable" class="helper warning">
+        Este artículo contiene bloques avanzados. Puedes actualizar su publicación y filtros;
+        el contenido se conservará sin cambios.
+      </p>
+
+      <label>
+        Estado
+        <select [(ngModel)]="estado">
+          <option *ngFor="let item of estados" [ngValue]="item.valor">
+            {{ item.etiqueta }}
+          </option>
+        </select>
+      </label>
+
+      <fieldset class="segmentation">
+        <legend>¿Quién puede ver este artículo?</legend>
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="segmentado"
+            (ngModelChange)="segmentacionCambiada()"
+          />
+          Mostrar solo a usuarios que cumplan condiciones
+        </label>
+
+        <ng-container *ngIf="segmentado">
+          <label>
+            Cómo combinar las condiciones
+            <select [(ngModel)]="modo">
+              <option value="todos">Deben cumplirse todas</option>
+              <option value="alguno">Debe cumplirse al menos una</option>
+            </select>
+          </label>
+
+          <div class="condition" *ngFor="let condicion of condiciones; let i = index">
+            <label>
+              Atributo
+              <select
+                [(ngModel)]="condicion.atributo"
+                (ngModelChange)="cambiarAtributo(condicion)"
+              >
+                <option *ngFor="let atributo of atributos" [value]="atributo.clave">
+                  {{ atributo.etiqueta }}
+                </option>
+              </select>
+            </label>
+            <label>
+              Regla
+              <select [(ngModel)]="condicion.operador">
+                <option value="eq">Es igual a</option>
+                <option value="ne">Es diferente de</option>
+                <option value="in">Está entre (separar con comas)</option>
+                <option value="not_in">No está entre (separar con comas)</option>
+                <option *ngIf="esNumerico(condicion)" value="gt">Mayor que</option>
+                <option *ngIf="esNumerico(condicion)" value="gte">Mayor o igual que</option>
+                <option *ngIf="esNumerico(condicion)" value="lt">Menor que</option>
+                <option *ngIf="esNumerico(condicion)" value="lte">Menor o igual que</option>
+                <option value="exists">Está informado</option>
+              </select>
+            </label>
+            <label *ngIf="condicion.operador !== 'exists'">
+              Valor
+              <input
+                type="text"
+                [(ngModel)]="condicion.valor"
+                [placeholder]="condicion.operador === 'in' || condicion.operador === 'not_in'
+                  ? 'Ej. valor1, valor2'
+                  : (esNumerico(condicion) ? 'Ej. 18' : 'Escribe el valor')"
+              />
+            </label>
+            <label *ngIf="condicion.operador === 'exists'">
+              Atributo informado
+              <select [(ngModel)]="condicion.valor">
+                <option value="true">Sí, está informado</option>
+                <option value="false">No, está vacío</option>
+              </select>
+            </label>
+            <button type="button" class="remove-condition" (click)="quitarCondicion(i)">
+              Quitar
+            </button>
+          </div>
+          <button type="button" class="secondary" (click)="agregarCondicion()">
+            Agregar condición
+          </button>
+          <p class="helper">
+            Sin segmentación, el artículo se muestra a todos. Los datos se comparan con el perfil
+            guardado del usuario.
+          </p>
+        </ng-container>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" class="primary" [disabled]="guardando" (click)="guardar()">
+          {{ guardando ? 'Guardando…' : (estado === 1 ? 'Guardar y publicar' : 'Guardar artículo') }}
+        </button>
+        <button type="button" class="secondary" (click)="nuevo()">Limpiar</button>
+      </div>
+    </section>
+  </div>
+</main>

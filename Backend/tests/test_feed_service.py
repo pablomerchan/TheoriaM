@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from uuid import UUID
 
 import pytest
 
@@ -20,6 +21,10 @@ class RepositorioFeedFalso:
         self.articulos = articulos
         self.menu = menu or []
         self.argumentos: tuple[datetime | None, int | None, int] | None = None
+        self.atributos: dict[str, object] = {}
+
+    def obtener_atributos_usuario(self, usuario_id: UUID) -> dict[str, object]:
+        return self.atributos
 
     def listar_menu(self) -> list[OpcionMenuFeed]:
         return self.menu
@@ -71,7 +76,11 @@ def test_listar_devuelve_solo_limite_y_cursor_de_ultima_entrega() -> None:
     ]
     repository = RepositorioFeedFalso(articulos)
 
-    resultado = FeedService(repository).listar(cursor=None, limite=2)
+    resultado = FeedService(repository).listar(
+        cursor=None,
+        limite=2,
+        usuario_id=UUID("00000000-0000-0000-0000-000000000001"),
+    )
 
     assert [item["id"] for item in resultado["items"]] == [9, 8]
     assert resultado["items"][0]["bloques"][0]["payload"] == {
@@ -81,18 +90,22 @@ def test_listar_devuelve_solo_limite_y_cursor_de_ultima_entrega() -> None:
         articulos[1].publicado_en,
         articulos[1].id,
     )
-    assert repository.argumentos == (None, None, 2)
+    assert repository.argumentos == (None, None, 50)
 
 
 def test_listar_no_devuelve_cursor_si_no_hay_mas_articulos() -> None:
     fecha = datetime(2026, 10, 15, 12, 30, 45)
     repository = RepositorioFeedFalso([crear_articulo(1, fecha)])
 
-    resultado = FeedService(repository).listar(cursor="", limite=10)
+    resultado = FeedService(repository).listar(
+        cursor="",
+        limite=10,
+        usuario_id=UUID("00000000-0000-0000-0000-000000000001"),
+    )
 
     assert len(resultado["items"]) == 1
     assert resultado["siguienteCursor"] is None
-    assert repository.argumentos == (None, None, 10)
+    assert repository.argumentos == (None, None, 50)
 
 
 def test_listar_menu_incluye_el_criterio_de_filtro() -> None:
@@ -116,3 +129,122 @@ def test_listar_menu_incluye_el_criterio_de_filtro() -> None:
             "criterio_filtro": None,
         }
     ]
+
+
+def test_listar_filtra_articulos_por_atributos_del_perfil() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    restringido = ArticuloFeed(
+        id=3,
+        titulo="Contenido adulto",
+        publicado_en=fecha,
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "todos",
+            "condiciones": [
+                {"atributo": "perfil.edad", "operador": "gte", "valor": 18}
+            ],
+        },
+    )
+    repository = RepositorioFeedFalso(
+        [restringido, crear_articulo(2, fecha - timedelta(days=1))]
+    )
+    repository.atributos["perfil.fecha_nacimiento"] = date(2015, 5, 1)
+
+    resultado = FeedService(repository).listar(
+        cursor=None,
+        limite=10,
+        usuario_id=UUID("00000000-0000-0000-0000-000000000001"),
+    )
+
+    assert [item["id"] for item in resultado["items"]] == [2]
+    assert resultado["siguienteCursor"] is None
+
+
+def test_regla_puede_combinar_atributos_de_perfil_y_contexto() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    articulo = ArticuloFeed(
+        id=1,
+        titulo="Artículo segmentado",
+        publicado_en=fecha,
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "alguno",
+            "condiciones": [
+                {"atributo": "perfil.sexo", "operador": "eq", "valor": "mujer"},
+                {"atributo": "contexto.idioma", "operador": "in", "valor": ["es"]},
+            ],
+        },
+    )
+    repository = RepositorioFeedFalso([articulo])
+
+    resultado = FeedService(repository).listar(
+        cursor=None,
+        limite=10,
+        usuario_id=UUID("00000000-0000-0000-0000-000000000001"),
+        idioma="es-CO,es;q=0.9",
+    )
+
+    assert [item["id"] for item in resultado["items"]] == [1]
+
+
+def test_paginacion_busca_contenido_elegible_y_no_omite_la_pagina_siguiente() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    articulos = []
+    for articulo_id in range(100, 0, -1):
+        reglas = (
+            {
+                "modo": "todos",
+                "condiciones": [
+                    {"atributo": "perfil.edad", "operador": "gte", "valor": 18}
+                ],
+            }
+            if articulo_id not in {49, 50}
+            else None
+        )
+        articulo = crear_articulo(articulo_id, fecha)
+        articulos.append(
+            ArticuloFeed(
+                articulo.id,
+                articulo.titulo,
+                articulo.publicado_en,
+                articulo.bloques,
+                reglas,
+            )
+        )
+
+    class RepositorioConCursor(RepositorioFeedFalso):
+        def listar(
+            self,
+            cursor_fecha: datetime | None,
+            cursor_id: int | None,
+            limite: int,
+        ) -> list[ArticuloFeed]:
+            self.argumentos = (cursor_fecha, cursor_id, limite)
+            restantes = [
+                articulo
+                for articulo in self.articulos
+                if cursor_fecha is None
+                or articulo.publicado_en < cursor_fecha
+                or (
+                    articulo.publicado_en == cursor_fecha
+                    and cursor_id is not None
+                    and articulo.id < cursor_id
+                )
+            ]
+            return restantes[: limite + 1]
+
+    repository = RepositorioConCursor(articulos)
+    repository.atributos["perfil.edad"] = 20
+    service = FeedService(repository)
+    usuario_id = UUID("00000000-0000-0000-0000-000000000001")
+
+    primera_pagina = service.listar(cursor=None, limite=1, usuario_id=usuario_id)
+    segunda_pagina = service.listar(
+        cursor=primera_pagina["siguienteCursor"],
+        limite=1,
+        usuario_id=usuario_id,
+    )
+
+    assert [item["id"] for item in primera_pagina["items"]] == [50]
+    assert [item["id"] for item in segunda_pagina["items"]] == [49]
+    assert segunda_pagina["siguienteCursor"] is None

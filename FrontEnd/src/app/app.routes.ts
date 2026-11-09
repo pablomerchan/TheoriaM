@@ -28,6 +28,12 @@ export const routes: Routes = [
         import('./features/feed/feed-container.component').then((module) => module.FeedContainerComponent)
     }]
   },
+  {
+    path: 'webmaster/feed',
+    loadComponent: () =>
+      import('./features/feed/feed-admin.component').then((module) => module.FeedAdminComponent),
+    canActivate: [authGuard]
+  },
   { path: 'webmaster', component: WebmasterDashboardComponent },
   { path: 'webmaster/articulos', component: WebmasterArticuloComponent },
   { path: 'webmaster/articulos/nuevo', component: WebmasterArticuloAddComponent },
