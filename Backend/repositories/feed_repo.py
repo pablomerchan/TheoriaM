@@ -31,6 +31,21 @@ class OpcionMenuFeed:
     criterio_filtro: str | None
 
 
+@dataclass(frozen=True)
+class ComentarioFeed:
+    id: int
+    autor: str
+    contenido: str
+    creado_en: datetime
+
+
+@dataclass(frozen=True)
+class InteraccionesFeed:
+    me_gusta: bool
+    total_me_gusta: int
+    comentarios: list[ComentarioFeed]
+
+
 class FeedRepository(Protocol):
     def obtener_atributos_usuario(self, usuario_id: UUID) -> dict[str, Any]: ...
 
@@ -53,3 +68,22 @@ class FeedRepository(Protocol):
     ) -> list[ArticuloFeed]: ...
 
     def listar_menu(self) -> list[OpcionMenuFeed]: ...
+
+    def listar_interacciones(
+        self,
+        articulos_ids: list[int],
+        usuario_id: UUID,
+    ) -> dict[int, InteraccionesFeed]: ...
+
+    def alternar_me_gusta(
+        self,
+        articulo_id: int,
+        usuario_id: UUID,
+    ) -> tuple[bool, int]: ...
+
+    def crear_comentario(
+        self,
+        articulo_id: int,
+        usuario_id: UUID,
+        contenido: str,
+    ) -> ComentarioFeed: ...

@@ -30,7 +30,7 @@ que el atributo esté informado y `false` para exigir que esté ausente.
 
 - Perfil: `perfil.edad`, `perfil.sexo`, `perfil.color_piel`,
   `perfil.peso_kg`, `perfil.estatura_cm`, `perfil.color_cabello`,
-  `perfil.clima_principal` y `perfil.clima_secundario`.
+  `perfil.clima_principal`, `perfil.clima_secundario` y `perfil.id_usuario`.
 - Contexto del servidor: `contexto.fecha_utc`, `contexto.hora_utc`,
   `contexto.dia_semana` (lunes = 0) y `contexto.idioma` (primer idioma de
   `Accept-Language`, sin región).
@@ -42,8 +42,9 @@ contexto del servidor; las reglas no pueden leer datos arbitrarios del cliente.
 ## Publicar y segmentar desde Webmaster
 
 El panel nuevo se abre desde **Webmaster → Publicar en Feed** (`/webmaster/feed`).
-No modifica los artículos existentes de `tbl_articulo`; administra los artículos
-que consume el Feed (`tm_feed.articulo`).
+Administra los artículos que consume el Feed (`tm_feed.articulo`). El administrador
+heredado y sus rutas CRUD se retiraron; se conservan los datos y lectores antiguos
+porque otras funciones todavía dependen de ellos.
 
 En el panel se puede crear un artículo, escribir el contenido, elegir Borrador,
 Publicado o Archivado y marcar si se mostrará a todos o solo a usuarios que
@@ -51,6 +52,11 @@ cumplan condiciones. Los atributos y los operadores se seleccionan en controles
 del formulario; no hace falta escribir JSON. Para una condición `in`/`not_in`,
 separar los valores con comas. `todos` exige que se cumplan todas las condiciones;
 `alguno` acepta que se cumpla una.
+
+Para asignar un artículo a una persona específica, agrega `perfil.id_usuario` con
+el operador `eq` y el UUID `IdUsr` de esa persona. Combina esa condición con las
+condiciones físicas en modo `todos`. El ID se deriva de la sesión autenticada del
+usuario que consulta el Feed; el navegador no puede elegir qué identidad comparar.
 
 Para habilitar el panel:
 

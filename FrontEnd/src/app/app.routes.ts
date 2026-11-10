@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
 import { ServiceLandingPageComponent } from './components/service_landing_page/service_landing_page.component';
 import { WebmasterDashboardComponent } from './components/webmaster-dashboard/webmaster-dashboard.component';
-import { WebmasterArticuloComponent } from './components/webmaster-articulo/webmaster-articulo.component';
-import { WebmasterArticuloAddComponent } from './components/webmaster-articulo/webmaster-articulo-add.component';
 import { CentroInformacionComponent } from './components/centro_informacion/centro_informacion.component';
 import { CentroContactoComponent } from './components/centro_contacto/centro_contacto.component';
 import { NuevoUsuarioComponent } from './components/nuevo-usuario/nuevo-usuario.component';
@@ -35,7 +33,5 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   { path: 'webmaster', component: WebmasterDashboardComponent },
-  { path: 'webmaster/articulos', component: WebmasterArticuloComponent },
-  { path: 'webmaster/articulos/nuevo', component: WebmasterArticuloAddComponent },
   { path: '**', redirectTo: '' }
 ];

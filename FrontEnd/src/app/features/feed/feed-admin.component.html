@@ -38,7 +38,7 @@
     <section class="editor">
       <h2>{{ seleccionado ? 'Editar artículo' : 'Crear artículo' }}</h2>
       <p class="helper">
-        Este panel administra el Feed nuevo; no modifica los artículos del módulo anterior.
+        Los artículos se administran desde el Feed; el contenido legado de otras funciones no se modifica.
       </p>
 
       <label>
@@ -102,7 +102,7 @@
             </label>
             <label>
               Regla
-              <select [(ngModel)]="condicion.operador">
+              <select *ngIf="!esIdUsuario(condicion)" [(ngModel)]="condicion.operador">
                 <option value="eq">Es igual a</option>
                 <option value="ne">Es diferente de</option>
                 <option value="in">Está entre (separar con comas)</option>
@@ -113,6 +113,7 @@
                 <option *ngIf="esNumerico(condicion)" value="lte">Menor o igual que</option>
                 <option value="exists">Está informado</option>
               </select>
+              <span *ngIf="esIdUsuario(condicion)">Es igual al usuario indicado</span>
             </label>
             <label *ngIf="condicion.operador !== 'exists'">
               Valor
@@ -141,6 +142,10 @@
           <p class="helper">
             Sin segmentación, el artículo se muestra a todos. Los datos se comparan con el perfil
             guardado del usuario.
+          </p>
+          <p class="helper">
+            Para asignarlo a una persona concreta, agrega la condición “ID de usuario (UUID)” con
+            su IdUsr. Combínala con las condiciones físicas usando “Deben cumplirse todas”.
           </p>
         </ng-container>
       </fieldset>

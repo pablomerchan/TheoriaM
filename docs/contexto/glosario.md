@@ -247,7 +247,6 @@ Definición clara de todos los términos, entidades y conceptos usados en el pro
 
 **Componentes UI**:
 - `articulo.component.ts`: Visualización de artículo individual
-- `webmaster-articulo.component.ts`: Gestión de artículos (admin)
 
 ---
 
@@ -348,7 +347,6 @@ Definición clara de todos los términos, entidades y conceptos usados en el pro
 | **Mi Guardarropa** | Gestión del guardarropa personal | `mi-guarda-ropas.component.ts` |
 | **Sugerencia Diaria** | Outfit sugerido del día | `sugerencia-diaria.component.ts` |
 | **Texto GPT** | Contenido generado con IA | `texto-gpt.component.ts` |
-| **Webmaster Articulo** | CRUD de artículos (admin) | `webmaster-articulo.component.ts` |
 | **Webmaster Dashboard** | Panel de control del administrador | `webmaster-dashboard.component.ts` |
 | **Interactive Help** | Sistema de ayuda contextual | `interactive-help.component.ts` |
 | **Registro Asesoría** | Formulario de registro | `registro-asesoria-theor-iam.component.ts` |
@@ -419,14 +417,8 @@ Definición clara de todos los términos, entidades y conceptos usados en el pro
 
 ---
 
-#### WebmasterArticuloService
-**Propósito**: CRUD de artículos (administrador).
-
-**Métodos Principales**:
-- `getArticulos()`: Lista todos los artículos
-- `createArticulo(data)`: Crea nuevo artículo
-- `updateArticulo(id, data)`: Edita artículo
-- `deleteArticulo(id)`: Elimina artículo
+#### FeedAdminComponent
+**Propósito**: Publicar artículos en el Feed y segmentarlos por usuario y perfil.
 
 ---
 
@@ -485,11 +477,8 @@ GET    /api/asesoria/carruseles         # Obtener definiciones de carrusel
 GET    /api/asesoria/articulo           # Obtener artículo personalizado
 GET    /api/asesoria/rapida            # Obtener asesoría rápida
 GET    /api/persona/mi-perfil           # Obtener perfil del usuario actual
-GET    /api/webmaster/articulos         # Listar artículos de webmaster
-GET    /api/webmaster/articulo/{articulo_id} # Obtener artículo por id
-POST   /api/webmaster/articulo          # Crear artículo de webmaster
-PUT    /api/webmaster/articulo/{articulo_id} # Actualizar artículo de webmaster
-DELETE /api/webmaster/articulo/{articulo_id} # Eliminar artículo de webmaster
+GET    /api/v1/feed/admin/articulos     # Listar artículos administrables del Feed
+POST   /api/v1/feed/admin/articulos     # Crear artículo del Feed
 ```},{
 
 ---

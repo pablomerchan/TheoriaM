@@ -49,4 +49,30 @@ describe('FeedApiService', () => {
     expect(request.request.method).toBe('GET');
     request.flush([]);
   });
+
+  it('alternar Me gusta envía la solicitud para el artículo', () => {
+    TestBed.inject(FeedApiService).alternarMeGusta(17).subscribe();
+
+    const request = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}/v1/feed/articulos/17/me-gusta`
+    );
+    expect(request.request.method).toBe('POST');
+    request.flush({ me_gusta: true, total_me_gusta: 1 });
+  });
+
+  it('crear comentario envía el contenido al artículo', () => {
+    TestBed.inject(FeedApiService).crearComentario(17, 'Muy útil').subscribe();
+
+    const request = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}/v1/feed/articulos/17/comentarios`
+    );
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ contenido: 'Muy útil' });
+    request.flush({
+      id: 5,
+      autor: 'ana',
+      contenido: 'Muy útil',
+      creado_en: '2026-10-15T12:30:45'
+    });
+  });
 });

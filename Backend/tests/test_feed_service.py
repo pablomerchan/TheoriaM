@@ -3,7 +3,13 @@ from uuid import UUID
 
 import pytest
 
-from repositories.feed_repo import ArticuloFeed, BloqueFeed, OpcionMenuFeed
+from repositories.feed_repo import (
+    ArticuloFeed,
+    BloqueFeed,
+    ComentarioFeed,
+    InteraccionesFeed,
+    OpcionMenuFeed,
+)
 from services.feed_service import (
     ErrorCursorFeed,
     FeedService,
@@ -22,12 +28,28 @@ class RepositorioFeedFalso:
         self.menu = menu or []
         self.argumentos: tuple[datetime | None, int | None, int] | None = None
         self.atributos: dict[str, object] = {}
+        self.interacciones: dict[int, InteraccionesFeed] = {}
+        self.interacciones_solicitadas: tuple[list[int], UUID] | None = None
 
     def obtener_atributos_usuario(self, usuario_id: UUID) -> dict[str, object]:
         return self.atributos
 
     def listar_menu(self) -> list[OpcionMenuFeed]:
         return self.menu
+
+    def listar_interacciones(
+        self,
+        articulos_ids: list[int],
+        usuario_id: UUID,
+    ) -> dict[int, InteraccionesFeed]:
+        self.interacciones_solicitadas = (articulos_ids, usuario_id)
+        return {
+            articulo_id: self.interacciones.get(
+                articulo_id,
+                InteraccionesFeed(False, 0, []),
+            )
+            for articulo_id in articulos_ids
+        }
 
     def listar(
         self,
@@ -86,11 +108,47 @@ def test_listar_devuelve_solo_limite_y_cursor_de_ultima_entrega() -> None:
     assert resultado["items"][0]["bloques"][0]["payload"] == {
         "contenido": "Texto de prueba"
     }
+    assert resultado["items"][0]["me_gusta"] is False
+    assert resultado["items"][0]["total_me_gusta"] == 0
+    assert resultado["items"][0]["comentarios"] == []
     assert decodificar_cursor(resultado["siguienteCursor"]) == (
         articulos[1].publicado_en,
         articulos[1].id,
     )
     assert repository.argumentos == (None, None, 50)
+
+
+def test_listar_incluye_me_gusta_y_comentarios_de_cada_articulo() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    comentario = ComentarioFeed(
+        id=5,
+        autor="ana",
+        contenido="Muy útil",
+        creado_en=fecha,
+    )
+    repository = RepositorioFeedFalso([crear_articulo(1, fecha)])
+    repository.interacciones[1] = InteraccionesFeed(True, 3, [comentario])
+
+    resultado = FeedService(repository).listar(
+        cursor=None,
+        limite=10,
+        usuario_id=UUID("00000000-0000-0000-0000-000000000001"),
+    )
+
+    assert resultado["items"][0]["me_gusta"] is True
+    assert resultado["items"][0]["total_me_gusta"] == 3
+    assert repository.interacciones_solicitadas == (
+        [1],
+        UUID("00000000-0000-0000-0000-000000000001"),
+    )
+    assert resultado["items"][0]["comentarios"] == [
+        {
+            "id": 5,
+            "autor": "ana",
+            "contenido": "Muy útil",
+            "creado_en": fecha,
+        }
+    ]
 
 
 def test_listar_no_devuelve_cursor_si_no_hay_mas_articulos() -> None:
@@ -158,6 +216,81 @@ def test_listar_filtra_articulos_por_atributos_del_perfil() -> None:
 
     assert [item["id"] for item in resultado["items"]] == [2]
     assert resultado["siguienteCursor"] is None
+
+
+def test_listar_asigna_articulo_a_usuario_y_caracteristicas_especificas() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    usuario_id = UUID("00000000-0000-0000-0000-000000000001")
+    articulo_asignado = ArticuloFeed(
+        id=1,
+        titulo="Artículo asignado",
+        publicado_en=fecha,
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "todos",
+            "condiciones": [
+                {
+                    "atributo": "perfil.id_usuario",
+                    "operador": "eq",
+                    "valor": str(usuario_id),
+                },
+                {
+                    "atributo": "perfil.estatura_cm",
+                    "operador": "gte",
+                    "valor": 170,
+                },
+            ],
+        },
+    )
+    articulo_otro_usuario = ArticuloFeed(
+        id=2,
+        titulo="Artículo de otro usuario",
+        publicado_en=fecha - timedelta(minutes=1),
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "todos",
+            "condiciones": [
+                {
+                    "atributo": "perfil.id_usuario",
+                    "operador": "eq",
+                    "valor": "00000000-0000-0000-0000-000000000002",
+                }
+            ],
+        },
+    )
+    articulo_incompatible = ArticuloFeed(
+        id=3,
+        titulo="Artículo incompatible",
+        publicado_en=fecha - timedelta(minutes=2),
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "todos",
+            "condiciones": [
+                {
+                    "atributo": "perfil.id_usuario",
+                    "operador": "eq",
+                    "valor": str(usuario_id),
+                },
+                {
+                    "atributo": "perfil.estatura_cm",
+                    "operador": "lt",
+                    "valor": 170,
+                },
+            ],
+        },
+    )
+    repository = RepositorioFeedFalso(
+        [articulo_asignado, articulo_otro_usuario, articulo_incompatible]
+    )
+    repository.atributos["perfil.estatura_cm"] = 180
+
+    resultado = FeedService(repository).listar(
+        cursor=None,
+        limite=10,
+        usuario_id=usuario_id,
+    )
+
+    assert [item["id"] for item in resultado["items"]] == [1]
 
 
 def test_regla_puede_combinar_atributos_de_perfil_y_contexto() -> None:
@@ -234,7 +367,7 @@ def test_paginacion_busca_contenido_elegible_y_no_omite_la_pagina_siguiente() ->
             return restantes[: limite + 1]
 
     repository = RepositorioConCursor(articulos)
-    repository.atributos["perfil.edad"] = 20
+    repository.atributos["perfil.edad"] = 17
     service = FeedService(repository)
     usuario_id = UUID("00000000-0000-0000-0000-000000000001")
 

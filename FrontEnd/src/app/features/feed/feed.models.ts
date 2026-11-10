@@ -9,7 +9,22 @@ export interface ArticuloFeed {
   id: number;
   titulo: string;
   publicado_en: string;
+  me_gusta: boolean;
+  total_me_gusta: number;
+  comentarios: ComentarioFeed[];
   bloques: BloqueFeed[];
+}
+
+export interface ComentarioFeed {
+  id: number;
+  autor: string;
+  contenido: string;
+  creado_en: string;
+}
+
+export interface RespuestaMeGustaFeed {
+  me_gusta: boolean;
+  total_me_gusta: number;
 }
 
 export interface PaginaFeed {

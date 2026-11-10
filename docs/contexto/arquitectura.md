@@ -45,10 +45,6 @@ La arquitectura sigue un patrón **cliente-servidor** con separación clara entr
 └─────────────────────────────────────────────────────────────┘
          │
          ▼
-┌─────────────────────────────────────────────────────────────┐
-│               WEBMASTER (Sistema adicional)                  │
-│          articulo_crud.py - Gestión de Contenidos           │
-└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -101,7 +97,7 @@ La arquitectura sigue un patrón **cliente-servidor** con separación clara entr
 - interactive-help.service.ts - Sistema de ayuda
 - maestras.service.ts - Datos maestros
 - usuario.service.ts - Gestión de usuarios
-- webmaster-articulo.service.ts - Gestión de artículos
+- FeedAdminComponent - Publicación y segmentación del Feed
 ```
 
 #### Routing:
@@ -110,8 +106,7 @@ La arquitectura sigue un patrón **cliente-servidor** con separación clara entr
 'datos-morfologicos' → DatosMorfologicosComponent
 'asesoria' → AsesoriaComponent
 'webmaster' → WebmasterDashboardComponent
-'webmaster/articulos' → WebmasterArticuloComponent
-'webmaster/articulos/nuevo' → WebmasterArticuloAddComponent
+'webmaster/feed' → FeedAdminComponent
 ```
 
 ---
@@ -137,10 +132,6 @@ La arquitectura sigue un patrón **cliente-servidor** con separación clara entr
 2. **ContenidosPersonalizadosService** (`services/contenidos_personalizados_service.py`)
    - Generación de contenidos adaptados al usuario
    - Personalización basada en datos morfológicos
-
-3. **Articulo CRUD** (`webmaster/articulo_crud.py`)
-   - Gestión completa de artículos (Create, Read, Update, Delete)
-   - Operaciones: `create_articulo()`, `get_articulos()`, `get_articulo_by_id()`, `update_articulo()`, `delete_articulo()`, `get_menu_articulo()`
 
 ---
 
@@ -236,24 +227,12 @@ Usuario solicita asesoría
         [Componentes mostrar asesoría, carruseles, sugerencias]
 ```
 
-### 5.3 Gestión de Artículos (Webmaster)
+### 5.3 Gestión de Artículos (Feed)
 
-```
-Webmaster accede panel
-    ↓
-    [WebmasterDashboardComponent]
-    ├→ webmaster-articulo.service.ts
-    └→ GET /api/webmaster/articulos
-        ↓
-        Backend: articulo_crud.get_articulos()
-        └→ BD: articulos table
-        
-Nuevo artículo:
-    [WebmasterArticuloAddComponent]
-    ├→ POST /api/webmaster/articulo
-    └→ Backend: articulo_crud.create_articulo()
-        └→ BD: Insertar nuevo artículo
-```
+El panel Webmaster administra los artículos del Feed y sus reglas de
+segmentación en `tm_feed`. El administrador y las rutas CRUD heredadas se
+retiraron; se mantienen los datos y lectores de `tbl_articulo` que todavía usan
+otras funciones.
 
 ---
 
@@ -312,10 +291,6 @@ src/
 │           ├── services/               (Servicios HTTP)
 │           ├── models/                 (Interfaces TypeScript)
 │           └── styles.scss             (Estilos globales)
-│
-├── webmaster/
-│   ├── __init__.py
-│   └── articulo_crud.py                (Gestión de artículos)
 │
 └── docs/
     └── contexto/
@@ -377,7 +352,7 @@ src/
 |---|---|---|
 | Frontend | Backend API | Obtención de datos, asesorías |
 | Backend | SQLite | Persistencia de datos |
-| WebmasterArticuloComponent | webmaster-articulo.service | Gestión de artículos |
+| FeedAdminComponent | Feed Admin API | Publicación y segmentación del Feed |
 | AsesoriaComponent | asesoria.service | Datos de asesoría personalizada |
 | DatosMorfologicosComponent | usuario.service | Perfil del usuario |
 | AuthService | asesoria.db | Resolver identidad del usuario |

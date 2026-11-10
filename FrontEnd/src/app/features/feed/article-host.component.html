@@ -40,4 +40,70 @@
       }
     </section>
   }
+
+  <section class="article-interactions" [attr.aria-label]="texto('feed.interaction.label')">
+    <div class="interaction-actions">
+      <button
+        class="interaction-button"
+        type="button"
+        [attr.aria-pressed]="meGusta()"
+        [disabled]="actualizandoMeGusta()"
+        (click)="alternarMeGusta()"
+      >
+        {{ meGusta() ? texto('feed.like.remove') : texto('feed.like.add') }}
+        <span>{{ totalMeGusta() }}</span>
+      </button>
+      <button
+        class="interaction-button"
+        type="button"
+        [attr.aria-expanded]="comentariosAbiertos()"
+        (click)="alternarComentarios()"
+      >
+        {{ texto('feed.comments.button') }}
+        <span>{{ comentarios().length }}</span>
+      </button>
+    </div>
+
+    @if (comentariosAbiertos()) {
+      <div class="comments">
+        @for (comentario of comentarios(); track comentario.id) {
+          <article class="comment">
+            <header>
+              <strong>{{ comentario.autor }}</strong>
+              <time [attr.datetime]="comentario.creado_en">
+                {{ comentario.creado_en | date: 'dd/MM/yyyy HH:mm' }}
+              </time>
+            </header>
+            <p>{{ comentario.contenido }}</p>
+          </article>
+        } @empty {
+          <p class="comments-empty">{{ texto('feed.comments.empty') }}</p>
+        }
+
+        <form class="comment-form" (ngSubmit)="publicarComentario()">
+          <textarea
+            name="comentario"
+            [ngModel]="comentarioBorrador()"
+            (ngModelChange)="comentarioBorrador.set($event)"
+            [attr.aria-label]="texto('feed.comments.input')"
+            [placeholder]="texto('feed.comments.input')"
+            [disabled]="enviandoComentario()"
+            maxlength="1000"
+            rows="3"
+          ></textarea>
+          <button
+            class="interaction-button"
+            type="submit"
+            [disabled]="enviandoComentario() || !comentarioBorrador().trim()"
+          >
+            {{ enviandoComentario() ? texto('feed.comments.sending') : texto('feed.comments.submit') }}
+          </button>
+        </form>
+      </div>
+    }
+
+    @if (errorInteraccion(); as mensajeError) {
+      <p class="interaction-error" role="alert">{{ mensajeError }}</p>
+    }
+  </section>
 </article>

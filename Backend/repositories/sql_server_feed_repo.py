@@ -1,12 +1,14 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
 from repositories.feed_repo import (
     ArticuloFeed,
     BloqueFeed,
+    ComentarioFeed,
     FeedRepository,
+    InteraccionesFeed,
     OpcionMenuFeed,
 )
 from services.usuarios_sql_service import abrir_conexion
@@ -27,6 +29,14 @@ def _fetch_result_set(cursor: Any, advance: bool = False) -> list[Any] | None:
         if not cursor.nextset():
             return None
     return cursor.fetchall()
+
+
+def _fecha_utc(value: Any) -> datetime:
+    if not isinstance(value, datetime):
+        raise ErrorDatosFeed("La fecha almacenada de una interacción no es válida.")
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 class SqlServerFeedRepository(FeedRepository):
@@ -221,6 +231,129 @@ class SqlServerFeedRepository(FeedRepository):
             )
             for row in rows
         ]
+
+    def listar_interacciones(
+        self,
+        articulos_ids: list[int],
+        usuario_id: UUID,
+    ) -> dict[int, InteraccionesFeed]:
+        if not articulos_ids:
+            return {}
+
+        connection = abrir_conexion("users_database")
+        try:
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    """
+                    EXEC [tm_feed].[usp_feed_interacciones_listar]
+                        @articulos_json = ?, @usuario_id = ?
+                    """,
+                    json.dumps(articulos_ids),
+                    str(usuario_id),
+                )
+                resumen_rows = _fetch_result_set(cursor)
+                comentario_rows = _fetch_result_set(cursor, advance=True)
+                if resumen_rows is None or comentario_rows is None:
+                    raise ErrorDatosFeed(
+                        "usp_feed_interacciones_listar no devolvió los resultados esperados."
+                    )
+            finally:
+                cursor.close()
+        finally:
+            connection.close()
+
+        comentarios_por_articulo: dict[int, list[ComentarioFeed]] = {}
+        for row in comentario_rows:
+            comentarios_por_articulo.setdefault(int(row[0]), []).append(
+                ComentarioFeed(
+                    id=int(row[1]),
+                    autor=str(row[2]),
+                    contenido=str(row[3]),
+                    creado_en=_fecha_utc(row[4]),
+                )
+            )
+
+        interacciones = {
+            int(row[0]): InteraccionesFeed(
+                me_gusta=bool(row[2]),
+                total_me_gusta=int(row[1]),
+                comentarios=comentarios_por_articulo.get(int(row[0]), []),
+            )
+            for row in resumen_rows
+        }
+        if set(interacciones) != set(articulos_ids):
+            raise ErrorDatosFeed(
+                "No fue posible obtener las interacciones de todos los artículos."
+            )
+        return interacciones
+
+    def alternar_me_gusta(
+        self,
+        articulo_id: int,
+        usuario_id: UUID,
+    ) -> tuple[bool, int]:
+        connection = abrir_conexion("users_database")
+        try:
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    """
+                    EXEC [tm_feed].[usp_feed_me_gusta_alternar]
+                        @articulo_id = ?, @usuario_id = ?
+                    """,
+                    articulo_id,
+                    str(usuario_id),
+                )
+                row = cursor.fetchone()
+                if row is None:
+                    raise ErrorArticuloFeedNoEncontrado
+                connection.commit()
+            except Exception:
+                connection.rollback()
+                raise
+            finally:
+                cursor.close()
+        finally:
+            connection.close()
+        return bool(row[0]), int(row[1])
+
+    def crear_comentario(
+        self,
+        articulo_id: int,
+        usuario_id: UUID,
+        contenido: str,
+    ) -> ComentarioFeed:
+        connection = abrir_conexion("users_database")
+        try:
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    """
+                    EXEC [tm_feed].[usp_feed_comentario_crear]
+                        @articulo_id = ?, @usuario_id = ?, @contenido = ?
+                    """,
+                    articulo_id,
+                    str(usuario_id),
+                    contenido,
+                )
+                row = cursor.fetchone()
+                if row is None:
+                    raise ErrorArticuloFeedNoEncontrado
+                connection.commit()
+            except Exception:
+                connection.rollback()
+                raise
+            finally:
+                cursor.close()
+        finally:
+            connection.close()
+        return ComentarioFeed(
+            id=int(row[0]),
+            autor=str(row[1]),
+            contenido=str(row[2]),
+            creado_en=_fecha_utc(row[3]),
+        )
 
     def listar(
         self,

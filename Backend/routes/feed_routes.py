@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from typing import Any, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field, model_validator
@@ -37,7 +38,32 @@ class ArticuloRespuesta(BaseModel):
     id: int
     titulo: str
     publicado_en: datetime
+    me_gusta: bool
+    total_me_gusta: int
+    comentarios: list["ComentarioRespuesta"]
     bloques: list[BloqueRespuesta]
+
+
+class ComentarioRespuesta(BaseModel):
+    id: int
+    autor: str
+    contenido: str
+    creado_en: datetime
+
+
+class MeGustaRespuesta(BaseModel):
+    me_gusta: bool
+    total_me_gusta: int
+
+
+class CrearComentarioEntrada(BaseModel):
+    contenido: str = Field(min_length=1, max_length=1000)
+
+    @model_validator(mode="after")
+    def validar_contenido(self) -> "CrearComentarioEntrada":
+        if not self.contenido.strip():
+            raise ValueError("El comentario no puede estar vacío.")
+        return self
 
 
 class FeedRespuesta(BaseModel):
@@ -57,6 +83,7 @@ class OpcionMenuRespuesta(BaseModel):
 class CondicionSegmentacionEntrada(BaseModel):
     atributo: Literal[
         "perfil.edad",
+        "perfil.id_usuario",
         "perfil.sexo",
         "perfil.color_piel",
         "perfil.peso_kg",
@@ -76,6 +103,14 @@ class CondicionSegmentacionEntrada(BaseModel):
 
     @model_validator(mode="after")
     def validar_valor(self) -> "CondicionSegmentacionEntrada":
+        if self.atributo == "perfil.id_usuario":
+            if self.operador != "eq" or not isinstance(self.valor, str):
+                raise ValueError("El ID de usuario solo admite una comparación exacta.")
+            try:
+                self.valor = str(UUID(self.valor))
+            except ValueError as error:
+                raise ValueError("El ID de usuario debe ser un UUID válido.") from error
+            return self
         atributos_numericos = {
             "perfil.edad",
             "perfil.peso_kg",
@@ -126,6 +161,17 @@ class ReglasSegmentacionEntrada(BaseModel):
         min_length=1,
         max_length=20,
     )
+
+    @model_validator(mode="after")
+    def validar_asignacion_usuario(self) -> "ReglasSegmentacionEntrada":
+        if self.modo != "todos" and any(
+            condicion.atributo == "perfil.id_usuario"
+            for condicion in self.condiciones
+        ):
+            raise ValueError(
+                "La asignación a un usuario requiere que se cumplan todas las condiciones."
+            )
+        return self
 
 
 class GuardarArticuloFeedEntrada(BaseModel):
@@ -344,6 +390,95 @@ def obtener_feed(
             detail={
                 "codigo": "error_reglas_feed",
                 "mensaje": "No fue posible evaluar las reglas del feed.",
+                "detalle": None,
+            },
+        ) from error
+
+
+@router.post(
+    "/feed/articulos/{articulo_id}/me-gusta",
+    response_model=MeGustaRespuesta,
+    responses={
+        401: {"model": ErrorRespuesta},
+        404: {"model": ErrorRespuesta},
+        503: {"model": ErrorRespuesta},
+    },
+)
+def alternar_me_gusta(
+    articulo_id: int,
+    usuario: UsuarioActual = Depends(get_usuario_actual),
+) -> dict[str, bool | int]:
+    try:
+        me_gusta, total_me_gusta = feed_repository.alternar_me_gusta(
+            articulo_id,
+            usuario["id"],
+        )
+        return {"me_gusta": me_gusta, "total_me_gusta": total_me_gusta}
+    except ErrorArticuloFeedNoEncontrado as error:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "codigo": "articulo_feed_no_encontrado",
+                "mensaje": "No se encontró el artículo publicado.",
+                "detalle": None,
+            },
+        ) from error
+    except ErrorDatosFeed as error:
+        logger.exception("No fue posible registrar el Me gusta del artículo.")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "codigo": "error_interaccion_feed",
+                "mensaje": "No fue posible registrar el Me gusta.",
+                "detalle": None,
+            },
+        ) from error
+
+
+@router.post(
+    "/feed/articulos/{articulo_id}/comentarios",
+    response_model=ComentarioRespuesta,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        401: {"model": ErrorRespuesta},
+        404: {"model": ErrorRespuesta},
+        422: {"model": ErrorRespuesta},
+        503: {"model": ErrorRespuesta},
+    },
+)
+def crear_comentario_feed(
+    articulo_id: int,
+    entrada: CrearComentarioEntrada,
+    usuario: UsuarioActual = Depends(get_usuario_actual),
+) -> dict[str, Any]:
+    try:
+        comentario = feed_repository.crear_comentario(
+            articulo_id,
+            usuario["id"],
+            entrada.contenido.strip(),
+        )
+        return {
+            "id": comentario.id,
+            "autor": comentario.autor,
+            "contenido": comentario.contenido,
+            "creado_en": comentario.creado_en,
+        }
+    except ErrorArticuloFeedNoEncontrado as error:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "codigo": "articulo_feed_no_encontrado",
+                "mensaje": "No se encontró el artículo publicado.",
+                "detalle": None,
+            },
+        ) from error
+    except ErrorDatosFeed as error:
+        logger.exception("No fue posible guardar el comentario del artículo.")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "codigo": "error_interaccion_feed",
+                "mensaje": "No fue posible guardar el comentario.",
                 "detalle": None,
             },
         ) from error

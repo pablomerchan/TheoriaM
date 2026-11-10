@@ -19,6 +19,17 @@ idempotentes de tablas, procedimientos y permisos están en
 `Backend/scripts/002_permisos_feed.sql`. Ejecútalos en ese orden con una cuenta
 administradora de la base `TheoriaM`; el segundo reutiliza `usuario_web`.
 
+El script `Backend/scripts/005_feed_interacciones.sql` agrega el registro de
+«Me gusta» y comentarios para cada artículo. Ejecútalo después de
+`004_feed_segmentacion.sql`. Cada usuario mantiene un único «Me gusta» activo
+por artículo y puede quitarlo al volver a pulsar el botón; el registro conserva
+las fechas UTC de activación y retiro. Los comentarios también guardan su fecha
+UTC, se limitan a 1000 caracteres y se muestran con el seudónimo del autor.
+`GET /api/v1/feed` incluye el total de «Me gusta», el estado del usuario
+autenticado y los comentarios de cada artículo. `POST /api/v1/feed/articulos/{articulo_id}/me-gusta`
+alterna el «Me gusta» y `POST /api/v1/feed/articulos/{articulo_id}/comentarios`
+registra un comentario.
+
 Se verificó en SQL Server que `tm_userdata.tbl_usuarios.IdUsr` es
 `uniqueidentifier` (16 bytes). Por eso `respuesta_formulario.usuario_id` y los
 parámetros de los procedimientos de respuesta usan ese tipo, sin una clave

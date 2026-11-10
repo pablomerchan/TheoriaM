@@ -37,6 +37,7 @@ export class FeedAdminComponent implements OnInit {
 
   readonly atributos: AtributoFeed[] = [
     { clave: 'perfil.edad', etiqueta: 'Edad', tipo: 'numero' },
+    { clave: 'perfil.id_usuario', etiqueta: 'ID de usuario (UUID)', tipo: 'texto' },
     { clave: 'perfil.sexo', etiqueta: 'Sexo', tipo: 'texto' },
     { clave: 'perfil.color_piel', etiqueta: 'Color de piel', tipo: 'texto' },
     { clave: 'perfil.peso_kg', etiqueta: 'Peso (kg)', tipo: 'numero' },
@@ -144,6 +145,10 @@ export class FeedAdminComponent implements OnInit {
     return this.atributos.find((item) => item.clave === condicion.atributo)?.tipo === 'numero';
   }
 
+  esIdUsuario(condicion: CondicionFormulario): boolean {
+    return condicion.atributo === 'perfil.id_usuario';
+  }
+
   guardar(): void {
     this.error = null;
     this.mensaje = null;
@@ -214,6 +219,16 @@ export class FeedAdminComponent implements OnInit {
 
     const condiciones: CondicionFeed[] = [];
     for (const condicion of this.condiciones) {
+      if (this.esIdUsuario(condicion)) {
+        if (
+          condicion.operador !== 'eq' ||
+          !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            condicion.valor.trim()
+          )
+        ) {
+          return 'Ingresa un ID de usuario válido (UUID) para asignar el artículo.';
+        }
+      }
       if (condicion.operador === 'exists') {
         if (!['true', 'false'].includes(condicion.valor)) {
           return 'Selecciona si el atributo debe estar informado.';
@@ -244,6 +259,12 @@ export class FeedAdminComponent implements OnInit {
         operador: condicion.operador,
         valor
       });
+    }
+    if (
+      this.modo !== 'todos' &&
+      condiciones.some((condicion) => condicion.atributo === 'perfil.id_usuario')
+    ) {
+      return 'Para asignar un artículo a una persona, todas las condiciones deben cumplirse.';
     }
     return { modo: this.modo, condiciones };
   }

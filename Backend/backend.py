@@ -15,7 +15,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Permitir importar el paquete `services` y `webmaster` que están en el nivel superior del archivo
+# Permitir importar el paquete `services` que está en el nivel superior del archivo
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
@@ -35,15 +35,6 @@ from routes.caracteristicas_fisicas import (
 from routes.feed_routes import router as feed_router
 from routes.formularios_routes import router as formularios_router
 
-from webmaster.articulo_crud import (
-    Articulo as WC_Articulo,
-    create_articulo as wc_create_articulo,
-    get_articulos as wc_get_articulos,
-    get_articulo_by_id as wc_get_articulo_by_id,
-    update_articulo as wc_update_articulo,
-    delete_articulo as wc_delete_articulo,
-    get_menu_articulo as wc_get_menu_articulo,
-)
 from pydantic import BaseModel
 
 def parse_id_usuario(val):
@@ -1575,110 +1566,6 @@ def get_articulo(id_usuario: str = "1", tipo_asesoria: Optional[str] = None):
     if not row:
         raise HTTPException(status_code=404, detail="No se encontró artículo para este tipo de asesoría")
     return row
-
-
-class ArticuloIn(BaseModel):
-    id_usuario: Optional[int] = 1
-    texto_html: Optional[str] = ""
-    media_url: Optional[str] = None
-    media_url_webm: Optional[str] = None
-    media_tipo: Optional[str] = "imagen"
-    orden: Optional[int] = 0
-    tipo_asesoria: Optional[str] = None
-    titulo: Optional[str] = None
-    contenido: Optional[str] = None
-    grupo_id: Optional[str] = None
-    tags: Optional[list] = None
-    publicado_en: Optional[str] = None
-    visible: Optional[int] = 1
-
-
-@app.get("/api/webmaster/articulos")
-def wm_list_articulos(id_usuario: Optional[int] = None, tipo_asesoria: Optional[str] = None, visible_only: bool = True):
-    return wc_get_articulos(tipo_asesoria=tipo_asesoria, visible_only=visible_only)
-
-
-@app.get("/api/webmaster/articulo/{articulo_id}")
-def wm_get_articulo(articulo_id: int):
-    row = wc_get_articulo_by_id(articulo_id)
-    if not row:
-        raise HTTPException(status_code=404, detail="Artículo no encontrado")
-    return row
-
-
-@app.get("/api/webmaster/articulo/{articulo_id}/menu")
-def wm_get_articulo_menu(articulo_id: int):
-    article = wc_get_articulo_by_id(articulo_id)
-    if not article:
-        raise HTTPException(status_code=404, detail="Artículo no encontrado")
-
-    menu_rows = wc_get_menu_articulo(
-        menu_servicio_id=None,
-        tipo_asesoria=article.get("tipo_asesoria"),
-        visible_only=False,
-    )
-    return menu_rows
-
-
-@app.post("/api/webmaster/articulo", status_code=201)
-def wm_create_articulo(
-    payload: ArticuloIn,
-    menu_servicio_id: int = 28,
-    menu_titulo: Optional[str] = None,
-    menu_principal: Optional[str] = None,
-    menu_observacion: Optional[str] = None,
-):
-    art = WC_Articulo(
-        id_usuario=payload.id_usuario,
-        texto_html=payload.texto_html or "",
-        media_url=payload.media_url,
-        media_url_webm=payload.media_url_webm,
-        media_tipo=payload.media_tipo or "imagen",
-        orden=payload.orden or 0,
-        tipo_asesoria=payload.tipo_asesoria,
-        titulo=payload.titulo,
-        contenido=payload.contenido,
-        grupo_id=payload.grupo_id,
-        tags=payload.tags or [],
-        publicado_en=payload.publicado_en,
-        visible=payload.visible if payload.visible in (0,1) else 1,
-    )
-    return wc_create_articulo(
-        art,
-        menu_servicio_id=menu_servicio_id,
-        menu_titulo=menu_titulo,
-        menu_principal=menu_principal,
-        menu_observacion=menu_observacion,
-    )
-
-
-@app.put("/api/webmaster/articulo/{articulo_id}")
-def wm_update_articulo(articulo_id: int, payload: dict):
-    # payload may contain fields directly or nested under 'updates'
-    if not isinstance(payload, dict):
-        raise HTTPException(status_code=400, detail="Cuerpo inválido")
-    if 'updates' in payload:
-        updates = payload.get('updates')
-        menu_updates = payload.get('menu_updates')
-    else:
-        updates = payload
-        menu_updates = payload.get('menu_updates') if isinstance(payload.get('menu_updates'), dict) else None
-    if not updates:
-        raise HTTPException(status_code=400, detail="Faltan campos 'updates' en el cuerpo")
-    try:
-        updated = wc_update_articulo(articulo_id, updates, menu_updates)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    return updated
-
-
-@app.delete("/api/webmaster/articulo/{articulo_id}")
-def wm_delete_articulo(articulo_id: int, soft: bool = True):
-    try:
-        wc_delete_articulo(articulo_id, soft=soft)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    return {"deleted": True, "soft": soft}
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -31,9 +31,6 @@ src/
 │           ├── models/        # Interfaces y tipos
 │           └── app.ts         # Componente raíz
 │
-├── webmaster/                  # Sistema de administración
-│   └── articulo_crud.py       # CRUD de artículos
-│
 └── docs/
     └── contexto/              # Documentación del proyecto
         ├── arquitectura.md
@@ -232,12 +229,10 @@ GET    /api/asesoria/carruseles
 GET    /api/asesoria/articulo
 GET    /api/asesoria/rapida
 GET    /api/persona/mi-perfil
-GET    /api/webmaster/articulos
-GET    /api/webmaster/articulo/{articulo_id}
-POST   /api/webmaster/articulo
-PUT    /api/webmaster/articulo/{articulo_id}
-DELETE /api/webmaster/articulo/{articulo_id}
 ```
+
+La administración de artículos se realiza desde `/api/v1/feed/admin/articulos`.
+Las rutas CRUD anteriores `/api/webmaster/articulo(s)` fueron retiradas.
 
 ### 2.9 Variables Privadas
 

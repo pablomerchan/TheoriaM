@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from routes.feed_routes import (
     CondicionSegmentacionEntrada,
+    CrearComentarioEntrada,
     GuardarArticuloFeedEntrada,
 )
 from repositories.sql_server_feed_repo import _fetch_result_set
@@ -65,6 +66,32 @@ def test_condicion_exists_requiere_booleano() -> None:
         )
 
 
+def test_condicion_id_usuario_admite_uuid_y_comparacion_exacta() -> None:
+    condicion = CondicionSegmentacionEntrada(
+        atributo="perfil.id_usuario",
+        operador="eq",
+        valor="00000000-0000-0000-0000-000000000001",
+    )
+
+    assert condicion.valor == "00000000-0000-0000-0000-000000000001"
+
+
+@pytest.mark.parametrize(
+    ("operador", "valor"),
+    [("eq", "no-es-uuid"), ("ne", "00000000-0000-0000-0000-000000000001")],
+)
+def test_condicion_id_usuario_rechaza_uuid_o_comparacion_invalidos(
+    operador: str,
+    valor: str,
+) -> None:
+    with pytest.raises(ValidationError):
+        CondicionSegmentacionEntrada(
+            atributo="perfil.id_usuario",
+            operador=operador,
+            valor=valor,
+        )
+
+
 def test_articulo_rechaza_titulo_vacio() -> None:
     with pytest.raises(ValidationError):
         GuardarArticuloFeedEntrada(
@@ -72,6 +99,35 @@ def test_articulo_rechaza_titulo_vacio() -> None:
             estado=0,
             reglas=None,
         )
+
+
+def test_asignacion_a_usuario_requiere_modo_todos() -> None:
+    with pytest.raises(ValidationError):
+        GuardarArticuloFeedEntrada(
+            titulo="Artículo asignado",
+            estado=0,
+            reglas={
+                "modo": "alguno",
+                "condiciones": [
+                    {
+                        "atributo": "perfil.id_usuario",
+                        "operador": "eq",
+                        "valor": "00000000-0000-0000-0000-000000000001",
+                    }
+                ],
+            },
+        )
+
+
+def test_comentario_rechaza_contenido_vacio() -> None:
+    with pytest.raises(ValidationError):
+        CrearComentarioEntrada(contenido="   ")
+
+
+def test_comentario_admite_contenido_con_espacios() -> None:
+    entrada = CrearComentarioEntrada(contenido="  Opinión  ")
+
+    assert entrada.contenido == "  Opinión  "
 
 
 def test_editor_feed_requiere_id_autorizado(monkeypatch: pytest.MonkeyPatch) -> None:

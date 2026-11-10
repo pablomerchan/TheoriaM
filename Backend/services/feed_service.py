@@ -50,8 +50,11 @@ def _valor_condicion(
             f"Atributo de segmentación no admitido: {atributo}."
         )
     valores = atributos if origen == "perfil" else contexto
-    existe = clave in valores and valores[clave] is not None
-    actual = valores.get(clave)
+    clave_valor = (
+        clave if clave in valores else atributo if atributo in valores else None
+    )
+    existe = clave_valor is not None and valores[clave_valor] is not None
+    actual = valores.get(clave_valor) if clave_valor is not None else None
 
     if operador == "exists":
         if not isinstance(esperado, bool):
@@ -222,6 +225,7 @@ class FeedService:
         )
         ahora = datetime.now(timezone.utc)
         atributos = self.repository.obtener_atributos_usuario(usuario_id)
+        atributos["perfil.id_usuario"] = str(usuario_id)
         nacimiento = atributos.pop("perfil.fecha_nacimiento", None)
         if isinstance(nacimiento, datetime):
             nacimiento = nacimiento.date()
@@ -275,6 +279,10 @@ class FeedService:
             if hay_mas and cursor_siguiente
             else None
         )
+        interacciones = self.repository.listar_interacciones(
+            [articulo.id for articulo in articulos_visibles],
+            usuario_id,
+        )
 
         return {
             "items": [
@@ -282,6 +290,17 @@ class FeedService:
                     "id": articulo.id,
                     "titulo": articulo.titulo,
                     "publicado_en": articulo.publicado_en,
+                    "me_gusta": interacciones[articulo.id].me_gusta,
+                    "total_me_gusta": interacciones[articulo.id].total_me_gusta,
+                    "comentarios": [
+                        {
+                            "id": comentario.id,
+                            "autor": comentario.autor,
+                            "contenido": comentario.contenido,
+                            "creado_en": comentario.creado_en,
+                        }
+                        for comentario in interacciones[articulo.id].comentarios
+                    ],
                     "bloques": [
                         {
                             "id": bloque.id,
