@@ -218,6 +218,41 @@ def test_listar_filtra_articulos_por_atributos_del_perfil() -> None:
     assert resultado["siguienteCursor"] is None
 
 
+def test_listar_compara_sexo_con_la_clave_completa_del_perfil() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    articulo = ArticuloFeed(
+        id=1,
+        titulo="Artículo por sexo",
+        publicado_en=fecha,
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "todos",
+            "condiciones": [
+                {"atributo": "perfil.sexo", "operador": "eq", "valor": "femenino"}
+            ],
+        },
+    )
+    repository = RepositorioFeedFalso([articulo])
+    repository.atributos["perfil.sexo"] = "femenino"
+    service = FeedService(repository)
+    usuario_id = UUID("00000000-0000-0000-0000-000000000001")
+
+    resultado_coincidente = service.listar(
+        cursor=None,
+        limite=10,
+        usuario_id=usuario_id,
+    )
+    repository.atributos["perfil.sexo"] = "masculino"
+    resultado_no_coincidente = service.listar(
+        cursor=None,
+        limite=10,
+        usuario_id=usuario_id,
+    )
+
+    assert [item["id"] for item in resultado_coincidente["items"]] == [1]
+    assert resultado_no_coincidente["items"] == []
+
+
 def test_listar_asigna_articulo_a_usuario_y_caracteristicas_especificas() -> None:
     fecha = datetime(2026, 10, 15, 12, 30, 45)
     usuario_id = UUID("00000000-0000-0000-0000-000000000001")

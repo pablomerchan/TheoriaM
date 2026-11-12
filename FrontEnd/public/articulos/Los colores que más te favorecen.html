@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Los colores que más te favorecen</title>
+<style>
+:root{--bg:#faf7f3;--surface:#fff;--text:#2b2623;--muted:#6b625b;--accent:#8a3b52;--line:#e7dfd6;--stage:#efe6dc;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1917;--surface:#26221f;--text:#f1ebe4;--muted:#b3a89e;--accent:#e0a3b5;--line:#3a3430;--stage:#342f2b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1917;--surface:#26221f;--text:#f1ebe4;--muted:#b3a89e;--accent:#e0a3b5;--line:#3a3430;--stage:#342f2b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65;font-size:1.05rem}
+main{max-width:880px;margin:0 auto;padding:32px 20px 64px}
+h1{font-family:Georgia,serif;font-size:clamp(2rem,6vw,3rem);line-height:1.15;margin:0 0 8px}
+h2{font-family:Georgia,serif;font-size:1.6rem;margin:48px 0 8px;color:var(--accent)}
+p{margin:0 0 14px}
+.lead{font-size:1.15rem;color:var(--muted)}
+.box{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:10px;padding:16px 20px;margin:22px 0}
+.box ul{margin:8px 0 0;padding-left:20px}
+.hero{display:flex;justify-content:center;gap:10px;background:var(--stage);border-radius:18px;padding:16px 10px 0;margin:22px 0;overflow:hidden}
+.hero svg{width:calc(20% - 8px);max-width:150px;height:auto;display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.card svg{display:block;width:100%;height:auto;background:var(--stage)}
+.card b{display:block;padding:10px 12px 0}
+.card span{display:block;padding:2px 12px 14px;font-size:.88rem;color:var(--muted);line-height:1.45}
+.dot{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid #0003}
+.no::after{content:"✕";position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#000a;color:#fff;text-align:center;line-height:24px;font-size:.8rem}
+.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0}
+.steps li{counter-increment:s;position:relative;padding:4px 0 12px 44px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--bg);text-align:center;line-height:30px;font-weight:700}
+.combos{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.combo{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;font-size:.9rem}
+.combo i{width:18px;height:18px;border-radius:50%;border:1px solid #0003}
+.combo i+i{margin-left:-14px}
+footer{margin-top:44px;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a5f40"/><stop offset=".55" stop-color="#5a3925"/><stop offset="1" stop-color="#3a2417"/></linearGradient>
+<radialGradient id="skin" cx=".45" cy=".4" r=".75"><stop offset="0" stop-color="#fbe8da"/><stop offset=".7" stop-color="#f3d3bf"/><stop offset="1" stop-color="#e6b99f"/></radialGradient>
+<linearGradient id="sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>
+<filter id="bl"><feGaussianBlur stdDeviation="1.6"/></filter>
+<symbol id="bd" viewBox="0 0 100 120">
+<path d="M42 64v20q8 9 16 0V64z" fill="url(#skin)"/>
+<ellipse cx="50" cy="73" rx="10" ry="5" fill="#a86a50" opacity=".25" filter="url(#bl)"/>
+<path d="M3 120C3 94 26 85 50 85s47 9 47 35z" style="fill:var(--c)"/>
+<path d="M3 120C3 94 26 85 50 85s47 9 47 35z" fill="url(#sh)"/>
+<path d="M36 85.5Q50 108 64 85.5Q50 92 36 85.5z" fill="url(#skin)"/>
+<path d="M36 85.5Q50 108 64 85.5" stroke="#fff" stroke-opacity=".3" stroke-width="1" fill="none"/>
+<ellipse cx="31" cy="49" rx="3" ry="5.5" fill="#efc9b0"/><ellipse cx="69" cy="49" rx="3" ry="5.5" fill="#efc9b0"/>
+<path d="M31 44C31 26 40 18 50 18s19 8 19 26c0 15-9 27-19 27S31 59 31 44z" fill="url(#skin)"/>
+<circle cx="38" cy="55" r="5" fill="#ee9f92" opacity=".35" filter="url(#bl)"/><circle cx="62" cy="55" r="5" fill="#ee9f92" opacity=".35" filter="url(#bl)"/>
+<path d="M37.5 40.5Q43 37 48 39.5M62.5 40.5Q57 37 52 39.5" stroke="#4a2f20" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+<path d="M38 46Q43 42 48 46Q43 48.5 38 46zM52 46Q57 42 62 46Q57 48.5 52 46z" fill="#fff"/>
+<circle cx="43" cy="45.4" r="2.2" fill="#5b3a24"/><circle cx="57" cy="45.4" r="2.2" fill="#5b3a24"/>
+<circle cx="43" cy="45.4" r="1" fill="#1c120d"/><circle cx="57" cy="45.4" r="1" fill="#1c120d"/>
+<circle cx="43.8" cy="44.6" r=".6" fill="#fff"/><circle cx="57.8" cy="44.6" r=".6" fill="#fff"/>
+<path d="M37.5 46Q43 41.5 48.5 46M51.5 46Q57 41.5 62.5 46" stroke="#2a1a12" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+<path d="M50 48Q48.5 55 47 57.5Q50 59.5 53 57.5Q51.5 55 50 48" stroke="#cf967f" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M43.5 62.5Q47 60.5 50 62Q53 60.5 56.5 62.5Q50 64.5 43.5 62.5z" fill="#b24f5a"/>
+<path d="M43.5 62.5Q50 70 56.5 62.5Q50 65 43.5 62.5z" fill="#cc6f77"/>
+</symbol>
+<symbol id="hb1" viewBox="0 0 100 120"><path d="M25 48C21 18 38 7 50 7s29 11 25 41c4 22 3 50 9 66H16c6-16 5-44 9-66z" fill="url(#hair)"/></symbol>
+<symbol id="hf1" viewBox="0 0 100 120"><path d="M30 42C29 20 46 12 57 14c9 2 13 14 12 28-5-11-13-18-23-18-7 1-13 8-16 18z" fill="url(#hair)"/>
+<path d="M28 44C21 68 22 92 30 108c7-3 9-11 7-22-4-12-4-26-3-40zM72 44c7 24 6 48-2 64-7-3-9-11-7-22 4-12 4-26 3-40z" fill="url(#hair)"/>
+<path d="M33 30Q42 22 54 22M27 70Q26 86 31 100M73 70q1 16-4 30" stroke="#b78a63" stroke-opacity=".55" stroke-width="1.2" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="hb2" viewBox="0 0 100 120"><path d="M26 46C23 17 38 8 50 8s27 9 24 38c2 16 3 32 6 46H20c3-14 4-30 6-46z" fill="url(#hair)"/></symbol>
+<symbol id="hf2" viewBox="0 0 100 120"><path d="M30 44C30 22 48 13 50 13s20 9 20 31c-5-12-13-19-20-19s-15 7-20 19z" fill="url(#hair)"/>
+<path d="M29 44C23 62 22 80 25 94c9 3 14-3 13-12-3-11-4-24-4-38zM71 44c6 18 7 36 4 50-9 3-14-3-13-12 3-11 4-24 4-38z" fill="url(#hair)"/>
+<path d="M36 28Q44 20 50 20M26 66Q25 80 28 90M74 66q1 14-2 24" stroke="#b78a63" stroke-opacity=".55" stroke-width="1.2" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="hb3" viewBox="0 0 100 120"><circle cx="50" cy="8" r="9" fill="url(#hair)"/><path d="M29 44C27 16 73 16 71 44z" fill="url(#hair)"/></symbol>
+<symbol id="hf3" viewBox="0 0 100 120"><path d="M30 45C27 17 73 17 70 45c-4-14-12-21-20-21s-16 7-20 21z" fill="url(#hair)"/>
+<path d="M36 26Q50 17 64 26" stroke="#b78a63" stroke-opacity=".55" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<circle cx="31" cy="56" r="2" fill="#d9b24c"/><circle cx="69" cy="56" r="2" fill="#d9b24c"/></symbol>
+<symbol id="p1" viewBox="0 0 100 120"><use href="#hb1"/><use href="#bd"/><use href="#hf1"/></symbol>
+<symbol id="p2" viewBox="0 0 100 120"><use href="#hb2"/><use href="#bd"/><use href="#hf2"/></symbol>
+<symbol id="p3" viewBox="0 0 100 120"><use href="#hb3"/><use href="#bd"/><use href="#hf3"/></symbol>
+<symbol id="tired" viewBox="0 0 100 120"><ellipse cx="43" cy="49.5" rx="5.5" ry="2.2" fill="#7a5a86" opacity=".3" filter="url(#bl)"/><ellipse cx="57" cy="49.5" rx="5.5" ry="2.2" fill="#7a5a86" opacity=".3" filter="url(#bl)"/><ellipse cx="50" cy="44" rx="19" ry="27" fill="#c9c46a" opacity=".16"/></symbol>
+</defs>
+</svg>
+
+<main>
+<h1>Los colores que más te favorecen</h1>
+<p class="lead">Una guía sencilla para mujeres con piel clara y cabello castaño. Sin términos técnicos: solo qué colores usar y cómo combinarlos.</p>
+
+<div class="hero" role="img" aria-label="Cinco ilustraciones de mujeres con blusas en colores favorecedores">
+<svg viewBox="0 0 100 120"><use href="#p1" style="--c:#1f2a4d"/></svg>
+<svg viewBox="0 0 100 120"><use href="#p2" style="--c:#1e8c6b"/></svg>
+<svg viewBox="0 0 100 120"><use href="#p3" style="--c:#6d1f3a"/></svg>
+<svg viewBox="0 0 100 120"><use href="#p1" style="--c:#d9a7a7"/></svg>
+<svg viewBox="0 0 100 120"><use href="#p2" style="--c:#b9a7d6"/></svg>
+</div>
+
+<div class="box"><b>Resumen en 30 segundos</b>
+<ul>
+<li>Los colores <b>intensos</b> (azul marino, verde esmeralda, vino) dan fuerza al rostro.</li>
+<li>Los colores <b>suaves</b> (rosa empolvado, lavanda) lo hacen ver fresco y delicado.</li>
+<li>Los colores <b>muy parecidos a tu piel</b> o los <b>neón</b> te apagan: úsalos lejos de la cara.</li>
+</ul></div>
+
+<h2>¿Por qué importa el color?</h2>
+<p>Tu piel clara y tu cabello castaño ya tienen un buen contraste natural. Eso significa que casi cualquier estilo te puede quedar bien si eliges el color correcto.</p>
+<p>El color adecuado hace que tu rostro se vea más luminoso, descansado y joven. El equivocado puede marcar ojeras o dar un aspecto cansado.</p>
+<div class="box"><b>Dato clave:</b> importa más el color que llevas <b>cerca de la cara</b> (cuello, escote, bufanda, aretes) que el de la falda o el pantalón.</div>
+
+<h2>Los colores ideales</h2>
+<p>Estos nueve tonos te dan elegancia sin endurecer tu apariencia:</p>
+<div class="grid">
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p3" style="--c:#1f2a4d"/></svg><b>Azul marino</b><span>Alternativa elegante al negro. Ideal para la oficina.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p1" style="--c:#1e8c6b"/></svg><b>Verde esmeralda</b><span>Ilumina el rostro y resalta el castaño del cabello.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p2" style="--c:#1f5f6b"/></svg><b>Azul petróleo</b><span>Moderno y sofisticado, sirve todo el año.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p3" style="--c:#6d1f3a"/></svg><b>Burdeos o vino</b><span>Aporta calidez. Perfecto para la noche.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p1" style="--c:#d9a7a7"/></svg><b>Rosa empolvado</b><span>Suaviza las facciones y se ve muy fresco.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p2" style="--c:#b9a7d6"/></svg><b>Lavanda suave</b><span>Da luz sin ser llamativo. Muy bonito en primavera.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p3" style="--c:#b9814a"/></svg><b>Camel</b><span>Un clásico para abrigos, blazers y bolsos.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p1" style="--c:#d8bfa0"/></svg><b>Beige cálido</b><span>Luminoso si lo combinas con un color más oscuro.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p2" style="--c:#8a8d93"/></svg><b>Gris medio</b><span>Sobrio. Mejor con un toque de color cerca del rostro.</span></div>
+</div>
+
+<h2>Tu base: los colores neutros</h2>
+<p>Son prendas que combinan con todo. Con estas cinco tendrás un armario fácil de usar:</p>
+<div class="grid">
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p3" style="--c:#f4f0e8"/></svg><b>Blanco roto</b><span>Más suave que el blanco puro.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p1" style="--c:#f1e8d0"/></svg><b>Marfil</b><span>Cálido y elegante, ideal en blusas.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p2" style="--c:#e6d9c6"/></svg><b>Beige suave</b><span>Perfecto para looks de un solo color.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p3" style="--c:#d6d8dc"/></svg><b>Gris perla</b><span>Delicado. Queda muy bien con rosa o lavanda.</span></div>
+<div class="card"><svg viewBox="0 0 100 120"><use href="#p1" style="--c:#1a1a1a"/></svg><b>Negro</b><span>Añade algo claro cerca del rostro: collar, pañuelo o cuello blanco.</span></div>
+</div>
+
+<h2>Colores para usar con cuidado</h2>
+<p>No están prohibidos. Solo evita ponerlos pegados a la cara. Mira cómo el rostro pierde luz:</p>
+<div class="grid">
+<div class="card no"><svg viewBox="0 0 100 120"><use href="#p2" style="--c:#e8c9a8"/><use href="#tired"/></svg><b>Beige igual a tu piel</b><span>Hace que el rostro se «borre».</span></div>
+<div class="card no"><svg viewBox="0 0 100 120"><use href="#p3" style="--c:#e6ff00"/><use href="#tired"/></svg><b>Amarillo neón</b><span>Da un aspecto cansado.</span></div>
+<div class="card no"><svg viewBox="0 0 100 120"><use href="#p1" style="--c:#a8e000"/><use href="#tired"/></svg><b>Verde lima</b><span>Es tan fuerte que compite con tu rostro.</span></div>
+<div class="card no"><svg viewBox="0 0 100 120"><use href="#p2" style="--c:#a9a59e"/><use href="#tired"/></svg><b>Gris apagado</b><span>Cerca de la cara le quita luminosidad.</span></div>
+</div>
+
+<h2>Cómo saber si un color te favorece</h2>
+<ol class="steps">
+<li><b>Ponte frente a un espejo</b> con luz natural, cerca de una ventana.</li>
+<li><b>Acerca la prenda</b> debajo de tu barbilla.</li>
+<li><b>Observa tu rostro.</b> Si se ve descansado y tus ojos brillan, es buen color. Si se marcan las ojeras o la piel se ve amarillenta, úsalo lejos de la cara.</li>
+</ol>
+
+<h2>Ideas de combinaciones fáciles</h2>
+<div class="combos">
+<div class="combo"><i style="background:#1f2a4d"></i><i style="background:#f4f0e8"></i><i style="background:#b9814a"></i>Azul marino + blanco roto + camel</div>
+<div class="combo"><i style="background:#6d1f3a"></i><i style="background:#d6d8dc"></i>Vino + gris perla</div>
+<div class="combo"><i style="background:#1e8c6b"></i><i style="background:#f1e8d0"></i>Esmeralda + marfil</div>
+<div class="combo"><i style="background:#d9a7a7"></i><i style="background:#8a8d93"></i>Rosa empolvado + gris</div>
+<div class="combo"><i style="background:#b9a7d6"></i><i style="background:#d8bfa0"></i>Lavanda + beige cálido</div>
+</div>
+
+<h2>Más trucos sencillos</h2>
+<p><b>Accesorios:</b> los dorados suelen ir bien con camel y vino; los plateados, con azules y lavanda. Elige el que más te guste.</p>
+<p><b>Maquillaje:</b> un labial rosa empolvado o color vino y sombras marrones suaves combinan con toda esta paleta.</p>
+<p><b>Un solo color:</b> vestirte en distintos tonos del mismo color (por ejemplo, camel con beige y marfil) te hace ver más estilizada.</p>
+
+<footer>Las imágenes son ilustraciones realistas, no fotografías. La luz, el subtono de tu piel y tu gusto personal siempre cuentan: usa esta guía como punto de partida.</footer>
+</main>
+</body>
+</html>
