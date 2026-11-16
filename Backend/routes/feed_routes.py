@@ -178,6 +178,7 @@ class GuardarArticuloFeedEntrada(BaseModel):
     titulo: str = Field(min_length=1, max_length=200)
     contenido: str | None = Field(default=None, max_length=100000)
     estado: Literal[0, 1, 2]
+    prioridad: int = Field(default=0, ge=-2147483648, le=2147483647)
     reglas: ReglasSegmentacionEntrada | None = None
 
     @model_validator(mode="after")
@@ -249,6 +250,7 @@ def crear_articulo_feed(
             entrada.titulo.strip(),
             entrada.contenido,
             entrada.estado,
+            entrada.prioridad,
             reglas,
         )
     except ErrorDatosFeed as error:
@@ -284,6 +286,7 @@ def actualizar_articulo_feed(
             entrada.titulo.strip(),
             entrada.contenido,
             entrada.estado,
+            entrada.prioridad,
             entrada.reglas.model_dump() if entrada.reglas else None,
         )
     except ErrorArticuloFeedNoEncontrado as error:

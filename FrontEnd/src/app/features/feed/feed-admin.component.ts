@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
   ArticuloAdministrableFeed,
@@ -34,6 +37,9 @@ interface CondicionFormulario {
 })
 export class FeedAdminComponent implements OnInit {
   private readonly api = inject(FeedAdminApiService);
+  private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
+  private solicitudArchivoHtml: Subscription | null = null;
 
   readonly atributos: AtributoFeed[] = [
     { clave: 'perfil.edad', etiqueta: 'Edad', tipo: 'numero' },
@@ -61,7 +67,10 @@ export class FeedAdminComponent implements OnInit {
   seleccionado: ArticuloAdministrableFeed | null = null;
   titulo = '';
   contenido = '';
+  archivoHtml = '';
+  cargandoHtml = false;
   estado: 0 | 1 | 2 = 0;
+  prioridad = 0;
   segmentado = false;
   modo: 'todos' | 'alguno' = 'todos';
   condiciones: CondicionFormulario[] = [];
@@ -90,10 +99,13 @@ export class FeedAdminComponent implements OnInit {
   }
 
   nuevo(): void {
+    this.cancelarCargaHtml();
     this.seleccionado = null;
     this.titulo = '';
     this.contenido = '';
+    this.archivoHtml = '';
     this.estado = 0;
+    this.prioridad = 0;
     this.segmentado = false;
     this.modo = 'todos';
     this.condiciones = [];
@@ -102,10 +114,13 @@ export class FeedAdminComponent implements OnInit {
   }
 
   editar(articulo: ArticuloAdministrableFeed): void {
+    this.cancelarCargaHtml();
     this.seleccionado = articulo;
     this.titulo = articulo.titulo;
     this.contenido = articulo.contenido;
+    this.archivoHtml = '';
     this.estado = articulo.estado;
+    this.prioridad = articulo.prioridad;
     this.segmentado = articulo.reglas !== null;
     this.modo = articulo.reglas?.modo ?? 'todos';
     this.condiciones = (articulo.reglas?.condiciones ?? []).map((condicion) => ({
@@ -115,6 +130,44 @@ export class FeedAdminComponent implements OnInit {
     }));
     this.error = null;
     this.mensaje = null;
+  }
+
+  cargarHtml(): void {
+    if (this.cargandoHtml) {
+      return;
+    }
+
+    const nombreArchivo = this.archivoHtml.trim();
+    if (
+      !nombreArchivo ||
+      !nombreArchivo.toLowerCase().endsWith('.html') ||
+      /[\\/]/.test(nombreArchivo)
+    ) {
+      this.error = 'Indica el nombre de un archivo .html ubicado en FrontEnd/public/articulos.';
+      this.mensaje = null;
+      return;
+    }
+
+    this.error = null;
+    this.mensaje = null;
+    this.cargandoHtml = true;
+    this.solicitudArchivoHtml = this.http
+      .get(`/articulos/${encodeURIComponent(nombreArchivo)}`, { responseType: 'text' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (html) => {
+          this.contenido = html;
+          this.cargandoHtml = false;
+          this.solicitudArchivoHtml = null;
+          this.mensaje = `HTML cargado desde "${nombreArchivo}". Guarda el artículo para aplicar los cambios.`;
+        },
+        error: (error: unknown) => {
+          console.error('No fue posible cargar el archivo HTML del artículo:', error);
+          this.cargandoHtml = false;
+          this.solicitudArchivoHtml = null;
+          this.error = `No se pudo cargar "${nombreArchivo}". Verifica que exista en FrontEnd/public/articulos.`;
+        }
+      });
   }
 
   agregarCondicion(): void {
@@ -150,6 +203,10 @@ export class FeedAdminComponent implements OnInit {
   }
 
   guardar(): void {
+    if (this.guardando || this.cargandoHtml) {
+      return;
+    }
+
     this.error = null;
     this.mensaje = null;
     if (!this.titulo.trim()) {
@@ -158,6 +215,14 @@ export class FeedAdminComponent implements OnInit {
     }
     if (!this.seleccionado && !this.contenido.trim()) {
       this.error = 'Escribe el contenido del artículo.';
+      return;
+    }
+    if (
+      !Number.isInteger(this.prioridad) ||
+      this.prioridad < -2147483648 ||
+      this.prioridad > 2147483647
+    ) {
+      this.error = 'La prioridad debe ser un número entero entre -2147483648 y 2147483647.';
       return;
     }
     const reglas = this.obtenerReglas();
@@ -169,6 +234,7 @@ export class FeedAdminComponent implements OnInit {
     const articulo: GuardarArticuloFeed = {
       titulo: this.titulo.trim(),
       estado: this.estado,
+      prioridad: this.prioridad,
       reglas
     };
     if (!this.seleccionado || this.seleccionado.contenido_editable) {
@@ -290,5 +356,11 @@ export class FeedAdminComponent implements OnInit {
 
   private mostrarValor(valor: unknown): string {
     return Array.isArray(valor) ? valor.join(', ') : String(valor ?? '');
+  }
+
+  private cancelarCargaHtml(): void {
+    this.solicitudArchivoHtml?.unsubscribe();
+    this.solicitudArchivoHtml = null;
+    this.cargandoHtml = false;
   }
 }

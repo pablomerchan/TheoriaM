@@ -19,6 +19,7 @@ class ArticuloFeed:
     publicado_en: datetime
     bloques: list[BloqueFeed]
     reglas_segmentacion: dict[str, Any] | None = None
+    prioridad: int = 0
 
 
 @dataclass(frozen=True)
@@ -62,6 +63,7 @@ class FeedRepository(Protocol):
 
     def listar(
         self,
+        cursor_prioridad: int | None,
         cursor_fecha: datetime | None,
         cursor_id: int | None,
         limite: int,

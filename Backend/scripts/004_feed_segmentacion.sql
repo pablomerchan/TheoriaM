@@ -32,7 +32,30 @@ BEGIN
 END
 GO
 
+IF COL_LENGTH(N'tm_feed.articulo', N'prioridad') IS NULL
+BEGIN
+    ALTER TABLE [tm_feed].[articulo]
+        ADD prioridad INT NOT NULL
+            CONSTRAINT DF_articulo_prioridad DEFAULT (0);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = N'IX_articulo_feed_prioridad'
+      AND object_id = OBJECT_ID(N'tm_feed.articulo')
+)
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_articulo_feed_prioridad
+        ON [tm_feed].[articulo] (prioridad ASC, publicado_en DESC, articulo_id DESC)
+        INCLUDE (titulo)
+        WHERE estado = 1;
+END
+GO
+
 CREATE OR ALTER PROCEDURE [tm_feed].[usp_feed_candidatos_listar]
+    @cursor_prioridad INT          = NULL,
     @cursor_fecha DATETIME2(0) = NULL,
     @cursor_id    BIGINT       = NULL,
     @limite       INT          = 50
@@ -48,24 +71,34 @@ BEGIN
     (
         articulo_id  BIGINT        NOT NULL PRIMARY KEY,
         titulo       NVARCHAR(200) NOT NULL,
-        publicado_en DATETIME2(0)  NOT NULL
+        publicado_en DATETIME2(0)  NOT NULL,
+        prioridad    INT           NOT NULL
     );
 
-    INSERT INTO #pagina (articulo_id, titulo, publicado_en)
+    INSERT INTO #pagina (articulo_id, titulo, publicado_en, prioridad)
     SELECT TOP (@limite + 1)
-           a.articulo_id, a.titulo, a.publicado_en
+           a.articulo_id, a.titulo, a.publicado_en, a.prioridad
     FROM [tm_feed].[articulo] AS a
     WHERE a.estado = 1
       AND (
-            @cursor_fecha IS NULL
-         OR a.publicado_en < @cursor_fecha
-         OR (a.publicado_en = @cursor_fecha AND a.articulo_id < @cursor_id)
+            @cursor_prioridad IS NULL
+         OR a.prioridad > @cursor_prioridad
+         OR (
+                a.prioridad = @cursor_prioridad
+            AND (
+                    a.publicado_en < @cursor_fecha
+                 OR (
+                        a.publicado_en = @cursor_fecha
+                    AND a.articulo_id < @cursor_id
+                 )
+            )
+         )
       )
-    ORDER BY a.publicado_en DESC, a.articulo_id DESC;
+    ORDER BY a.prioridad ASC, a.publicado_en DESC, a.articulo_id DESC;
 
-    SELECT articulo_id, titulo, publicado_en
+    SELECT articulo_id, titulo, publicado_en, prioridad
     FROM #pagina
-    ORDER BY publicado_en DESC, articulo_id DESC;
+    ORDER BY prioridad ASC, publicado_en DESC, articulo_id DESC;
 
     SELECT b.articulo_id, b.bloque_id, b.orden, b.tipo, b.payload_json
     FROM [tm_feed].[articulo_bloque] AS b
@@ -84,9 +117,9 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    SELECT articulo_id, titulo, publicado_en, estado
+    SELECT articulo_id, titulo, publicado_en, estado, prioridad
     FROM [tm_feed].[articulo]
-    ORDER BY actualizado_en DESC, articulo_id DESC;
+    ORDER BY prioridad ASC, publicado_en DESC, articulo_id DESC;
 
     SELECT b.articulo_id, b.bloque_id, b.orden, b.tipo, b.payload_json
     FROM [tm_feed].[articulo_bloque] AS b
@@ -104,6 +137,7 @@ CREATE OR ALTER PROCEDURE [tm_feed].[usp_feed_admin_articulo_guardar]
     @titulo NVARCHAR(200),
     @contenido NVARCHAR(MAX) = NULL,
     @estado TINYINT,
+    @prioridad INT = 0,
     @reglas_json NVARCHAR(MAX) = NULL
 AS
 BEGIN
@@ -128,8 +162,8 @@ BEGIN
 
     IF @articulo_id IS NULL
     BEGIN
-        INSERT INTO [tm_feed].[articulo] (titulo, estado)
-        VALUES (@titulo, @estado);
+        INSERT INTO [tm_feed].[articulo] (titulo, estado, prioridad)
+        VALUES (@titulo, @estado, @prioridad);
         SET @articulo_id = CONVERT(BIGINT, SCOPE_IDENTITY());
     END
     ELSE
@@ -137,6 +171,7 @@ BEGIN
         UPDATE [tm_feed].[articulo]
         SET titulo = @titulo,
             estado = @estado,
+            prioridad = @prioridad,
             actualizado_en = SYSUTCDATETIME()
         WHERE articulo_id = @articulo_id;
 

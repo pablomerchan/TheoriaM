@@ -104,10 +104,15 @@
 }
 
 .editor > label,
+.html-source > label,
 .condition > label {
   display: block;
   margin-top: 1rem;
   font-weight: 600;
+}
+
+.html-source > button {
+  margin-top: 0.5rem;
 }
 
 input:not([type='checkbox']),

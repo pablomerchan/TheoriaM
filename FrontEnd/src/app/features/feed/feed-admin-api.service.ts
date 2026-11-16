@@ -19,6 +19,7 @@ export interface ArticuloAdministrableFeed {
   titulo: string;
   publicado_en: string;
   estado: 0 | 1 | 2;
+  prioridad: number;
   contenido: string;
   contenido_editable: boolean;
   reglas: ReglasFeed | null;
@@ -28,6 +29,7 @@ export interface GuardarArticuloFeed {
   titulo: string;
   contenido?: string;
   estado: 0 | 1 | 2;
+  prioridad: number;
   reglas: ReglasFeed | null;
 }
 

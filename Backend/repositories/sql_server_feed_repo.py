@@ -149,6 +149,7 @@ class SqlServerFeedRepository(FeedRepository):
                     "titulo": str(row[1]),
                     "publicado_en": row[2],
                     "estado": int(row[3]),
+                    "prioridad": int(row[4]),
                     "contenido": contenido,
                     "contenido_editable": contenido_editable,
                     "reglas": reglas_por_articulo.get(articulo_id),
@@ -162,6 +163,7 @@ class SqlServerFeedRepository(FeedRepository):
         titulo: str,
         contenido: str | None,
         estado: int,
+        prioridad: int,
         reglas: dict[str, Any] | None,
     ) -> dict[str, Any]:
         reglas_json = (
@@ -177,12 +179,13 @@ class SqlServerFeedRepository(FeedRepository):
                     """
                     EXEC [tm_feed].[usp_feed_admin_articulo_guardar]
                         @articulo_id = ?, @titulo = ?, @contenido = ?,
-                        @estado = ?, @reglas_json = ?
+                        @estado = ?, @prioridad = ?, @reglas_json = ?
                     """,
                     articulo_id,
                     titulo,
                     contenido,
                     estado,
+                    prioridad,
                     reglas_json,
                 )
                 row = cursor.fetchone()
@@ -357,6 +360,7 @@ class SqlServerFeedRepository(FeedRepository):
 
     def listar(
         self,
+        cursor_prioridad: int | None,
         cursor_fecha: datetime | None,
         cursor_id: int | None,
         limite: int,
@@ -368,8 +372,10 @@ class SqlServerFeedRepository(FeedRepository):
                 cursor.execute(
                     """
                     EXEC [tm_feed].[usp_feed_candidatos_listar]
-                        @cursor_fecha = ?, @cursor_id = ?, @limite = ?
+                        @cursor_prioridad = ?, @cursor_fecha = ?,
+                        @cursor_id = ?, @limite = ?
                     """,
+                    cursor_prioridad,
                     cursor_fecha,
                     cursor_id,
                     limite,
@@ -433,6 +439,7 @@ class SqlServerFeedRepository(FeedRepository):
                 publicado_en=row[2],
                 bloques=bloques_por_articulo.get(int(row[0]), []),
                 reglas_segmentacion=reglas_por_articulo.get(int(row[0])),
+                prioridad=int(row[3]),
             )
             for row in articulo_rows
         ]

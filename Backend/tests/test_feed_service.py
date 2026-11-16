@@ -26,7 +26,7 @@ class RepositorioFeedFalso:
     ) -> None:
         self.articulos = articulos
         self.menu = menu or []
-        self.argumentos: tuple[datetime | None, int | None, int] | None = None
+        self.argumentos: tuple[int | None, datetime | None, int | None, int] | None = None
         self.atributos: dict[str, object] = {}
         self.interacciones: dict[int, InteraccionesFeed] = {}
         self.interacciones_solicitadas: tuple[list[int], UUID] | None = None
@@ -53,11 +53,12 @@ class RepositorioFeedFalso:
 
     def listar(
         self,
+        cursor_prioridad: int | None,
         cursor_fecha: datetime | None,
         cursor_id: int | None,
         limite: int,
     ) -> list[ArticuloFeed]:
-        self.argumentos = (cursor_fecha, cursor_id, limite)
+        self.argumentos = (cursor_prioridad, cursor_fecha, cursor_id, limite)
         return self.articulos
 
 
@@ -80,7 +81,7 @@ def crear_articulo(articulo_id: int, publicado_en: datetime) -> ArticuloFeed:
 def test_cursor_se_codifica_y_decodifica() -> None:
     fecha = datetime(2026, 10, 15, 12, 30, 45)
 
-    assert decodificar_cursor(codificar_cursor(fecha, 25)) == (fecha, 25)
+    assert decodificar_cursor(codificar_cursor(3, fecha, 25)) == (3, fecha, 25)
 
 
 @pytest.mark.parametrize("cursor", ["", "no-es-base64", "e30"])
@@ -112,10 +113,11 @@ def test_listar_devuelve_solo_limite_y_cursor_de_ultima_entrega() -> None:
     assert resultado["items"][0]["total_me_gusta"] == 0
     assert resultado["items"][0]["comentarios"] == []
     assert decodificar_cursor(resultado["siguienteCursor"]) == (
+        0,
         articulos[1].publicado_en,
         articulos[1].id,
     )
-    assert repository.argumentos == (None, None, 50)
+    assert repository.argumentos == (None, None, None, 50)
 
 
 def test_listar_incluye_me_gusta_y_comentarios_de_cada_articulo() -> None:
@@ -163,7 +165,7 @@ def test_listar_no_devuelve_cursor_si_no_hay_mas_articulos() -> None:
 
     assert len(resultado["items"]) == 1
     assert resultado["siguienteCursor"] is None
-    assert repository.argumentos == (None, None, 50)
+    assert repository.argumentos == (None, None, None, 50)
 
 
 def test_listar_menu_incluye_el_criterio_de_filtro() -> None:
@@ -383,20 +385,32 @@ def test_paginacion_busca_contenido_elegible_y_no_omite_la_pagina_siguiente() ->
     class RepositorioConCursor(RepositorioFeedFalso):
         def listar(
             self,
+            cursor_prioridad: int | None,
             cursor_fecha: datetime | None,
             cursor_id: int | None,
             limite: int,
         ) -> list[ArticuloFeed]:
-            self.argumentos = (cursor_fecha, cursor_id, limite)
+            self.argumentos = (
+                cursor_prioridad,
+                cursor_fecha,
+                cursor_id,
+                limite,
+            )
             restantes = [
                 articulo
                 for articulo in self.articulos
-                if cursor_fecha is None
-                or articulo.publicado_en < cursor_fecha
+                if cursor_prioridad is None
+                or articulo.prioridad > cursor_prioridad
                 or (
-                    articulo.publicado_en == cursor_fecha
-                    and cursor_id is not None
-                    and articulo.id < cursor_id
+                    articulo.prioridad == cursor_prioridad
+                    and (
+                        articulo.publicado_en < cursor_fecha
+                        or (
+                            articulo.publicado_en == cursor_fecha
+                            and cursor_id is not None
+                            and articulo.id < cursor_id
+                        )
+                    )
                 )
             ]
             return restantes[: limite + 1]
@@ -416,3 +430,60 @@ def test_paginacion_busca_contenido_elegible_y_no_omite_la_pagina_siguiente() ->
     assert [item["id"] for item in primera_pagina["items"]] == [50]
     assert [item["id"] for item in segunda_pagina["items"]] == [49]
     assert segunda_pagina["siguienteCursor"] is None
+
+
+def test_listar_prioriza_articulos_y_pagina_por_prioridad() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    articulos = [
+        ArticuloFeed(1, "Prioridad baja", fecha, [], prioridad=5),
+        ArticuloFeed(2, "Prioridad alta", fecha - timedelta(days=1), [], prioridad=-1),
+        ArticuloFeed(3, "Prioridad alta reciente", fecha, [], prioridad=-1),
+    ]
+
+    class RepositorioOrdenado(RepositorioFeedFalso):
+        def listar(
+            self,
+            cursor_prioridad: int | None,
+            cursor_fecha: datetime | None,
+            cursor_id: int | None,
+            limite: int,
+        ) -> list[ArticuloFeed]:
+            ordenados = sorted(
+                self.articulos,
+                key=lambda articulo: (
+                    articulo.prioridad,
+                    -articulo.publicado_en.timestamp(),
+                    -articulo.id,
+                ),
+            )
+            restantes = [
+                articulo
+                for articulo in ordenados
+                if cursor_prioridad is None
+                or articulo.prioridad > cursor_prioridad
+                or (
+                    articulo.prioridad == cursor_prioridad
+                    and (
+                        articulo.publicado_en < cursor_fecha
+                        or (
+                            articulo.publicado_en == cursor_fecha
+                            and cursor_id is not None
+                            and articulo.id < cursor_id
+                        )
+                    )
+                )
+            ]
+            return restantes[: limite + 1]
+
+    service = FeedService(RepositorioOrdenado(articulos))
+    usuario_id = UUID("00000000-0000-0000-0000-000000000001")
+
+    primera_pagina = service.listar(None, limite=2, usuario_id=usuario_id)
+    segunda_pagina = service.listar(
+        primera_pagina["siguienteCursor"],
+        limite=2,
+        usuario_id=usuario_id,
+    )
+
+    assert [item["id"] for item in primera_pagina["items"]] == [3, 2]
+    assert [item["id"] for item in segunda_pagina["items"]] == [1]

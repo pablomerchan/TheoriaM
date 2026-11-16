@@ -138,12 +138,17 @@ def _articulo_elegible(
     return all(resultados) if modo == "todos" else any(resultados)
 
 
-def codificar_cursor(publicado_en: datetime, articulo_id: int) -> str:
+def codificar_cursor(
+    prioridad: int,
+    publicado_en: datetime,
+    articulo_id: int,
+) -> str:
     if publicado_en.tzinfo is not None or articulo_id < 1:
         raise ValueError("El cursor requiere fecha UTC sin zona horaria e id positivo.")
 
     contenido = json.dumps(
         {
+            "prioridad": prioridad,
             "publicado_en": publicado_en.isoformat(timespec="seconds"),
             "id": articulo_id,
         },
@@ -152,7 +157,7 @@ def codificar_cursor(publicado_en: datetime, articulo_id: int) -> str:
     return base64.urlsafe_b64encode(contenido).decode("ascii").rstrip("=")
 
 
-def decodificar_cursor(cursor: str) -> tuple[datetime, int]:
+def decodificar_cursor(cursor: str) -> tuple[int, datetime, int]:
     if not cursor or len(cursor) > 512:
         raise ErrorCursorFeed("El cursor está vacío o excede el tamaño permitido.")
 
@@ -165,7 +170,9 @@ def decodificar_cursor(cursor: str) -> tuple[datetime, int]:
         datos: Any = json.loads(contenido.decode("utf-8"))
         if (
             not isinstance(datos, dict)
-            or set(datos) != {"publicado_en", "id"}
+            or set(datos) != {"prioridad", "publicado_en", "id"}
+            or isinstance(datos["prioridad"], bool)
+            or not isinstance(datos["prioridad"], int)
             or not isinstance(datos["publicado_en"], str)
             or isinstance(datos["id"], bool)
             or not isinstance(datos["id"], int)
@@ -186,7 +193,7 @@ def decodificar_cursor(cursor: str) -> tuple[datetime, int]:
             raise
         raise ErrorCursorFeed("El formato del cursor no es válido.") from error
 
-    return publicado_en, datos["id"]
+    return datos["prioridad"], publicado_en, datos["id"]
 
 
 class FeedService:
@@ -220,8 +227,10 @@ class FeedService:
 
         if cursor == "":
             cursor = None
-        cursor_fecha, cursor_id = (
-            decodificar_cursor(cursor) if cursor is not None else (None, None)
+        cursor_prioridad, cursor_fecha, cursor_id = (
+            decodificar_cursor(cursor)
+            if cursor is not None
+            else (None, None, None)
         )
         ahora = datetime.now(timezone.utc)
         atributos = self.repository.obtener_atributos_usuario(usuario_id)
@@ -244,9 +253,14 @@ class FeedService:
         }
 
         articulos_visibles: list[ArticuloFeed] = []
-        cursor_siguiente: tuple[datetime, int] | None = None
+        cursor_siguiente: tuple[int, datetime, int] | None = None
         while len(articulos_visibles) <= limite:
-            candidatos = self.repository.listar(cursor_fecha, cursor_id, 50)
+            candidatos = self.repository.listar(
+                cursor_prioridad,
+                cursor_fecha,
+                cursor_id,
+                50,
+            )
             if not candidatos:
                 break
 
@@ -259,6 +273,7 @@ class FeedService:
 
             if len(articulos_visibles) > limite:
                 cursor_siguiente = (
+                    articulos_visibles[limite - 1].prioridad,
                     articulos_visibles[limite - 1].publicado_en,
                     articulos_visibles[limite - 1].id,
                 )
@@ -267,7 +282,8 @@ class FeedService:
             if len(candidatos) <= 50:
                 break
             ultimo_candidato = pagina[-1]
-            cursor_fecha, cursor_id = (
+            cursor_prioridad, cursor_fecha, cursor_id = (
+                ultimo_candidato.prioridad,
                 ultimo_candidato.publicado_en,
                 ultimo_candidato.id,
             )

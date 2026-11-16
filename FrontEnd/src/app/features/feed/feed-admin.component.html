@@ -30,7 +30,8 @@
       >
         <span class="article-title">{{ articulo.titulo }}</span>
         <span class="article-meta">
-          {{ etiquetaEstado(articulo.estado) }} · {{ resumenReglas(articulo) }}
+          Prioridad {{ articulo.prioridad }} · {{ etiquetaEstado(articulo.estado) }} ·
+          {{ resumenReglas(articulo) }}
         </span>
       </button>
     </section>
@@ -46,14 +47,39 @@
         <input [(ngModel)]="titulo" maxlength="200" placeholder="Ej. Consejos para elegir colores" />
       </label>
 
-      <label *ngIf="!seleccionado || seleccionado.contenido_editable">
-        Contenido (HTML)
-        <textarea
-          [(ngModel)]="contenido"
-          rows="9"
-          placeholder="<p>Escribe el contenido del artículo</p>"
-        ></textarea>
-      </label>
+      <ng-container *ngIf="!seleccionado || seleccionado.contenido_editable">
+        <div class="html-source">
+          <label>
+            Archivo HTML en public/articulos
+            <input
+              [(ngModel)]="archivoHtml"
+              [disabled]="cargandoHtml"
+              placeholder="Los colores que más te favorecen.html"
+            />
+          </label>
+          <button
+            type="button"
+            class="secondary"
+            [disabled]="cargandoHtml || guardando"
+            (click)="cargarHtml()"
+          >
+            {{ cargandoHtml ? 'Cargando HTML…' : 'Cargar HTML' }}
+          </button>
+          <p class="helper">
+            Se cargará el archivo en el contenido editable. También puedes escribir o pegar HTML
+            directamente.
+          </p>
+        </div>
+
+        <label>
+          Contenido (HTML)
+          <textarea
+            [(ngModel)]="contenido"
+            rows="9"
+            placeholder="<p>Escribe el contenido del artículo</p>"
+          ></textarea>
+        </label>
+      </ng-container>
       <p *ngIf="seleccionado && !seleccionado.contenido_editable" class="helper warning">
         Este artículo contiene bloques avanzados. Puedes actualizar su publicación y filtros;
         el contenido se conservará sin cambios.
@@ -66,6 +92,20 @@
             {{ item.etiqueta }}
           </option>
         </select>
+      </label>
+
+      <label>
+        Prioridad
+        <input
+          type="number"
+          [(ngModel)]="prioridad"
+          min="-2147483648"
+          max="2147483647"
+          step="1"
+        />
+        <span class="helper">
+          Los valores menores aparecen primero; en empate, se muestra antes el más reciente.
+        </span>
       </label>
 
       <fieldset class="segmentation">
@@ -151,7 +191,12 @@
       </fieldset>
 
       <div class="actions">
-        <button type="button" class="primary" [disabled]="guardando" (click)="guardar()">
+        <button
+          type="button"
+          class="primary"
+          [disabled]="guardando || cargandoHtml"
+          (click)="guardar()"
+        >
           {{ guardando ? 'Guardando…' : (estado === 1 ? 'Guardar y publicar' : 'Guardar artículo') }}
         </button>
         <button type="button" class="secondary" (click)="nuevo()">Limpiar</button>

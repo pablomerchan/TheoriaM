@@ -101,6 +101,27 @@ def test_articulo_rechaza_titulo_vacio() -> None:
         )
 
 
+def test_articulo_admite_prioridad_por_defecto_y_personalizada() -> None:
+    por_defecto = GuardarArticuloFeedEntrada(titulo="Artículo", estado=0)
+    personalizada = GuardarArticuloFeedEntrada(
+        titulo="Artículo prioritario",
+        estado=1,
+        prioridad=-2,
+    )
+
+    assert por_defecto.prioridad == 0
+    assert personalizada.prioridad == -2
+
+
+def test_articulo_rechaza_prioridad_fuera_del_rango_sql() -> None:
+    with pytest.raises(ValidationError):
+        GuardarArticuloFeedEntrada(
+            titulo="Artículo",
+            estado=0,
+            prioridad=2147483648,
+        )
+
+
 def test_asignacion_a_usuario_requiere_modo_todos() -> None:
     with pytest.raises(ValidationError):
         GuardarArticuloFeedEntrada(

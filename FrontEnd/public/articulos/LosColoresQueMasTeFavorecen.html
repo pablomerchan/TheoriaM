@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Los colores que más te favorecen</title>
+
 <style>
 :root{--bg:#faf7f3;--surface:#fff;--text:#2b2623;--muted:#6b625b;--accent:#8a3b52;--line:#e7dfd6;--stage:#efe6dc;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1917;--surface:#26221f;--text:#f1ebe4;--muted:#b3a89e;--accent:#e0a3b5;--line:#3a3430;--stage:#342f2b;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#1c1917;--surface:#26221f;--text:#f1ebe4;--muted:#b3a89e;--accent:#e0a3b5;--line:#3a3430;--stage:#342f2b;color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65;font-size:1.05rem}
 main{max-width:880px;margin:0 auto;padding:32px 20px 64px}
 h1{font-family:Georgia,serif;font-size:clamp(2rem,6vw,3rem);line-height:1.15;margin:0 0 8px}
@@ -25,7 +24,6 @@ p{margin:0 0 14px}
 .card svg{display:block;width:100%;height:auto;background:var(--stage)}
 .card b{display:block;padding:10px 12px 0}
 .card span{display:block;padding:2px 12px 14px;font-size:.88rem;color:var(--muted);line-height:1.45}
-.dot{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid #0003}
 .no::after{content:"✕";position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#000a;color:#fff;text-align:center;line-height:24px;font-size:.8rem}
 .steps{counter-reset:s;list-style:none;padding:0;margin:16px 0}
 .steps li{counter-increment:s;position:relative;padding:4px 0 12px 44px}
@@ -35,6 +33,7 @@ p{margin:0 0 14px}
 .combo i{width:18px;height:18px;border-radius:50%;border:1px solid #0003}
 .combo i+i{margin-left:-14px}
 footer{margin-top:44px;color:var(--muted);font-size:.85rem}
+.article-image{display:block;width:100%;height:auto;border-radius:18px;margin:22px 0}
 </style>
 </head>
 <body>
@@ -86,6 +85,7 @@ footer{margin-top:44px;color:var(--muted);font-size:.85rem}
 <main>
 <h1>Los colores que más te favorecen</h1>
 <p class="lead">Una guía sencilla para mujeres con piel clara y cabello castaño. Sin términos técnicos: solo qué colores usar y cómo combinarlos.</p>
+<img class="article-image" src="/articulos/imgs/coloresmujerpielClaraCabelloCastaño.webp" alt="Mujer de piel clara y cabello castaño con una combinación de colores favorecedora">
 
 <div class="hero" role="img" aria-label="Cinco ilustraciones de mujeres con blusas en colores favorecedores">
 <svg viewBox="0 0 100 120"><use href="#p1" style="--c:#1f2a4d"/></svg>
@@ -95,7 +95,7 @@ footer{margin-top:44px;color:var(--muted);font-size:.85rem}
 <svg viewBox="0 0 100 120"><use href="#p2" style="--c:#b9a7d6"/></svg>
 </div>
 
-<div class="box"><b>Resumen en 30 segundos</b>
+<div class="box"><b>Resumen rápido</b>
 <ul>
 <li>Los colores <b>intensos</b> (azul marino, verde esmeralda, vino) dan fuerza al rostro.</li>
 <li>Los colores <b>suaves</b> (rosa empolvado, lavanda) lo hacen ver fresco y delicado.</li>

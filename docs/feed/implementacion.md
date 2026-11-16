@@ -6,14 +6,17 @@ emite el inicio de sesión, devuelve artículos publicados con bloques y pagina
 por `publicado_en DESC, articulo_id DESC`. El límite aceptado es de 1 a 50.
 
 El cursor es un JSON codificado en Base64 URL-safe que contiene la fecha y el
-id del último artículo entregado. Es un dato de paginación, no una credencial.
+id del último artículo entregado, además de su prioridad. Es un dato de
+paginación, no una credencial. El orden es `prioridad ASC, publicado_en DESC,
+articulo_id DESC`; prioridades menores aparecen primero y la fecha más reciente
+resuelve los empates.
 Si quedan artículos, la respuesta entrega `siguienteCursor`; en caso contrario
 vale `null`. Los payloads JSON de los bloques se entregan como objetos en
 `payload`.
 
 El repositorio es una interfaz (`FeedRepository`) con implementación SQL
-Server. La implementación llama solamente a `tm_feed.usp_feed_listar` mediante
-parámetros y procesa sus dos resultados con `cursor.nextset()`. Los scripts
+Server. La implementación llama a `tm_feed.usp_feed_candidatos_listar` con
+parámetros y procesa sus resultados con `cursor.nextset()`. Los scripts
 idempotentes de tablas, procedimientos y permisos están en
 `Backend/scripts/001_feed_formularios.sql` y
 `Backend/scripts/002_permisos_feed.sql`. Ejecútalos en ese orden con una cuenta
@@ -176,3 +179,16 @@ Desde `FrontEnd/`, ejecutar:
 npm run build
 npm test -- --watch=false --include="src/app/features/feed/**/*.spec.ts"
 ```
+
+## Prioridad de publicación de artículos
+
+En la administración del Feed se puede asignar una prioridad numérica a cada
+artículo. Los números menores se muestran primero; si coinciden, se conserva
+el orden por fecha de publicación y luego por id. La paginación por cursor usa
+los mismos campos para no saltar ni repetir artículos entre páginas.
+
+Para actualizar una base existente, volver a ejecutar
+`Backend/scripts/004_feed_segmentacion.sql` después de la actualización del
+código. El script agrega la columna con prioridad `0` para los artículos
+actuales y actualiza los procedimientos de listado y guardado de forma
+idempotente.
