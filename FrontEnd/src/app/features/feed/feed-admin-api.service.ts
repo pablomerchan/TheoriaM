@@ -37,6 +37,10 @@ export interface GuardarArticuloFeed {
 export class FeedAdminApiService {
   private readonly api = inject(ApiClientService);
 
+  listarArchivosHtml(): Observable<string[]> {
+    return this.api.get<string[]>('v1/feed/admin/articulos/archivos-html');
+  }
+
   listar(): Observable<ArticuloAdministrableFeed[]> {
     return this.api.get<ArticuloAdministrableFeed[]>('v1/feed/admin/articulos');
   }

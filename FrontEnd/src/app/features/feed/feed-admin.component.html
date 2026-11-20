@@ -50,7 +50,35 @@
       <ng-container *ngIf="!seleccionado || seleccionado.contenido_editable">
         <div class="html-source">
           <label>
-            Archivo HTML en public/articulos
+            Buscar archivo HTML en public/articulos
+            <input
+              [(ngModel)]="busquedaArchivoHtml"
+              [disabled]="cargandoHtml"
+              placeholder="Buscar por nombre"
+            />
+          </label>
+          <div class="html-file-results" *ngIf="archivosHtmlFiltrados.length">
+            <button
+              *ngFor="let nombreArchivo of archivosHtmlFiltrados"
+              type="button"
+              class="html-file-option"
+              [class.selected]="archivoHtml === nombreArchivo"
+              (click)="archivoHtml = nombreArchivo"
+            >
+              {{ nombreArchivo }}
+            </button>
+          </div>
+          <p *ngIf="!archivosHtml.length && !errorArchivosHtml" class="helper">
+            No hay archivos HTML disponibles en public/articulos.
+          </p>
+          <p *ngIf="archivosHtml.length && !archivosHtmlFiltrados.length" class="helper">
+            No se encontraron archivos con ese nombre.
+          </p>
+          <p *ngIf="errorArchivosHtml" class="helper warning" role="status">
+            {{ errorArchivosHtml }}
+          </p>
+          <label>
+            Nombre del archivo HTML
             <input
               [(ngModel)]="archivoHtml"
               [disabled]="cargandoHtml"

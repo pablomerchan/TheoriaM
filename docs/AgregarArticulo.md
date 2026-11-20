@@ -3,6 +3,13 @@ Los artículos nuevos se crean y publican desde **Webmaster → Publicar en Feed
 se usan para publicar artículos. Los datos heredados se conservan porque otras
 funciones existentes todavía los consultan.
 
+En el editor puedes buscar y seleccionar un archivo `.html` en
+`FrontEnd/public/articulos`, o escribir su nombre manualmente y cargarlo. Las
+imágenes referenciadas con rutas relativas, por ejemplo `imgs/portada.png`, deben
+estar bajo esa carpeta (en este caso, `FrontEnd/public/articulos/imgs/`) y sus
+rutas se ajustan al importarlas para que funcionen en el Feed. Las imágenes se
+limitan al ancho disponible y conservan su proporción.
+
 Para asignar un artículo a una persona y verificar sus características físicas:
 
 1. En Webmaster, abre **Publicar en Feed**, crea o selecciona un artículo y activa

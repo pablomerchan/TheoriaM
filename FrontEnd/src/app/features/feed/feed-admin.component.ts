@@ -68,6 +68,9 @@ export class FeedAdminComponent implements OnInit {
   titulo = '';
   contenido = '';
   archivoHtml = '';
+  busquedaArchivoHtml = '';
+  archivosHtml: string[] = [];
+  errorArchivosHtml: string | null = null;
   cargandoHtml = false;
   estado: 0 | 1 | 2 = 0;
   prioridad = 0;
@@ -81,6 +84,14 @@ export class FeedAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+    this.cargarArchivosHtml();
+  }
+
+  get archivosHtmlFiltrados(): string[] {
+    const consulta = this.busquedaArchivoHtml.trim().toLowerCase();
+    return this.archivosHtml.filter((archivo) =>
+      archivo.toLowerCase().includes(consulta)
+    );
   }
 
   cargar(): void {
@@ -156,7 +167,7 @@ export class FeedAdminComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (html) => {
-          this.contenido = html;
+          this.contenido = this.normalizarImagenesHtml(html, nombreArchivo);
           this.cargandoHtml = false;
           this.solicitudArchivoHtml = null;
           this.mensaje = `HTML cargado desde "${nombreArchivo}". Guarda el artículo para aplicar los cambios.`;
@@ -168,6 +179,67 @@ export class FeedAdminComponent implements OnInit {
           this.error = `No se pudo cargar "${nombreArchivo}". Verifica que exista en FrontEnd/public/articulos.`;
         }
       });
+  }
+
+  private cargarArchivosHtml(): void {
+    this.api
+      .listarArchivosHtml()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (archivos) => {
+          this.archivosHtml = archivos;
+          this.errorArchivosHtml = null;
+        },
+        error: (error) => {
+          console.error('No fue posible buscar los archivos HTML del artículo:', error);
+          this.errorArchivosHtml =
+            'No se pudieron buscar archivos HTML. Puedes escribir el nombre manualmente.';
+        }
+      });
+  }
+
+  private normalizarImagenesHtml(html: string, nombreArchivo: string): string {
+    const documento = new DOMParser().parseFromString(html, 'text/html');
+    const urlBase = new URL(
+      `/articulos/${encodeURIComponent(nombreArchivo)}`,
+      document.baseURI
+    );
+
+    for (const recurso of documento.querySelectorAll('img[src], source[src]')) {
+      const origen = recurso.getAttribute('src')?.trim();
+      if (origen) {
+        recurso.setAttribute('src', this.normalizarUrlImagen(origen, urlBase));
+      }
+    }
+
+    for (const recurso of documento.querySelectorAll('img[srcset], source[srcset]')) {
+      const srcset = recurso.getAttribute('srcset');
+      if (srcset && !/data:/i.test(srcset)) {
+        recurso.setAttribute(
+          'srcset',
+          srcset
+            .split(',')
+            .map((candidato) => {
+              const [origen, ...descriptor] = candidato.trim().split(/\s+/);
+              return origen
+                ? `${this.normalizarUrlImagen(origen, urlBase)} ${descriptor.join(' ')}`.trim()
+                : candidato.trim();
+            })
+            .join(', ')
+        );
+      }
+    }
+
+    return documento.body.innerHTML;
+  }
+
+  private normalizarUrlImagen(origen: string, urlBase: URL): string {
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(origen)) {
+      return origen;
+    }
+
+    const urlImagen = new URL(origen, urlBase);
+    return `${urlImagen.pathname}${urlImagen.search}${urlImagen.hash}`;
   }
 
   agregarCondicion(): void {

@@ -16,12 +16,14 @@ describe('FeedAdminComponent', () => {
   let httpTestingController: HttpTestingController;
   let api: {
     listar: ReturnType<typeof vi.fn>;
+    listarArchivosHtml: ReturnType<typeof vi.fn>;
     crear: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(async () => {
     api = {
       listar: vi.fn(() => of([])),
+      listarArchivosHtml: vi.fn(() => of(['PresentacionTheoriam.html'])),
       crear: vi.fn(() => of({ id: 1 }))
     };
     await TestBed.configureTestingModule({
@@ -56,11 +58,25 @@ describe('FeedAdminComponent', () => {
     );
     expect(request.request.method).toBe('GET');
     expect(request.request.responseType).toBe('text');
-    request.flush('<article><h1>Colores</h1></article>');
+    request.flush(
+      '<article><h1>Colores</h1><img src="imgs/portada.png" ' +
+      'srcset="imgs/portada-small.png 1x, imgs/portada.png 2x"></article>'
+    );
 
-    expect(component.contenido).toBe('<article><h1>Colores</h1></article>');
+    expect(component.contenido).toBe(
+      '<article><h1>Colores</h1><img src="/articulos/imgs/portada.png" ' +
+      'srcset="/articulos/imgs/portada-small.png 1x, /articulos/imgs/portada.png 2x"></article>'
+    );
     expect(component.mensaje).toContain('HTML cargado');
     expect(component.cargandoHtml).toBe(false);
+  });
+
+  it('filtra los archivos HTML por nombre sin distinguir mayúsculas', () => {
+    const component = fixture.componentInstance;
+    component.archivosHtml = ['PresentacionTheoriam.html', 'Colores.html'];
+    component.busquedaArchivoHtml = 'PRESENTACION';
+
+    expect(component.archivosHtmlFiltrados).toEqual(['PresentacionTheoriam.html']);
   });
 
   it('rechaza rutas fuera de public/articulos', () => {

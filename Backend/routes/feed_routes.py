@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Literal
 from uuid import UUID
 
@@ -23,6 +24,9 @@ from services.feed_service import (
 
 
 logger = logging.getLogger(__name__)
+DIRECTORIO_ARTICULOS_FEED = (
+    Path(__file__).resolve().parents[2] / "FrontEnd" / "public" / "articulos"
+)
 feed_repository = SqlServerFeedRepository()
 feed_service = FeedService(feed_repository)
 
@@ -194,6 +198,35 @@ router = APIRouter(
     route_class=ApiRoute,
     dependencies=[Depends(get_usuario_actual)],
 )
+
+
+@router.get(
+    "/feed/admin/articulos/archivos-html",
+    responses={
+        401: {"model": ErrorRespuesta},
+        403: {"model": ErrorRespuesta},
+        503: {"model": ErrorRespuesta},
+    },
+)
+def listar_archivos_html_feed(
+    _: UsuarioActual = Depends(get_editor_feed),
+) -> list[str]:
+    try:
+        return sorted(
+            archivo.name
+            for archivo in DIRECTORIO_ARTICULOS_FEED.iterdir()
+            if archivo.is_file() and archivo.suffix.lower() == ".html"
+        )
+    except OSError as error:
+        logger.exception("No fue posible buscar archivos HTML para el feed.")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "codigo": "error_archivos_feed",
+                "mensaje": "No fue posible buscar los archivos HTML de artículos.",
+                "detalle": None,
+            },
+        ) from error
 
 
 @router.get(

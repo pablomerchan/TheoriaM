@@ -9,6 +9,7 @@ from routes.feed_routes import (
     CrearComentarioEntrada,
     GuardarArticuloFeedEntrada,
 )
+from routes import feed_routes
 from repositories.sql_server_feed_repo import _fetch_result_set
 from services.auth_dependencies import UsuarioActual
 from services.feed_admin_dependencies import get_editor_feed
@@ -178,3 +179,16 @@ def test_editor_feed_acepta_id_autorizado(monkeypatch: pytest.MonkeyPatch) -> No
     )
 
     assert get_editor_feed(usuario) == usuario
+
+
+def test_busqueda_archivos_feed_lista_solo_html_ordenados(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "zeta.HTML").write_text("", encoding="utf-8")
+    (tmp_path / "alfa.html").write_text("", encoding="utf-8")
+    (tmp_path / "imagen.png").write_text("", encoding="utf-8")
+    (tmp_path / "subdirectorio.html").mkdir()
+    monkeypatch.setattr(feed_routes, "DIRECTORIO_ARTICULOS_FEED", tmp_path)
+
+    assert feed_routes.listar_archivos_html_feed() == ["alfa.html", "zeta.HTML"]

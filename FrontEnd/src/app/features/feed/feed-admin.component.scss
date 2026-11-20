@@ -115,6 +115,26 @@
   margin-top: 0.5rem;
 }
 
+.html-file-results {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 12rem;
+  margin-top: 0.5rem;
+  overflow-y: auto;
+}
+
+.html-file-option {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #334155;
+  text-align: left;
+}
+
+.html-file-option.selected {
+  border-color: #3974ac;
+  background: #f0f7ff;
+}
+
 input:not([type='checkbox']),
 textarea,
 select {
