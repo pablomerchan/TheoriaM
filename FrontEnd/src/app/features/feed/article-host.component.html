@@ -1,14 +1,64 @@
 <article
+  #articleElement
   class="feed-article"
+  [class.reading-mode]="modoLectura()"
+  [style.--reading-font-size]="tamanoFuente() + 'px'"
   role="article"
   [attr.aria-posinset]="posicion"
   [attr.aria-setsize]="totalArticulos"
 >
+  <div
+    class="reading-progress"
+    role="progressbar"
+    aria-label="Progreso de lectura"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-valuenow]="progresoLectura()"
+    [attr.aria-valuetext]="progresoLectura() + '% leído'"
+  >
+    <span [style.width.%]="progresoLectura()"></span>
+  </div>
+
   <header class="article-header">
     <h2>{{ articulo.titulo }}</h2>
     <time [attr.datetime]="articulo.publicado_en">
       {{ articulo.publicado_en | date: 'dd/MM/yyyy' }}
     </time>
+    <div class="reading-controls" aria-label="Controles de lectura">
+      <div class="font-controls">
+        <button
+          class="reading-button font-button"
+          type="button"
+          aria-label="Disminuir tamaño de letra"
+          title="Disminuir tamaño de letra"
+          [disabled]="tamanoFuente() <= 16"
+          (click)="disminuirTamanoFuente()"
+        >A−</button>
+        <button
+          class="reading-button font-button"
+          type="button"
+          aria-label="Restablecer tamaño de letra"
+          title="Restablecer tamaño de letra"
+          (click)="restablecerTamanoFuente()"
+        >{{ tamanoFuente() }}px</button>
+        <button
+          class="reading-button font-button"
+          type="button"
+          aria-label="Aumentar tamaño de letra"
+          title="Aumentar tamaño de letra"
+          [disabled]="tamanoFuente() >= 28"
+          (click)="aumentarTamanoFuente()"
+        >A+</button>
+      </div>
+      <button
+        class="reading-button reading-mode-button"
+        type="button"
+        [attr.aria-pressed]="modoLectura()"
+        (click)="alternarModoLectura()"
+      >
+        {{ modoLectura() ? 'Salir del modo lectura' : 'Modo lectura' }}
+      </button>
+    </div>
   </header>
 
   @for (bloque of articulo.bloques; track bloque.id) {

@@ -4,9 +4,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
+  AfterViewInit,
   Input,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
+  ViewChild,
   inject,
   signal
 } from '@angular/core';
@@ -20,6 +24,11 @@ import { BlockImageComponent } from './blocks/block-image.component';
 import { BlockTextComponent } from './blocks/block-text.component';
 import { BlockVideoComponent } from './blocks/block-video.component';
 import { BlockFormComponent } from './blocks/block-form.component';
+
+const DEFAULT_FONT_SIZE = 20;
+const MIN_FONT_SIZE = 16;
+const MAX_FONT_SIZE = 28;
+const FONT_SIZE_STORAGE_KEY = 'theoriam.feed.article-font-size';
 
 @Component({
   selector: 'app-article-host',
@@ -36,7 +45,7 @@ import { BlockFormComponent } from './blocks/block-form.component';
   styleUrl: './article-host.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleHostComponent implements OnChanges {
+export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy {
   private readonly contrato = inject(FeedContractService);
   private readonly api = inject(FeedApiService);
   private readonly destroyRef = inject(DestroyRef);
@@ -44,7 +53,11 @@ export class ArticleHostComponent implements OnChanges {
   @Input({ required: true }) articulo!: ArticuloFeed;
   @Input({ required: true }) posicion!: number;
   @Input({ required: true }) totalArticulos!: number;
+  @ViewChild('articleElement') private articleElement?: ElementRef<HTMLElement>;
 
+  readonly tamanoFuente = signal(this.leerTamanoFuente());
+  readonly modoLectura = signal(false);
+  readonly progresoLectura = signal(0);
   readonly interacciones = signal<{
     me_gusta: boolean;
     total_me_gusta: number;
@@ -56,6 +69,40 @@ export class ArticleHostComponent implements OnChanges {
   readonly enviandoComentario = signal(false);
   readonly errorInteraccion = signal<string | null>(null);
 
+  private progressObserver?: IntersectionObserver;
+  private progressFrame: number | null = null;
+  private isTrackingScroll = false;
+
+  private readonly onScrollOrResize = (): void => {
+    if (this.progressFrame !== null) {
+      return;
+    }
+
+    this.progressFrame = window.requestAnimationFrame(() => {
+      this.progressFrame = null;
+      this.actualizarProgreso();
+    });
+  };
+
+  ngAfterViewInit(): void {
+    const element = this.articleElement?.nativeElement;
+    if (!element || typeof IntersectionObserver === 'undefined') {
+      this.iniciarSeguimientoScroll();
+      this.actualizarProgreso();
+      return;
+    }
+
+    this.progressObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        this.iniciarSeguimientoScroll();
+        this.actualizarProgreso();
+      } else {
+        this.detenerSeguimientoScroll();
+      }
+    });
+    this.progressObserver.observe(element);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['articulo']) {
       this.interacciones.set({
@@ -66,8 +113,29 @@ export class ArticleHostComponent implements OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.progressObserver?.disconnect();
+    this.detenerSeguimientoScroll();
+  }
+
   texto(clave: string): string {
     return this.contrato.texto(clave);
+  }
+
+  disminuirTamanoFuente(): void {
+    this.establecerTamanoFuente(this.tamanoFuente() - 2);
+  }
+
+  aumentarTamanoFuente(): void {
+    this.establecerTamanoFuente(this.tamanoFuente() + 2);
+  }
+
+  restablecerTamanoFuente(): void {
+    this.establecerTamanoFuente(DEFAULT_FONT_SIZE);
+  }
+
+  alternarModoLectura(): void {
+    this.modoLectura.update((activo) => !activo);
   }
 
   alternarMeGusta(): void {
@@ -189,5 +257,81 @@ export class ArticleHostComponent implements OnChanges {
       }
     }
     return this.texto('feed.interaction.error');
+  }
+
+  private leerTamanoFuente(): number {
+    if (typeof localStorage === 'undefined') {
+      return DEFAULT_FONT_SIZE;
+    }
+
+    try {
+      const guardado = localStorage.getItem(FONT_SIZE_STORAGE_KEY);
+      if (guardado === null) {
+        return DEFAULT_FONT_SIZE;
+      }
+      const valor = Number(guardado);
+      return Number.isFinite(valor)
+        ? Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(valor)))
+        : DEFAULT_FONT_SIZE;
+    } catch (error) {
+      console.warn('No fue posible recuperar el tamaño de letra guardado:', error);
+      return DEFAULT_FONT_SIZE;
+    }
+  }
+
+  private establecerTamanoFuente(valor: number): void {
+    const nuevoTamano = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, valor));
+    this.tamanoFuente.set(nuevoTamano);
+
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    try {
+      localStorage.setItem(FONT_SIZE_STORAGE_KEY, String(nuevoTamano));
+    } catch (error) {
+      console.warn('No fue posible guardar el tamaño de letra:', error);
+    }
+  }
+
+  private iniciarSeguimientoScroll(): void {
+    if (this.isTrackingScroll) {
+      return;
+    }
+    window.addEventListener('scroll', this.onScrollOrResize, { passive: true });
+    window.addEventListener('resize', this.onScrollOrResize);
+    this.isTrackingScroll = true;
+  }
+
+  private detenerSeguimientoScroll(): void {
+    if (!this.isTrackingScroll) {
+      return;
+    }
+    window.removeEventListener('scroll', this.onScrollOrResize);
+    window.removeEventListener('resize', this.onScrollOrResize);
+    this.isTrackingScroll = false;
+
+    if (this.progressFrame !== null) {
+      window.cancelAnimationFrame(this.progressFrame);
+      this.progressFrame = null;
+    }
+  }
+
+  private actualizarProgreso(): void {
+    const element = this.articleElement?.nativeElement;
+    if (!element) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const recorrido = rect.height - window.innerHeight;
+    const porcentaje = Math.round(
+      recorrido > 0
+        ? Math.min(100, Math.max(0, (-rect.top / recorrido) * 100))
+        : rect.top < 0 ? 100 : 0
+    );
+    if (porcentaje !== this.progresoLectura()) {
+      this.progresoLectura.set(porcentaje);
+    }
   }
 }
