@@ -75,6 +75,11 @@ class FeedRespuesta(BaseModel):
     siguienteCursor: str | None
 
 
+class ArticuloIndiceRespuesta(BaseModel):
+    id: int
+    titulo: str
+
+
 class OpcionMenuRespuesta(BaseModel):
     id: str
     etiqueta: str
@@ -441,6 +446,50 @@ def obtener_feed(
             detail={
                 "codigo": "error_reglas_feed",
                 "mensaje": "No fue posible evaluar las reglas del feed.",
+                "detalle": None,
+            },
+        ) from error
+
+
+@router.get(
+    "/feed/indice",
+    response_model=list[ArticuloIndiceRespuesta],
+    responses={
+        401: {"model": ErrorRespuesta},
+        422: {"model": ErrorRespuesta},
+        503: {"model": ErrorRespuesta},
+    },
+)
+def obtener_indice_feed(
+    request: Request,
+    menu: str = Query(default="inicio", min_length=1, max_length=50),
+    usuario: UsuarioActual = Depends(get_usuario_actual),
+) -> list[dict[str, Any]]:
+    try:
+        return feed_service.listar_indice(
+            usuario["id"],
+            request.headers.get("Accept-Language"),
+            menu,
+        )
+    except ErrorDatosFeed as error:
+        logger.exception("No fue posible cargar el índice del feed.")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "codigo": "error_datos_feed",
+                "mensaje": "No fue posible cargar el índice del feed.",
+                "detalle": None,
+            },
+        ) from error
+    except ErrorReglaSegmentacion as error:
+        logger.exception(
+            "Las reglas de segmentación del índice del feed son inválidas."
+        )
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "codigo": "error_reglas_feed",
+                "mensaje": "No fue posible evaluar las reglas de segmentación.",
                 "detalle": None,
             },
         ) from error

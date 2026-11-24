@@ -10,6 +10,7 @@ import { vi } from 'vitest';
 
 import { FeedAdminComponent } from './feed-admin.component';
 import { FeedAdminApiService } from './feed-admin-api.service';
+import { MARCADOR_INDICE_FEED } from './feed.constants';
 
 describe('FeedAdminComponent', () => {
   let fixture: ComponentFixture<FeedAdminComponent>;
@@ -86,6 +87,22 @@ describe('FeedAdminComponent', () => {
     component.busquedaArchivoHtml = 'PRESENTACION';
 
     expect(component.archivosHtmlFiltrados).toEqual(['PresentacionTheoriam.html']);
+  });
+
+  it('inserta el índice del feed una sola vez en el contenido HTML', () => {
+    const component = fixture.componentInstance;
+    component.contenido = '<p>Contenido</p>';
+
+    component.insertarIndiceArticulos();
+
+    expect(component.contenido).toBe(
+      `<p>Contenido</p>\n${MARCADOR_INDICE_FEED}`
+    );
+    expect(component.indiceArticulosIncluido).toBe(true);
+
+    component.insertarIndiceArticulos();
+    expect(component.contenido.match(/FEED_INDEX/g)).toHaveLength(1);
+    expect(component.error).toContain('ya contiene un índice');
   });
 
   it('rechaza rutas fuera de public/articulos', () => {

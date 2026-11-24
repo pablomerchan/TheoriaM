@@ -99,14 +99,29 @@
           </p>
         </div>
 
-        <label>
-          Contenido (HTML)
+        <div class="content-editor">
+          <label for="feed-article-content">Contenido (HTML)</label>
+          <div class="content-editor-actions">
+            <button
+              type="button"
+              class="secondary"
+              [disabled]="guardando || indiceArticulosIncluido"
+              (click)="insertarIndiceArticulos()"
+            >
+              Insertar índice de artículos
+            </button>
+            <span class="helper">
+              Se listarán los artículos publicados y visibles en el mismo menú; los títulos desplazan
+              el feed hasta cada artículo.
+            </span>
+          </div>
           <textarea
+            id="feed-article-content"
             [(ngModel)]="contenido"
             rows="9"
             placeholder="<p>Escribe el contenido del artículo</p>"
           ></textarea>
-        </label>
+        </div>
       </ng-container>
       <p *ngIf="seleccionado && !seleccionado.contenido_editable" class="helper warning">
         Este artículo contiene bloques avanzados. Puedes actualizar su publicación y filtros;

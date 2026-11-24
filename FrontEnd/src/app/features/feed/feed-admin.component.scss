@@ -104,11 +104,34 @@
 }
 
 .editor > label,
+.content-editor > label,
 .html-source > label,
 .condition > label {
   display: block;
   margin-top: 1rem;
   font-weight: 600;
+}
+
+.content-editor {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.content-editor > label {
+  font-weight: 600;
+}
+
+.content-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.content-editor-actions .helper {
+  flex: 1 1 18rem;
+  margin: 0;
 }
 
 .html-source > button {
@@ -153,6 +176,10 @@ select {
 textarea {
   resize: vertical;
   font-family: Consolas, monospace;
+}
+
+.content-editor textarea {
+  margin-top: 0;
 }
 
 .segmentation {

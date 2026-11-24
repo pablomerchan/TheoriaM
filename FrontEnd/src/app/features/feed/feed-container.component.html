@@ -10,6 +10,8 @@
         [articulo]="articulo"
         [posicion]="indice + 1"
         [totalArticulos]="finDeLista() ? articulos().length : -1"
+        [menuId]="menuId()"
+        (navegarAArticulo)="navegarAArticulo($event)"
       />
     }
   </div>

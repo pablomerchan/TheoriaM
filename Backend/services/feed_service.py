@@ -333,3 +333,27 @@ class FeedService:
             ],
             "siguienteCursor": siguiente_cursor,
         }
+
+    def listar_indice(
+        self,
+        usuario_id: UUID,
+        idioma: str | None = None,
+        menu_id: str | None = "inicio",
+    ) -> list[dict[str, Any]]:
+        cursor: str | None = None
+        articulos: list[dict[str, Any]] = []
+        while True:
+            pagina = self.listar(
+                cursor,
+                limite=50,
+                usuario_id=usuario_id,
+                idioma=idioma,
+                menu_id=menu_id,
+            )
+            articulos.extend(
+                {"id": articulo["id"], "titulo": articulo["titulo"]}
+                for articulo in pagina["items"]
+            )
+            cursor = pagina["siguienteCursor"]
+            if cursor is None:
+                return articulos

@@ -14,6 +14,7 @@ import {
   GuardarArticuloFeed,
   ReglasFeed
 } from './feed-admin-api.service';
+import { MARCADOR_INDICE_FEED } from './feed.constants';
 import { OpcionMenuFeed } from './feed.models';
 
 type TipoAtributo = 'texto' | 'numero';
@@ -98,6 +99,23 @@ export class FeedAdminComponent implements OnInit {
     return this.archivosHtml.filter((archivo) =>
       archivo.toLowerCase().includes(consulta)
     );
+  }
+
+  get indiceArticulosIncluido(): boolean {
+    return this.contenido.includes(MARCADOR_INDICE_FEED);
+  }
+
+  insertarIndiceArticulos(): void {
+    if (this.indiceArticulosIncluido) {
+      this.error = 'Este artículo ya contiene un índice de artículos.';
+      this.mensaje = null;
+      return;
+    }
+
+    const separador = this.contenido && !this.contenido.endsWith('\n') ? '\n' : '';
+    this.contenido += `${separador}${MARCADOR_INDICE_FEED}`;
+    this.error = null;
+    this.mensaje = 'Se agregó el índice del menú actual al contenido.';
   }
 
   cargar(): void {

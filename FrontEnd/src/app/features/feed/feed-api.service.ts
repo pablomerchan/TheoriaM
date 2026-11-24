@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApiClientService } from '../../core/api-client.service';
 import {
+  ArticuloIndiceFeed,
   ComentarioFeed,
   OpcionMenuFeed,
   PaginaFeed,
@@ -30,6 +31,11 @@ export class FeedApiService {
 
   listarMenu(): Observable<OpcionMenuFeed[]> {
     return this.api.get<OpcionMenuFeed[]>('v1/feed/menu');
+  }
+
+  listarIndice(menuId: string): Observable<ArticuloIndiceFeed[]> {
+    const params = new HttpParams().set('menu', menuId);
+    return this.api.get<ArticuloIndiceFeed[]>('v1/feed/indice', params);
   }
 
   alternarMeGusta(articuloId: number): Observable<RespuestaMeGustaFeed> {

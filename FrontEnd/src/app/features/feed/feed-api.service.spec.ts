@@ -59,6 +59,16 @@ describe('FeedApiService', () => {
     request.flush([]);
   });
 
+  it('solicita el índice de artículos para el menú seleccionado', () => {
+    TestBed.inject(FeedApiService).listarIndice('consejos').subscribe();
+
+    const request = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}/v1/feed/indice?menu=consejos`
+    );
+    expect(request.request.method).toBe('GET');
+    request.flush([{ id: 17, titulo: 'Artículo recomendado' }]);
+  });
+
   it('alternar Me gusta envía la solicitud para el artículo', () => {
     TestBed.inject(FeedApiService).alternarMeGusta(17).subscribe();
 

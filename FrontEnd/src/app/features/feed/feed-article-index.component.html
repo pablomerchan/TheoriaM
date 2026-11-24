@@ -1,0 +1,21 @@
+<nav class="article-index" [attr.aria-label]="texto('feed.index.label')">
+  <h3>{{ texto('feed.index.label') }}</h3>
+  @if (cargando()) {
+    <p role="status">{{ texto('feed.index.loading') }}</p>
+  } @else if (error(); as mensajeError) {
+    <p role="alert">{{ mensajeError }}</p>
+  } @else if (articulos().length === 0) {
+    <p>{{ texto('feed.index.empty') }}</p>
+  } @else {
+    <ol>
+      @for (articulo of articulos(); track articulo.id) {
+        <li>
+          <a
+            [href]="'#feed-article-' + articulo.id"
+            (click)="seleccionarArticulo($event, articulo.id)"
+          >{{ articulo.titulo }}</a>
+        </li>
+      }
+    </ol>
+  }
+</nav>

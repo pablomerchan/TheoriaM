@@ -1,5 +1,16 @@
-@if (contenido(); as html) {
-  <div class="text-block" [innerHTML]="html"></div>
+@if (segmentos(); as segmentosContenido) {
+  <div class="text-block">
+    @for (segmento of segmentosContenido; track $index) {
+      @if (segmento.tipo === 'indice') {
+        <app-feed-article-index
+          [menuId]="menuId"
+          (navegarAArticulo)="navegarAArticulo.emit($event)"
+        />
+      } @else {
+        <div [innerHTML]="segmento.contenido"></div>
+      }
+    }
+  </div>
 } @else {
   <p class="block-error" role="alert">{{ textoInvalido() }}</p>
 }

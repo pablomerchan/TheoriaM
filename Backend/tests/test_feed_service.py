@@ -136,6 +136,34 @@ def test_listar_entrega_al_repositorio_el_menu_seleccionado() -> None:
     assert repository.argumentos == (None, None, None, 50, "consejos")
 
 
+def test_listar_indice_respeta_menu_y_segmentacion_del_usuario() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    restringido = ArticuloFeed(
+        id=2,
+        titulo="Artículo no visible",
+        publicado_en=fecha - timedelta(days=1),
+        bloques=[],
+        reglas_segmentacion={
+            "modo": "todos",
+            "condiciones": [
+                {"atributo": "perfil.edad", "operador": "gte", "valor": 18}
+            ],
+        },
+    )
+    repository = RepositorioFeedFalso(
+        [crear_articulo(3, fecha), restringido]
+    )
+    repository.atributos["perfil.edad"] = 17
+
+    resultado = FeedService(repository).listar_indice(
+        UUID("00000000-0000-0000-0000-000000000001"),
+        menu_id="consejos",
+    )
+
+    assert resultado == [{"id": 3, "titulo": "Artículo 3"}]
+    assert repository.argumentos == (None, None, None, 50, "consejos")
+
+
 def test_listar_incluye_me_gusta_y_comentarios_de_cada_articulo() -> None:
     fecha = datetime(2026, 10, 15, 12, 30, 45)
     comentario = ComentarioFeed(

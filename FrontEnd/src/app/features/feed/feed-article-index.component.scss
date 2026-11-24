@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  margin-block: 1.5rem;
+}
+
+.article-index {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--article-border-color, #e8e3dc);
+  border-radius: 0.75rem;
+  color: var(--article-text-color, #222);
+  background: var(--article-soft-surface, #f5f3ef);
+}
+
+.article-index h3 {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+}
+
+.article-index ol {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.article-index a {
+  color: var(--article-link-color, #654b2c);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.article-index a:focus-visible {
+  outline: 3px solid #315ca8;
+  outline-offset: 2px;
+}
+
+.article-index p {
+  margin: 0;
+}

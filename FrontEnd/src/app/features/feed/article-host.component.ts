@@ -4,11 +4,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  EventEmitter,
   ElementRef,
   AfterViewInit,
   Input,
   OnChanges,
   OnDestroy,
+  Output,
   SimpleChanges,
   ViewChild,
   inject,
@@ -55,6 +57,8 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
   @Input({ required: true }) articulo!: ArticuloFeed;
   @Input({ required: true }) posicion!: number;
   @Input({ required: true }) totalArticulos!: number;
+  @Input() menuId = 'inicio';
+  @Output() readonly navegarAArticulo = new EventEmitter<number>();
   @ViewChild('articleElement') private articleElement?: ElementRef<HTMLElement>;
   @ViewChild('articleContentViewport') private articleContentViewport?: ElementRef<HTMLElement>;
   @ViewChild('articleContent') private articleContent?: ElementRef<HTMLElement>;

@@ -15,6 +15,11 @@ export interface ArticuloFeed {
   bloques: BloqueFeed[];
 }
 
+export interface ArticuloIndiceFeed {
+  id: number;
+  titulo: string;
+}
+
 export interface ComentarioFeed {
   id: number;
   autor: string;

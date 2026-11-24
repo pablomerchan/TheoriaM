@@ -27,13 +27,14 @@ export class FeedContainerComponent {
   private readonly contrato = inject(FeedContractService);
   private readonly destroyRef = inject(DestroyRef);
   private solicitudActual: Subscription | null = null;
-  private menuId = 'inicio';
+  private articuloObjetivo: number | null = null;
 
   readonly articulos = signal<ArticuloFeed[]>([]);
   readonly cargando = signal(false);
   readonly cursor = signal<string | null>(null);
   readonly finDeLista = signal(false);
   readonly error = signal<string | null>(null);
+  readonly menuId = signal('inicio');
 
   constructor() {
     this.route.queryParamMap
@@ -55,6 +56,12 @@ export class FeedContainerComponent {
     return this.contrato.texto(clave);
   }
 
+  navegarAArticulo(articuloId: number): void {
+    this.articuloObjetivo = articuloId;
+    this.error.set(null);
+    this.resolverNavegacionAArticulo();
+  }
+
   cargarMas(): void {
     if (this.cargando() || this.finDeLista()) {
       return;
@@ -63,7 +70,7 @@ export class FeedContainerComponent {
     this.cargando.set(true);
     this.error.set(null);
     this.solicitudActual = this.api
-      .listar(this.cursor(), this.menuId)
+      .listar(this.cursor(), this.menuId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (pagina) => {
@@ -72,6 +79,7 @@ export class FeedContainerComponent {
           this.finDeLista.set(pagina.siguienteCursor === null);
           this.cargando.set(false);
           this.solicitudActual = null;
+          this.resolverNavegacionAArticulo();
         },
         error: (error: unknown) => {
           console.error('No fue posible cargar los artículos del feed:', error);
@@ -90,7 +98,8 @@ export class FeedContainerComponent {
   }
 
   private recargar(menuId: string): void {
-    this.menuId = menuId;
+    this.menuId.set(menuId);
+    this.articuloObjetivo = null;
     this.solicitudActual?.unsubscribe();
     this.solicitudActual = null;
     this.articulos.set([]);
@@ -98,6 +107,33 @@ export class FeedContainerComponent {
     this.cursor.set(null);
     this.finDeLista.set(false);
     this.error.set(null);
+    this.cargarMas();
+  }
+
+  private resolverNavegacionAArticulo(): void {
+    const articuloId = this.articuloObjetivo;
+    if (articuloId === null) {
+      return;
+    }
+
+    if (this.articulos().some((articulo) => articulo.id === articuloId)) {
+      this.articuloObjetivo = null;
+      if (typeof window !== 'undefined') {
+        window.requestAnimationFrame(() => {
+          const articulo = document.getElementById(`feed-article-${articuloId}`);
+          articulo?.scrollIntoView({ block: 'start' });
+          articulo?.focus({ preventScroll: true });
+        });
+      }
+      return;
+    }
+
+    if (this.finDeLista()) {
+      this.articuloObjetivo = null;
+      this.error.set(this.contrato.texto('feed.index.targetUnavailable'));
+      return;
+    }
+
     this.cargarMas();
   }
 

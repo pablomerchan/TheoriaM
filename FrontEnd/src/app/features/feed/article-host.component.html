@@ -1,6 +1,8 @@
 <article
   #articleElement
   class="feed-article"
+  [attr.id]="'feed-article-' + articulo.id"
+  tabindex="-1"
   [class.reading-mode]="modoLectura()"
   [class.dark-contrast]="preferenciasLectura.contrasteOscuro()"
   [style.--reading-font-size]="tamanoFuente() + 'px'"
@@ -72,7 +74,11 @@
           @defer (on viewport) {
             @switch (bloque.tipo) {
               @case ('texto') {
-                <app-block-text [payload]="bloque.payload" />
+                <app-block-text
+                  [payload]="bloque.payload"
+                  [menuId]="menuId"
+                  (navegarAArticulo)="navegarAArticulo.emit($event)"
+                />
               }
               @case ('imagen') {
                 <app-block-image [payload]="bloque.payload" />
