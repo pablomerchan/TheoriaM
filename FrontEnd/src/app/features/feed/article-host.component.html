@@ -37,13 +37,6 @@
         <button
           class="reading-button font-button"
           type="button"
-          aria-label="Restablecer tamaño de letra"
-          title="Restablecer tamaño de letra"
-          (click)="restablecerTamanoFuente()"
-        >{{ tamanoFuente() }}px</button>
-        <button
-          class="reading-button font-button"
-          type="button"
           aria-label="Aumentar tamaño de letra"
           title="Aumentar tamaño de letra"
           [disabled]="tamanoFuente() >= 28"
@@ -54,41 +47,61 @@
         class="reading-button reading-mode-button"
         type="button"
         [attr.aria-pressed]="modoLectura()"
+        [attr.aria-label]="modoLectura() ? 'Salir del modo lectura' : 'Activar modo lectura'"
+        [title]="modoLectura() ? 'Salir del modo lectura' : 'Activar modo lectura'"
         (click)="alternarModoLectura()"
       >
-        {{ modoLectura() ? 'Salir del modo lectura' : 'Modo lectura' }}
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 6.5c-2.2-1.6-5.3-2-8-1.2v12.2c2.7-.8 5.8-.4 8 1.2m0-12.2c2.2-1.6 5.3-2 8-1.2v12.2c-2.7-.8-5.8-.4-8 1.2m0-12.2v12.2" />
+        </svg>
       </button>
     </div>
   </header>
 
-  @for (bloque of articulo.bloques; track bloque.id) {
-    <section class="article-block" [style.aspect-ratio]="aspectoBloque(bloque)">
-      @defer (on viewport) {
-        @switch (bloque.tipo) {
-          @case ('texto') {
-            <app-block-text [payload]="bloque.payload" />
+  <div
+    #articleContentViewport
+    class="article-content-viewport"
+    [class.expanded]="contenidoExpandido()"
+  >
+    <div #articleContent class="article-content">
+      @for (bloque of articulo.bloques; track bloque.id) {
+        <section class="article-block" [style.aspect-ratio]="aspectoBloque(bloque)">
+          @defer (on viewport) {
+            @switch (bloque.tipo) {
+              @case ('texto') {
+                <app-block-text [payload]="bloque.payload" />
+              }
+              @case ('imagen') {
+                <app-block-image [payload]="bloque.payload" />
+              }
+              @case ('video') {
+                <app-block-video [payload]="bloque.payload" />
+              }
+              @case ('form') {
+                <app-block-form [articuloId]="articulo.id" [formId]="formId(bloque)" />
+              }
+              @default {
+                <p class="unsupported-block" role="status">
+                  {{ texto('feed.block.unavailable') }}
+                </p>
+              }
+            }
+          } @placeholder {
+            <div class="block-placeholder" aria-hidden="true"></div>
+          } @loading (minimum 100ms) {
+            <p class="block-placeholder" role="status">{{ texto('feed.block.loading') }}</p>
           }
-          @case ('imagen') {
-            <app-block-image [payload]="bloque.payload" />
-          }
-          @case ('video') {
-            <app-block-video [payload]="bloque.payload" />
-          }
-          @case ('form') {
-            <app-block-form [articuloId]="articulo.id" [formId]="formId(bloque)" />
-          }
-          @default {
-            <p class="unsupported-block" role="status">
-              {{ texto('feed.block.unavailable') }}
-            </p>
-          }
-        }
-      } @placeholder {
-        <div class="block-placeholder" aria-hidden="true"></div>
-      } @loading (minimum 100ms) {
-        <p class="block-placeholder" role="status">{{ texto('feed.block.loading') }}</p>
+        </section>
       }
-    </section>
+    </div>
+  </div>
+  @if (contenidoExpandible()) {
+    <button
+      class="content-toggle"
+      type="button"
+      [attr.aria-expanded]="contenidoExpandido()"
+      (click)="alternarContenido()"
+    >{{ contenidoExpandido() ? 'Ver menos' : 'Ver más' }}</button>
   }
 
   <section class="article-interactions" [attr.aria-label]="texto('feed.interaction.label')">

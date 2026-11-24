@@ -122,22 +122,73 @@
   font-weight: 600;
 }
 
-.font-controls .font-button:nth-child(2) {
-  min-width: 66px;
-  color: #55514c;
-  font-size: 0.8rem;
-}
-
 .reading-mode-button {
-  color: #fff;
-  border-color: #34302b;
-  background: #34302b;
+  min-width: 44px;
+  padding: 0.5rem;
+  border-color: transparent;
+  color: #55514c;
+  background: transparent;
 }
 
 .reading-mode-button:hover:not(:disabled) {
-  color: #fff;
-  border-color: #514638;
-  background: #514638;
+  border-color: #d6cec2;
+  color: #34302b;
+  background: #f8f5f0;
+}
+
+.reading-mode-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.article-content-viewport {
+  position: relative;
+  max-height: 9.5em;
+  overflow: hidden;
+}
+
+.article-content-viewport:not(.expanded)::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2em;
+  background: linear-gradient(transparent, #fff);
+  content: '';
+  pointer-events: none;
+}
+
+.article-content-viewport.expanded {
+  max-height: none;
+}
+
+.article-content {
+  font-size: var(--content-font-size, var(--reading-font-size, 20px));
+  line-height: 1.9;
+}
+
+.content-toggle {
+  justify-self: start;
+  padding: 0.2rem 0;
+  border: 0;
+  color: #654b2c;
+  background: transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.content-toggle:focus-visible {
+  outline: 3px solid #315ca8;
+  outline-offset: 3px;
 }
 
 .article-block {

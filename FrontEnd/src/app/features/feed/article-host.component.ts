@@ -54,9 +54,13 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
   @Input({ required: true }) posicion!: number;
   @Input({ required: true }) totalArticulos!: number;
   @ViewChild('articleElement') private articleElement?: ElementRef<HTMLElement>;
+  @ViewChild('articleContentViewport') private articleContentViewport?: ElementRef<HTMLElement>;
+  @ViewChild('articleContent') private articleContent?: ElementRef<HTMLElement>;
 
   readonly tamanoFuente = signal(this.leerTamanoFuente());
   readonly modoLectura = signal(false);
+  readonly contenidoExpandible = signal(false);
+  readonly contenidoExpandido = signal(false);
   readonly progresoLectura = signal(0);
   readonly interacciones = signal<{
     me_gusta: boolean;
@@ -70,7 +74,10 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
   readonly errorInteraccion = signal<string | null>(null);
 
   private progressObserver?: IntersectionObserver;
+  private contentResizeObserver?: ResizeObserver;
+  private contentMutationObserver?: MutationObserver;
   private progressFrame: number | null = null;
+  private contentMeasureFrame: number | null = null;
   private isTrackingScroll = false;
 
   private readonly onScrollOrResize = (): void => {
@@ -85,6 +92,23 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
   };
 
   ngAfterViewInit(): void {
+    const content = this.articleContent?.nativeElement;
+    if (content) {
+      if (typeof ResizeObserver !== 'undefined') {
+        this.contentResizeObserver = new ResizeObserver(() => this.programarMedicionContenido());
+        this.contentResizeObserver.observe(content);
+      }
+      if (typeof MutationObserver !== 'undefined') {
+        this.contentMutationObserver = new MutationObserver(() => this.programarMedicionContenido());
+        this.contentMutationObserver.observe(content, {
+          childList: true,
+          subtree: true,
+          characterData: true
+        });
+      }
+      this.programarMedicionContenido();
+    }
+
     const element = this.articleElement?.nativeElement;
     if (!element || typeof IntersectionObserver === 'undefined') {
       this.iniciarSeguimientoScroll();
@@ -105,6 +129,8 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['articulo']) {
+      this.contenidoExpandido.set(false);
+      this.contenidoExpandible.set(false);
       this.interacciones.set({
         me_gusta: this.articulo.me_gusta,
         total_me_gusta: this.articulo.total_me_gusta,
@@ -115,7 +141,13 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
 
   ngOnDestroy(): void {
     this.progressObserver?.disconnect();
+    this.contentResizeObserver?.disconnect();
+    this.contentMutationObserver?.disconnect();
     this.detenerSeguimientoScroll();
+    if (this.contentMeasureFrame !== null) {
+      window.cancelAnimationFrame(this.contentMeasureFrame);
+      this.contentMeasureFrame = null;
+    }
   }
 
   texto(clave: string): string {
@@ -130,12 +162,16 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
     this.establecerTamanoFuente(this.tamanoFuente() + 2);
   }
 
-  restablecerTamanoFuente(): void {
-    this.establecerTamanoFuente(DEFAULT_FONT_SIZE);
-  }
-
   alternarModoLectura(): void {
     this.modoLectura.update((activo) => !activo);
+  }
+
+  alternarContenido(): void {
+    const expandido = !this.contenidoExpandido();
+    this.contenidoExpandido.set(expandido);
+    if (!expandido) {
+      this.programarMedicionContenido();
+    }
   }
 
   alternarMeGusta(): void {
@@ -315,6 +351,25 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
       window.cancelAnimationFrame(this.progressFrame);
       this.progressFrame = null;
     }
+  }
+
+  private programarMedicionContenido(): void {
+    if (this.contentMeasureFrame !== null) {
+      return;
+    }
+    this.contentMeasureFrame = window.requestAnimationFrame(() => {
+      this.contentMeasureFrame = null;
+      const viewport = this.articleContentViewport?.nativeElement;
+      const content = this.articleContent?.nativeElement;
+      if (!viewport || !content || this.contenidoExpandido()) {
+        return;
+      }
+      const esExpandible = content.getBoundingClientRect().height > viewport.clientHeight + 1;
+      this.contenidoExpandible.set(esExpandible);
+      if (!esExpandible) {
+        this.contenidoExpandido.set(false);
+      }
+    });
   }
 
   private actualizarProgreso(): void {
