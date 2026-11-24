@@ -13,16 +13,17 @@
   margin: 0;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
+  color: var(--feed-text-color, #20242a);
   font-size: clamp(0.95rem, 2vw, 1.05rem);
 }
 
 .status {
-  background: #fff;
+  background: var(--feed-surface, #fff);
 }
 
 .error {
-  color: #8b1e1e;
-  background: #fff0f0;
+  color: var(--feed-error-color, #8b1e1e);
+  background: var(--feed-error-surface, #fff0f0);
 }
 
 .load-more {
@@ -32,8 +33,8 @@
   padding: 0.65rem 1.25rem;
   border: 0;
   border-radius: 999px;
-  color: #fff;
-  background: #315ca8;
+  color: var(--feed-action-color, #fff);
+  background: var(--feed-action-background, #315ca8);
   font: inherit;
   cursor: pointer;
 }
@@ -50,16 +51,4 @@
 
 .scroll-sentinel {
   min-height: 1px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .status {
-    color: #f2f4f7;
-    background: #22262d;
-  }
-
-  .error {
-    color: #ffd4d4;
-    background: #4b2528;
-  }
 }

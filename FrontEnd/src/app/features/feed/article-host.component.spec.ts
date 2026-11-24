@@ -74,6 +74,33 @@ describe('ArticleHostComponent reading controls', () => {
     expect(fixture.nativeElement.querySelector('.font-controls').textContent).not.toContain('26px');
   });
 
+  it('cambia y persiste el contraste de lectura en todos los artículos', () => {
+    createComponent();
+
+    const anotherFixture = TestBed.createComponent(ArticleHostComponent);
+    anotherFixture.componentRef.setInput('articulo', { ...articulo, id: 2 });
+    anotherFixture.componentRef.setInput('posicion', 2);
+    anotherFixture.componentRef.setInput('totalArticulos', 2);
+    anotherFixture.detectChanges();
+
+    component.preferenciasLectura.alternarContraste();
+    fixture.detectChanges();
+    anotherFixture.detectChanges();
+
+    expect(component.preferenciasLectura.contrasteOscuro()).toBe(true);
+    expect(fixture.nativeElement.querySelector('.feed-article').classList.contains('dark-contrast')).toBe(true);
+    expect(anotherFixture.nativeElement.querySelector('.feed-article').classList.contains('dark-contrast')).toBe(true);
+    expect(localStorage.getItem('theoriam.feed.article-contrast')).toBe('dark');
+  });
+
+  it('restaura el contraste elegido al cargar el feed', () => {
+    localStorage.setItem('theoriam.feed.article-contrast', 'dark');
+    createComponent();
+
+    expect(component.preferenciasLectura.contrasteOscuro()).toBe(true);
+    expect(fixture.nativeElement.querySelector('.feed-article').classList.contains('dark-contrast')).toBe(true);
+  });
+
   it('expande el contenido y usa un control de modo lectura con icono accesible', () => {
     createComponent();
     component.contenidoExpandible.set(true);

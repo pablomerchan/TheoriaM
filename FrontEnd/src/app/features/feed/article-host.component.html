@@ -2,6 +2,7 @@
   #articleElement
   class="feed-article"
   [class.reading-mode]="modoLectura()"
+  [class.dark-contrast]="preferenciasLectura.contrasteOscuro()"
   [style.--reading-font-size]="tamanoFuente() + 'px'"
   role="article"
   [attr.aria-posinset]="posicion"
@@ -43,18 +44,20 @@
           (click)="aumentarTamanoFuente()"
         >A+</button>
       </div>
-      <button
-        class="reading-button reading-mode-button"
-        type="button"
-        [attr.aria-pressed]="modoLectura()"
-        [attr.aria-label]="modoLectura() ? 'Salir del modo lectura' : 'Activar modo lectura'"
-        [title]="modoLectura() ? 'Salir del modo lectura' : 'Activar modo lectura'"
-        (click)="alternarModoLectura()"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M12 6.5c-2.2-1.6-5.3-2-8-1.2v12.2c2.7-.8 5.8-.4 8 1.2m0-12.2c2.2-1.6 5.3-2 8-1.2v12.2c-2.7-.8-5.8-.4-8 1.2m0-12.2v12.2" />
-        </svg>
-      </button>
+      <div class="reading-view-controls">
+        <button
+          class="reading-button reading-mode-button"
+          type="button"
+          [attr.aria-pressed]="modoLectura()"
+          [attr.aria-label]="modoLectura() ? 'Salir del modo lectura' : 'Activar modo lectura'"
+          [title]="modoLectura() ? 'Salir del modo lectura' : 'Activar modo lectura'"
+          (click)="alternarModoLectura()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 6.5c-2.2-1.6-5.3-2-8-1.2v12.2c2.7-.8 5.8-.4 8 1.2m0-12.2c2.2-1.6 5.3-2 8-1.2v12.2c-2.7-.8-5.8-.4-8 1.2m0-12.2v12.2" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 

@@ -6,6 +6,7 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { SessionService } from '../../core/session.service';
 import { FeedApiService } from './feed-api.service';
 import { FeedContractService } from './feed-contract.service';
+import { FeedReadingPreferencesService } from './feed-reading-preferences.service';
 import { OpcionMenuFeed } from './feed.models';
 
 type EstructuraMenu = 'mobile' | 'tablet' | 'desktop';
@@ -23,6 +24,7 @@ export class FeedShellComponent {
   private readonly router = inject(Router);
   private readonly session = inject(SessionService);
   private readonly api = inject(FeedApiService);
+  readonly preferenciasLectura = inject(FeedReadingPreferencesService);
   readonly contrato = inject(FeedContractService);
   readonly opciones = signal<OpcionMenuFeed[]>([]);
   readonly opcionesPrincipales = computed(() => this.opciones().slice(0, 4));

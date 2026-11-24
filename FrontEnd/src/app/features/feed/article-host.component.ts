@@ -19,6 +19,7 @@ import { FormsModule } from '@angular/forms';
 
 import { FeedContractService } from './feed-contract.service';
 import { FeedApiService } from './feed-api.service';
+import { FeedReadingPreferencesService } from './feed-reading-preferences.service';
 import { BloqueFeed, ArticuloFeed, ComentarioFeed } from './feed.models';
 import { BlockImageComponent } from './blocks/block-image.component';
 import { BlockTextComponent } from './blocks/block-text.component';
@@ -49,6 +50,7 @@ export class ArticleHostComponent implements OnChanges, AfterViewInit, OnDestroy
   private readonly contrato = inject(FeedContractService);
   private readonly api = inject(FeedApiService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly preferenciasLectura = inject(FeedReadingPreferencesService);
 
   @Input({ required: true }) articulo!: ArticuloFeed;
   @Input({ required: true }) posicion!: number;

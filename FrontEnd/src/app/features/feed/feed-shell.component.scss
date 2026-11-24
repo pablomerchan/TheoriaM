@@ -1,14 +1,36 @@
 :host {
   display: block;
   min-height: 100dvh;
-  color: #20242a;
-  background: #f5f6f8;
 }
 
 .feed-shell {
+  --feed-background: #f5f6f8;
+  --feed-surface: #fff;
+  --feed-text-color: #20242a;
+  --feed-border-color: #d9dde3;
+  --feed-hover-surface: #edf0f4;
+  --feed-error-color: #8b1e1e;
+  --feed-error-surface: #fff0f0;
+  --feed-action-background: #315ca8;
+  --feed-action-color: #fff;
+
   display: grid;
   grid-template-columns: 16rem minmax(0, 1fr);
   min-height: 100dvh;
+  color: var(--feed-text-color);
+  background: var(--feed-background);
+}
+
+.feed-shell.dark-contrast {
+  --feed-background: #000;
+  --feed-surface: #000;
+  --feed-text-color: #fff;
+  --feed-border-color: #505050;
+  --feed-hover-surface: #292929;
+  --feed-error-color: #ff9a9a;
+  --feed-error-surface: #301b1b;
+  --feed-action-background: #fff;
+  --feed-action-color: #000;
 }
 
 .sidebar {
@@ -19,8 +41,8 @@
   gap: 1.5rem;
   height: 100dvh;
   padding: 1.5rem 1rem;
-  border-right: 1px solid #d9dde3;
-  background: #fff;
+  border-right: 1px solid var(--feed-border-color);
+  background: var(--feed-surface);
 }
 
 .brand {
@@ -61,7 +83,7 @@
 .menu-button:focus-visible,
 .panel-close:hover,
 .panel-close:focus-visible {
-  background: #edf0f4;
+  background: var(--feed-hover-surface);
 }
 
 .menu-button:focus-visible,
@@ -84,8 +106,14 @@
 .topbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   min-height: 4.5rem;
   padding: 1rem clamp(1rem, 4vw, 2.5rem);
+}
+
+.topbar-heading {
+  min-width: 0;
 }
 
 .topbar h1 {
@@ -94,7 +122,44 @@
 }
 
 .topbar .brand {
-  margin: 0 auto 0 0;
+  margin: 0;
+}
+
+.contrast-toggle {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--feed-text-color);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.contrast-toggle:hover {
+  background: var(--feed-hover-surface);
+}
+
+.contrast-toggle:focus-visible {
+  outline: 3px solid #315ca8;
+  outline-offset: 3px;
+}
+
+.contrast-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.contrast-icon-half {
+  fill: currentColor;
+  stroke: none;
 }
 
 .feed-content {
@@ -110,8 +175,8 @@
   inset: 0 0 0 auto;
   width: min(24rem, 90vw);
   padding: 2rem 1.5rem;
-  border-left: 1px solid #d9dde3;
-  background: #fff;
+  border-left: 1px solid var(--feed-border-color);
+  background: var(--feed-surface);
   box-shadow: -0.5rem 0 2rem rgb(0 0 0 / 12%);
 }
 
@@ -179,6 +244,14 @@
   gap: 0.5rem 1rem;
 }
 
+.mobile .topbar-heading {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
 .mobile .topbar h1 {
   width: 100%;
 }
@@ -195,8 +268,8 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 0.4rem 0.35rem calc(0.4rem + env(safe-area-inset-bottom));
-  border-top: 1px solid #d9dde3;
-  background: #fff;
+  border-top: 1px solid var(--feed-border-color);
+  background: var(--feed-surface);
 }
 
 .mobile-navigation > .menu-button {
@@ -227,9 +300,9 @@
   bottom: calc(100% + 0.5rem);
   width: min(18rem, calc(100vw - 1rem));
   padding: 0.5rem;
-  border: 1px solid #d9dde3;
+  border: 1px solid var(--feed-border-color);
   border-radius: 1rem;
-  background: #fff;
+  background: var(--feed-surface);
   box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 16%);
 }
 
@@ -237,29 +310,11 @@
   min-height: 48px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host {
-    color: #f2f4f7;
-    background: #171a1f;
-  }
-
-  .sidebar,
-  .mobile-navigation,
-  .side-panel,
-  .more-menu {
-    border-color: #3a4049;
-    background: #22262d;
-  }
-
-  .menu-button:hover,
-  .menu-button:focus-visible,
-  .panel-close:hover,
-  .panel-close:focus-visible {
-    background: #343a44;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .contrast-toggle {
+    transition: none;
+  }
+
   *,
   *::before,
   *::after {

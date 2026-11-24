@@ -7,7 +7,7 @@
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
-  color: #222;
+  color: var(--article-text-color, #222);
   font-family: 'Inter', sans-serif;
   font-size: var(--content-font-size, var(--reading-font-size, 20px));
   line-height: 1.9;
@@ -23,7 +23,7 @@
 
 :host ::ng-deep .text-block p {
   margin: 0 0 1.5em;
-  color: #222;
+  color: var(--article-text-color, #222);
   line-height: 1.9;
 }
 
@@ -34,7 +34,7 @@
 :host ::ng-deep .text-block h5,
 :host ::ng-deep .text-block h6 {
   margin: 1.8em 0 0.75em;
-  color: #222;
+  color: var(--article-text-color, #222);
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   line-height: 1.3;
@@ -80,8 +80,8 @@
 :host ::ng-deep .text-block blockquote {
   margin: 1.8em 0;
   padding: 0.35em 0 0.35em 1.2em;
-  border-left: 3px solid #98764a;
-  color: #403a33;
+  border-left: 3px solid var(--article-quote-border, #98764a);
+  color: var(--article-muted-text-color, #403a33);
   font-size: 1.05em;
 }
 
@@ -100,14 +100,14 @@
 
 :host ::ng-deep .text-block figcaption {
   margin-top: 0.65em;
-  color: #55514c;
+  color: var(--article-muted-text-color, #55514c);
   font-size: 0.85em;
   line-height: 1.6;
   text-align: center;
 }
 
 :host ::ng-deep .text-block a {
-  color: #654b2c;
+  color: var(--article-link-color, #654b2c);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
@@ -120,5 +120,5 @@
 
 .block-error {
   margin: 0;
-  color: #8b1e1e;
+  color: var(--article-error-color, #8b1e1e);
 }

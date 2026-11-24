@@ -2,6 +2,7 @@
   class="feed-shell"
   [class.mobile]="estructura() === 'mobile'"
   [class.tablet]="estructura() === 'tablet'"
+  [class.dark-contrast]="preferenciasLectura.contrasteOscuro()"
 >
   <aside class="sidebar">
     <a class="brand" routerLink="/feed">{{ texto('feed.brand') }}</a>
@@ -81,14 +82,29 @@
 
   <div class="workspace">
     <header class="topbar">
-      @if (estructura() === 'mobile') {
-        <p class="brand">{{ texto('feed.brand') }}</p>
-      }
-      @if (estructura() !== 'desktop') {
-        @if (saludo(); as bienvenida) {
-          <h1>{{ bienvenida }}</h1>
+      <div class="topbar-heading">
+        @if (estructura() === 'mobile') {
+          <p class="brand">{{ texto('feed.brand') }}</p>
         }
-      }
+        @if (estructura() !== 'desktop') {
+          @if (saludo(); as bienvenida) {
+            <h1>{{ bienvenida }}</h1>
+          }
+        }
+      </div>
+      <button
+        class="contrast-toggle"
+        type="button"
+        [attr.aria-pressed]="preferenciasLectura.contrasteOscuro()"
+        [attr.aria-label]="texto(preferenciasLectura.contrasteOscuro() ? 'feed.reading.contrast.toLight' : 'feed.reading.contrast.toDark')"
+        [title]="texto(preferenciasLectura.contrasteOscuro() ? 'feed.reading.contrast.toLight' : 'feed.reading.contrast.toDark')"
+        (click)="preferenciasLectura.alternarContraste()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 3a9 9 0 0 0 0 18V3Z" class="contrast-icon-half" />
+          <circle cx="12" cy="12" r="9" />
+        </svg>
+      </button>
     </header>
 
     <main class="feed-content">

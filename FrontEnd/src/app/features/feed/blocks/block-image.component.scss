@@ -3,7 +3,7 @@
   margin: 0;
   overflow: hidden;
   border-radius: 0.75rem;
-  background: #eceff3;
+  background: var(--article-placeholder-surface, #eceff3);
 }
 
 .image-block img {
@@ -15,11 +15,5 @@
 
 .block-error {
   margin: 0;
-  color: #8b1e1e;
-}
-
-@media (prefers-color-scheme: dark) {
-  .image-block {
-    background: #343a44;
-  }
+  color: var(--article-error-color, #8b1e1e);
 }

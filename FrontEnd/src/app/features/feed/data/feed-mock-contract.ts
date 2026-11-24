@@ -22,6 +22,8 @@ export const FEED_MOCK_CONTRACT: ContratoFeed = {
     'feed.block.unavailable': 'Este bloque aún no está disponible.',
     'feed.interaction.label': 'Opiniones sobre el artículo',
     'feed.interaction.error': 'No fue posible registrar tu opinión. Inténtalo de nuevo.',
+    'feed.reading.contrast.toDark': 'Cambiar a contraste negro',
+    'feed.reading.contrast.toLight': 'Cambiar a contraste blanco',
     'feed.like.add': 'Me gusta',
     'feed.like.remove': 'Ya no me gusta',
     'feed.comments.button': 'Comentarios',
