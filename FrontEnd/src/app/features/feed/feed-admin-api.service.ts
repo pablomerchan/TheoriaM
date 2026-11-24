@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiClientService } from '../../core/api-client.service';
+import { OpcionMenuFeed } from './feed.models';
 
 export interface CondicionFeed {
   atributo: string;
@@ -23,6 +24,12 @@ export interface ArticuloAdministrableFeed {
   contenido: string;
   contenido_editable: boolean;
   reglas: ReglasFeed | null;
+  asignaciones: AsignacionMenuFeed[];
+}
+
+export interface AsignacionMenuFeed {
+  menu_id: string;
+  orden: number;
 }
 
 export interface GuardarArticuloFeed {
@@ -31,6 +38,7 @@ export interface GuardarArticuloFeed {
   estado: 0 | 1 | 2;
   prioridad: number;
   reglas: ReglasFeed | null;
+  asignaciones: AsignacionMenuFeed[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +51,10 @@ export class FeedAdminApiService {
 
   listar(): Observable<ArticuloAdministrableFeed[]> {
     return this.api.get<ArticuloAdministrableFeed[]>('v1/feed/admin/articulos');
+  }
+
+  listarMenus(): Observable<OpcionMenuFeed[]> {
+    return this.api.get<OpcionMenuFeed[]>('v1/feed/menu');
   }
 
   crear(articulo: GuardarArticuloFeed): Observable<{ id: number }> {

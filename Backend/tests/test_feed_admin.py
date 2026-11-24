@@ -112,6 +112,29 @@ def test_articulo_admite_prioridad_por_defecto_y_personalizada() -> None:
 
     assert por_defecto.prioridad == 0
     assert personalizada.prioridad == -2
+    assert personalizada.asignaciones == []
+
+
+def test_articulo_admite_orden_por_menu_y_rechaza_asignaciones_duplicadas() -> None:
+    entrada = GuardarArticuloFeedEntrada(
+        titulo="Artículo",
+        estado=1,
+        asignaciones=[
+            {"menu_id": "inicio", "orden": 2},
+            {"menu_id": "consejos", "orden": 1},
+        ],
+    )
+    assert [item.menu_id for item in entrada.asignaciones] == ["inicio", "consejos"]
+
+    with pytest.raises(ValidationError):
+        GuardarArticuloFeedEntrada(
+            titulo="Artículo",
+            estado=1,
+            asignaciones=[
+                {"menu_id": "inicio", "orden": 2},
+                {"menu_id": "inicio", "orden": 1},
+            ],
+        )
 
 
 def test_articulo_rechaza_prioridad_fuera_del_rango_sql() -> None:

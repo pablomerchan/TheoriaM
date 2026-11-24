@@ -18,8 +18,10 @@ const LIMITE_POR_TANDA = 10;
 export class FeedApiService {
   private readonly api = inject(ApiClientService);
 
-  listar(cursor: string | null): Observable<PaginaFeed> {
-    let params = new HttpParams().set('limite', LIMITE_POR_TANDA);
+  listar(cursor: string | null, menuId = 'inicio'): Observable<PaginaFeed> {
+    let params = new HttpParams()
+      .set('limite', LIMITE_POR_TANDA)
+      .set('menu', menuId);
     if (cursor) {
       params = params.set('cursor', cursor);
     }

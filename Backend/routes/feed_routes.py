@@ -178,20 +178,31 @@ class ReglasSegmentacionEntrada(BaseModel):
         return self
 
 
+class AsignacionMenuEntrada(BaseModel):
+    menu_id: str = Field(min_length=1, max_length=50)
+    orden: int = Field(ge=-2147483648, le=2147483647)
+
+
 class GuardarArticuloFeedEntrada(BaseModel):
     titulo: str = Field(min_length=1, max_length=200)
     contenido: str | None = Field(default=None, max_length=100000)
     estado: Literal[0, 1, 2]
     prioridad: int = Field(default=0, ge=-2147483648, le=2147483647)
     reglas: ReglasSegmentacionEntrada | None = None
+    asignaciones: list[AsignacionMenuEntrada] = Field(
+        default_factory=list,
+        max_length=50,
+    )
 
     @model_validator(mode="after")
     def validar_titulo(self) -> "GuardarArticuloFeedEntrada":
         if not self.titulo.strip():
             raise ValueError("El título del artículo es obligatorio.")
+        if len({asignacion.menu_id for asignacion in self.asignaciones}) != len(
+            self.asignaciones
+        ):
+            raise ValueError("Un artículo no puede repetirse en el mismo menú.")
         return self
-
-
 router = APIRouter(
     prefix="/api/v1",
     tags=["feed"],
@@ -285,6 +296,7 @@ def crear_articulo_feed(
             entrada.estado,
             entrada.prioridad,
             reglas,
+            [asignacion.model_dump() for asignacion in entrada.asignaciones],
         )
     except ErrorDatosFeed as error:
         logger.exception("No fue posible crear el artículo del feed.")
@@ -321,6 +333,7 @@ def actualizar_articulo_feed(
             entrada.estado,
             entrada.prioridad,
             entrada.reglas.model_dump() if entrada.reglas else None,
+            [asignacion.model_dump() for asignacion in entrada.asignaciones],
         )
     except ErrorArticuloFeedNoEncontrado as error:
         raise HTTPException(
@@ -380,6 +393,7 @@ def obtener_feed(
     request: Request,
     cursor: str | None = Query(default=None, max_length=512),
     limite: int = Query(default=10, ge=1, le=50),
+    menu: str = Query(default="inicio", min_length=1, max_length=50),
     usuario: UsuarioActual = Depends(get_usuario_actual),
 ) -> dict[str, object]:
     try:
@@ -388,6 +402,7 @@ def obtener_feed(
             limite,
             usuario["id"],
             request.headers.get("Accept-Language"),
+            menu,
         )
     except ErrorCursorFeed as error:
         raise HTTPException(

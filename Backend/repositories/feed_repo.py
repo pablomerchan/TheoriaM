@@ -59,6 +59,7 @@ class FeedRepository(Protocol):
         contenido: str | None,
         estado: int,
         reglas: dict[str, Any] | None,
+        asignaciones: list[dict[str, Any]],
     ) -> dict[str, Any]: ...
 
     def listar(
@@ -67,6 +68,7 @@ class FeedRepository(Protocol):
         cursor_fecha: datetime | None,
         cursor_id: int | None,
         limite: int,
+        menu_id: str | None,
     ) -> list[ArticuloFeed]: ...
 
     def listar_menu(self) -> list[OpcionMenuFeed]: ...

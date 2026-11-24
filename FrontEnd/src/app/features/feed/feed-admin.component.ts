@@ -8,11 +8,13 @@ import { Subscription } from 'rxjs';
 
 import {
   ArticuloAdministrableFeed,
+  AsignacionMenuFeed,
   CondicionFeed,
   FeedAdminApiService,
   GuardarArticuloFeed,
   ReglasFeed
 } from './feed-admin-api.service';
+import { OpcionMenuFeed } from './feed.models';
 
 type TipoAtributo = 'texto' | 'numero';
 
@@ -64,6 +66,9 @@ export class FeedAdminComponent implements OnInit {
   ];
 
   articulos: ArticuloAdministrableFeed[] = [];
+  menusFeed: OpcionMenuFeed[] = [];
+  asignaciones: AsignacionMenuFeed[] = [{ menu_id: 'inicio', orden: 0 }];
+  errorMenus: string | null = null;
   seleccionado: ArticuloAdministrableFeed | null = null;
   titulo = '';
   contenido = '';
@@ -84,6 +89,7 @@ export class FeedAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+    this.cargarMenus();
     this.cargarArchivosHtml();
   }
 
@@ -118,6 +124,9 @@ export class FeedAdminComponent implements OnInit {
     this.estado = 0;
     this.prioridad = 0;
     this.segmentado = false;
+    this.asignaciones = this.menusFeed.some((menu) => menu.id === 'inicio')
+      ? [{ menu_id: 'inicio', orden: 0 }]
+      : [];
     this.modo = 'todos';
     this.condiciones = [];
     this.error = null;
@@ -132,6 +141,7 @@ export class FeedAdminComponent implements OnInit {
     this.archivoHtml = '';
     this.estado = articulo.estado;
     this.prioridad = articulo.prioridad;
+    this.asignaciones = (articulo.asignaciones ?? []).map((asignacion) => ({ ...asignacion }));
     this.segmentado = articulo.reglas !== null;
     this.modo = articulo.reglas?.modo ?? 'todos';
     this.condiciones = (articulo.reglas?.condiciones ?? []).map((condicion) => ({
@@ -196,6 +206,46 @@ export class FeedAdminComponent implements OnInit {
             'No se pudieron buscar archivos HTML. Puedes escribir el nombre manualmente.';
         }
       });
+  }
+
+  private cargarMenus(): void {
+    this.api
+      .listarMenus()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (menus) => {
+          this.menusFeed = menus.filter((menu) => menu.destino === 'feed');
+          this.errorMenus = null;
+          if (!this.seleccionado && this.asignaciones.length === 0) {
+            const inicio = this.menusFeed.find((menu) => menu.id === 'inicio');
+            if (inicio) {
+              this.asignaciones = [{ menu_id: inicio.id, orden: 0 }];
+            }
+          }
+        },
+        error: (error) => {
+          console.error('No fue posible cargar los menús del feed:', error);
+          this.errorMenus = 'No se pudieron cargar los menús disponibles para los artículos.';
+        }
+      });
+  }
+
+  estaAsignado(menuId: string): boolean {
+    return this.asignaciones.some((asignacion) => asignacion.menu_id === menuId);
+  }
+
+  cambiarAsignacion(menuId: string, seleccionado: boolean): void {
+    if (seleccionado && !this.estaAsignado(menuId)) {
+      this.asignaciones.push({ menu_id: menuId, orden: 0 });
+    } else if (!seleccionado) {
+      this.asignaciones = this.asignaciones.filter(
+        (asignacion) => asignacion.menu_id !== menuId
+      );
+    }
+  }
+
+  etiquetaMenu(menuId: string): string {
+    return this.menusFeed.find((menu) => menu.id === menuId)?.etiqueta ?? menuId;
   }
 
   private normalizarImagenesHtml(html: string, nombreArchivo: string): string {
@@ -297,6 +347,17 @@ export class FeedAdminComponent implements OnInit {
       this.error = 'La prioridad debe ser un número entero entre -2147483648 y 2147483647.';
       return;
     }
+    if (
+      this.asignaciones.some((asignacion) =>
+        !Number.isInteger(asignacion.orden) ||
+        asignacion.orden < -2147483648 ||
+        asignacion.orden > 2147483647
+      )
+    ) {
+      this.error =
+        'El orden de cada menú debe ser un número entero entre -2147483648 y 2147483647.';
+      return;
+    }
     const reglas = this.obtenerReglas();
     if (typeof reglas === 'string') {
       this.error = reglas;
@@ -307,6 +368,7 @@ export class FeedAdminComponent implements OnInit {
       titulo: this.titulo.trim(),
       estado: this.estado,
       prioridad: this.prioridad,
+      asignaciones: this.asignaciones.map((asignacion) => ({ ...asignacion })),
       reglas
     };
     if (!this.seleccionado || this.seleccionado.contenido_editable) {

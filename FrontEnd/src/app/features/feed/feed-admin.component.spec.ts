@@ -16,6 +16,7 @@ describe('FeedAdminComponent', () => {
   let httpTestingController: HttpTestingController;
   let api: {
     listar: ReturnType<typeof vi.fn>;
+    listarMenus: ReturnType<typeof vi.fn>;
     listarArchivosHtml: ReturnType<typeof vi.fn>;
     crear: ReturnType<typeof vi.fn>;
   };
@@ -23,6 +24,14 @@ describe('FeedAdminComponent', () => {
   beforeEach(async () => {
     api = {
       listar: vi.fn(() => of([])),
+      listarMenus: vi.fn(() => of([{
+        id: 'inicio',
+        etiqueta: 'Inicio',
+        icono: '⌂',
+        destino: 'feed',
+        valor: '',
+        criterio_filtro: null
+      }])),
       listarArchivosHtml: vi.fn(() => of(['PresentacionTheoriam.html'])),
       crear: vi.fn(() => of({ id: 1 }))
     };
@@ -103,8 +112,25 @@ describe('FeedAdminComponent', () => {
       contenido: '<p>Contenido</p>',
       estado: 1,
       prioridad: -3,
+      asignaciones: [{ menu_id: 'inicio', orden: 0 }],
       reglas: null
     });
+  });
+
+  it('guarda la asignación y el orden configurados para un menú', () => {
+    const component = fixture.componentInstance;
+    component.titulo = 'Artículo de consejos';
+    component.contenido = '<p>Contenido</p>';
+    component.estado = 1;
+    component.asignaciones = [{ menu_id: 'consejos', orden: 4 }];
+
+    component.guardar();
+
+    expect(api.crear).toHaveBeenCalledWith(
+      expect.objectContaining({
+        asignaciones: [{ menu_id: 'consejos', orden: 4 }]
+      })
+    );
   });
 
   it('rechaza una prioridad que no sea entera', () => {

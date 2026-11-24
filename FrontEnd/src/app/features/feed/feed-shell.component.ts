@@ -79,7 +79,10 @@ export class FeedShellComponent {
     switch (opcion.destino) {
       case 'feed':
         void this.router.navigate(['/feed'], {
-          queryParams: opcion.valor ? { filtro: opcion.valor } : {}
+          queryParams: {
+            menu: opcion.id,
+            ...(opcion.valor ? { filtro: opcion.valor } : {})
+          }
         });
         return;
       case 'ruta':

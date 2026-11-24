@@ -23,7 +23,7 @@ describe('FeedApiService', () => {
     TestBed.inject(FeedApiService).listar(null).subscribe();
 
     const request = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}/v1/feed?limite=10`
+      `${environment.apiBaseUrl}/v1/feed?limite=10&menu=inicio`
     );
     expect(request.request.method).toBe('GET');
     request.flush({ items: [], siguienteCursor: null });
@@ -34,9 +34,18 @@ describe('FeedApiService', () => {
     TestBed.inject(FeedApiService).listar(cursor).subscribe();
 
     const request = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}/v1/feed?limite=10&cursor=${cursor}`
+      `${environment.apiBaseUrl}/v1/feed?limite=10&menu=inicio&cursor=${cursor}`
     );
     expect(request.request.method).toBe('GET');
+    request.flush({ items: [], siguienteCursor: null });
+  });
+
+  it('solicita artículos asignados al menú seleccionado', () => {
+    TestBed.inject(FeedApiService).listar(null, 'consejos').subscribe();
+
+    const request = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}/v1/feed?limite=10&menu=consejos`
+    );
     request.flush({ items: [], siguienteCursor: null });
   });
 

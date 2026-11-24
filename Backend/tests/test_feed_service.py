@@ -26,7 +26,9 @@ class RepositorioFeedFalso:
     ) -> None:
         self.articulos = articulos
         self.menu = menu or []
-        self.argumentos: tuple[int | None, datetime | None, int | None, int] | None = None
+        self.argumentos: tuple[
+            int | None, datetime | None, int | None, int, str | None
+        ] | None = None
         self.atributos: dict[str, object] = {}
         self.interacciones: dict[int, InteraccionesFeed] = {}
         self.interacciones_solicitadas: tuple[list[int], UUID] | None = None
@@ -57,8 +59,9 @@ class RepositorioFeedFalso:
         cursor_fecha: datetime | None,
         cursor_id: int | None,
         limite: int,
+        menu_id: str | None,
     ) -> list[ArticuloFeed]:
-        self.argumentos = (cursor_prioridad, cursor_fecha, cursor_id, limite)
+        self.argumentos = (cursor_prioridad, cursor_fecha, cursor_id, limite, menu_id)
         return self.articulos
 
 
@@ -117,7 +120,20 @@ def test_listar_devuelve_solo_limite_y_cursor_de_ultima_entrega() -> None:
         articulos[1].publicado_en,
         articulos[1].id,
     )
-    assert repository.argumentos == (None, None, None, 50)
+    assert repository.argumentos == (None, None, None, 50, "inicio")
+
+
+def test_listar_entrega_al_repositorio_el_menu_seleccionado() -> None:
+    fecha = datetime(2026, 10, 15, 12, 30, 45)
+    repository = RepositorioFeedFalso([crear_articulo(1, fecha)])
+
+    FeedService(repository).listar(
+        cursor=None,
+        usuario_id=UUID("00000000-0000-0000-0000-000000000001"),
+        menu_id="consejos",
+    )
+
+    assert repository.argumentos == (None, None, None, 50, "consejos")
 
 
 def test_listar_incluye_me_gusta_y_comentarios_de_cada_articulo() -> None:
@@ -165,7 +181,7 @@ def test_listar_no_devuelve_cursor_si_no_hay_mas_articulos() -> None:
 
     assert len(resultado["items"]) == 1
     assert resultado["siguienteCursor"] is None
-    assert repository.argumentos == (None, None, None, 50)
+    assert repository.argumentos == (None, None, None, 50, "inicio")
 
 
 def test_listar_menu_incluye_el_criterio_de_filtro() -> None:
@@ -389,12 +405,14 @@ def test_paginacion_busca_contenido_elegible_y_no_omite_la_pagina_siguiente() ->
             cursor_fecha: datetime | None,
             cursor_id: int | None,
             limite: int,
+            menu_id: str | None,
         ) -> list[ArticuloFeed]:
             self.argumentos = (
                 cursor_prioridad,
                 cursor_fecha,
                 cursor_id,
                 limite,
+                menu_id,
             )
             restantes = [
                 articulo
@@ -447,6 +465,7 @@ def test_listar_prioriza_articulos_y_pagina_por_prioridad() -> None:
             cursor_fecha: datetime | None,
             cursor_id: int | None,
             limite: int,
+            menu_id: str | None,
         ) -> list[ArticuloFeed]:
             ordenados = sorted(
                 self.articulos,

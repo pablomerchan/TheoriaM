@@ -94,6 +94,11 @@ class SqlServerFeedRepository(FeedRepository):
                     raise ErrorDatosFeed(
                         "usp_feed_admin_articulos_listar no devolvió las reglas."
                     )
+                asignacion_rows = _fetch_result_set(cursor, advance=True)
+                if asignacion_rows is None:
+                    raise ErrorDatosFeed(
+                        "usp_feed_admin_articulos_listar no devolvió las asignaciones."
+                    )
             finally:
                 cursor.close()
         finally:
@@ -125,6 +130,12 @@ class SqlServerFeedRepository(FeedRepository):
                 )
             reglas_por_articulo[int(row[0])] = reglas
 
+        asignaciones_por_articulo: dict[int, list[dict[str, Any]]] = {}
+        for row in asignacion_rows:
+            asignaciones_por_articulo.setdefault(int(row[0]), []).append(
+                {"menu_id": str(row[1]), "orden": int(row[2])}
+            )
+
         articulos = []
         for row in articulo_rows:
             articulo_id = int(row[0])
@@ -153,6 +164,7 @@ class SqlServerFeedRepository(FeedRepository):
                     "contenido": contenido,
                     "contenido_editable": contenido_editable,
                     "reglas": reglas_por_articulo.get(articulo_id),
+                    "asignaciones": asignaciones_por_articulo.get(articulo_id, []),
                 }
             )
         return articulos
@@ -165,6 +177,7 @@ class SqlServerFeedRepository(FeedRepository):
         estado: int,
         prioridad: int,
         reglas: dict[str, Any] | None,
+        asignaciones: list[dict[str, Any]],
     ) -> dict[str, Any]:
         reglas_json = (
             json.dumps(reglas, ensure_ascii=False, separators=(",", ":"))
@@ -179,7 +192,8 @@ class SqlServerFeedRepository(FeedRepository):
                     """
                     EXEC [tm_feed].[usp_feed_admin_articulo_guardar]
                         @articulo_id = ?, @titulo = ?, @contenido = ?,
-                        @estado = ?, @prioridad = ?, @reglas_json = ?
+                        @estado = ?, @prioridad = ?, @reglas_json = ?,
+                        @asignaciones_json = ?
                     """,
                     articulo_id,
                     titulo,
@@ -187,6 +201,11 @@ class SqlServerFeedRepository(FeedRepository):
                     estado,
                     prioridad,
                     reglas_json,
+                    json.dumps(
+                        asignaciones,
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ),
                 )
                 row = cursor.fetchone()
                 if row is None:
@@ -364,6 +383,7 @@ class SqlServerFeedRepository(FeedRepository):
         cursor_fecha: datetime | None,
         cursor_id: int | None,
         limite: int,
+        menu_id: str | None,
     ) -> list[ArticuloFeed]:
         connection = abrir_conexion("users_database")
         try:
@@ -373,12 +393,13 @@ class SqlServerFeedRepository(FeedRepository):
                     """
                     EXEC [tm_feed].[usp_feed_candidatos_listar]
                         @cursor_prioridad = ?, @cursor_fecha = ?,
-                        @cursor_id = ?, @limite = ?
+                        @cursor_id = ?, @limite = ?, @menu_codigo = ?
                     """,
                     cursor_prioridad,
                     cursor_fecha,
                     cursor_id,
                     limite,
+                    menu_id,
                 )
                 articulo_rows = _fetch_result_set(cursor)
                 bloque_rows = _fetch_result_set(cursor, advance=True)

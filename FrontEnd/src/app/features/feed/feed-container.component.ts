@@ -27,6 +27,7 @@ export class FeedContainerComponent {
   private readonly contrato = inject(FeedContractService);
   private readonly destroyRef = inject(DestroyRef);
   private solicitudActual: Subscription | null = null;
+  private menuId = 'inicio';
 
   readonly articulos = signal<ArticuloFeed[]>([]);
   readonly cargando = signal(false);
@@ -37,11 +38,17 @@ export class FeedContainerComponent {
   constructor() {
     this.route.queryParamMap
       .pipe(
-        map((params) => params.get('filtro')),
-        distinctUntilChanged(),
+        map((params) => ({
+          menuId: params.get('menu') ?? 'inicio',
+          filtro: params.get('filtro')
+        })),
+        distinctUntilChanged(
+          (anterior, actual) =>
+            anterior.menuId === actual.menuId && anterior.filtro === actual.filtro
+        ),
         takeUntilDestroyed()
       )
-      .subscribe(() => this.recargar());
+      .subscribe(({ menuId }) => this.recargar(menuId));
   }
 
   texto(clave: string): string {
@@ -56,7 +63,7 @@ export class FeedContainerComponent {
     this.cargando.set(true);
     this.error.set(null);
     this.solicitudActual = this.api
-      .listar(this.cursor())
+      .listar(this.cursor(), this.menuId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (pagina) => {
@@ -82,7 +89,8 @@ export class FeedContainerComponent {
       });
   }
 
-  private recargar(): void {
+  private recargar(menuId: string): void {
+    this.menuId = menuId;
     this.solicitudActual?.unsubscribe();
     this.solicitudActual = null;
     this.articulos.set([]);

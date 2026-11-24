@@ -219,6 +219,7 @@ class FeedService:
         limite: int = 10,
         usuario_id: UUID | None = None,
         idioma: str | None = None,
+        menu_id: str | None = "inicio",
     ) -> dict[str, Any]:
         if not 1 <= limite <= 50:
             raise ErrorLimiteFeed("El límite debe estar entre 1 y 50.")
@@ -260,6 +261,7 @@ class FeedService:
                 cursor_fecha,
                 cursor_id,
                 50,
+                menu_id,
             )
             if not candidatos:
                 break
