@@ -113,8 +113,11 @@
         [disabled]="actualizandoMeGusta()"
         (click)="alternarMeGusta()"
       >
-        {{ meGusta() ? texto('feed.like.remove') : texto('feed.like.add') }}
-        <span>{{ totalMeGusta() }}</span>
+        <svg class="interaction-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Zm0 0 5-7a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 .5 2L14.5 10h4.8a2 2 0 0 1 1.9 2.5l-1.7 6.9a2 2 0 0 1-1.9 1.5H7" />
+        </svg>
+        <span class="visually-hidden">{{ meGusta() ? texto('feed.like.remove') : texto('feed.like.add') }}</span>
+        <span class="interaction-count">{{ totalMeGusta() }}</span>
       </button>
       <button
         class="interaction-button"
@@ -122,8 +125,11 @@
         [attr.aria-expanded]="comentariosAbiertos()"
         (click)="alternarComentarios()"
       >
-        {{ texto('feed.comments.button') }}
-        <span>{{ comentarios().length }}</span>
+        <svg class="interaction-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-4-.99L3 21l1.99-5.5A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 1 1 21 11.5Z" />
+        </svg>
+        <span class="visually-hidden">{{ texto('feed.comments.button') }}</span>
+        <span class="interaction-count">{{ comentarios().length }}</span>
       </button>
     </div>
 
