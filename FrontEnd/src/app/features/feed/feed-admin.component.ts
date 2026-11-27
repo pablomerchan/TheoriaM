@@ -365,17 +365,6 @@ export class FeedAdminComponent implements OnInit {
       this.error = 'La prioridad debe ser un número entero entre -2147483648 y 2147483647.';
       return;
     }
-    if (
-      this.asignaciones.some((asignacion) =>
-        !Number.isInteger(asignacion.orden) ||
-        asignacion.orden < -2147483648 ||
-        asignacion.orden > 2147483647
-      )
-    ) {
-      this.error =
-        'El orden de cada menú debe ser un número entero entre -2147483648 y 2147483647.';
-      return;
-    }
     const reglas = this.obtenerReglas();
     if (typeof reglas === 'string') {
       this.error = reglas;
@@ -386,7 +375,10 @@ export class FeedAdminComponent implements OnInit {
       titulo: this.titulo.trim(),
       estado: this.estado,
       prioridad: this.prioridad,
-      asignaciones: this.asignaciones.map((asignacion) => ({ ...asignacion })),
+      asignaciones: this.asignaciones.map(({ menu_id }) => ({
+        menu_id,
+        orden: this.prioridad
+      })),
       reglas
     };
     if (!this.seleccionado || this.seleccionado.contenido_editable) {

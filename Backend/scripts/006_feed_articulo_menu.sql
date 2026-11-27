@@ -1,4 +1,4 @@
-/* Asignación y orden de artículos por menú.
+/* Asignación de artículos por menú y prioridad global.
    Ejecutar después de 003_feed_menu.sql, 004_feed_segmentacion.sql
    y 005_feed_interacciones.sql en la base TheoriaM. */
 USE [TheoriaM];
@@ -84,7 +84,7 @@ BEGIN
 
     INSERT INTO #pagina (articulo_id, titulo, publicado_en, prioridad)
     SELECT TOP (@limite + 1)
-           a.articulo_id, a.titulo, a.publicado_en, am.orden
+           a.articulo_id, a.titulo, a.publicado_en, a.prioridad
     FROM [tm_feed].[articulo] AS a
     INNER JOIN [tm_feed].[menu_principal] AS m
         ON m.codigo = @menu_codigo
@@ -96,9 +96,9 @@ BEGIN
     WHERE a.estado = 1
       AND (
             @cursor_prioridad IS NULL
-         OR am.orden > @cursor_prioridad
+         OR a.prioridad > @cursor_prioridad
          OR (
-                am.orden = @cursor_prioridad
+                a.prioridad = @cursor_prioridad
             AND (
                     a.publicado_en < @cursor_fecha
                  OR (
@@ -108,7 +108,7 @@ BEGIN
             )
          )
       )
-    ORDER BY am.orden ASC, a.publicado_en DESC, a.articulo_id DESC;
+    ORDER BY a.prioridad ASC, a.publicado_en DESC, a.articulo_id DESC;
 
     SELECT articulo_id, titulo, publicado_en, prioridad
     FROM #pagina

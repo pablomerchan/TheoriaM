@@ -3,7 +3,7 @@
 El backend nuevo se expone bajo `/api/v1` sin mover ni versionar las rutas
 existentes. `GET /api/v1/feed?menu=inicio&cursor=&limite=10` requiere la sesión que ya
 emite el inicio de sesión, devuelve artículos publicados con bloques y pagina
-por el orden configurado para ese menú y, en empate, por
+por prioridad global y, en empate, por
 `publicado_en DESC, articulo_id DESC`. El límite aceptado es de 1 a 50.
 
 El cursor es un JSON codificado en Base64 URL-safe que contiene la fecha y el
@@ -150,9 +150,9 @@ npm test -- --watch=false --include=src/app/shared/infinite-scroll.directive.spe
 `GET /api/v1/feed/menu`. La tabla `[TheoriaM].[tm_feed].[menu_principal]`
 almacena código estable, etiqueta, icono, destino, valor, orden, estado activo
 y `criterio_filtro`. La tabla `tm_feed.articulo_menu` asigna artículos a uno o
-más menús con un orden independiente para cada asignación. El menú activo cuyo
-destino es `feed` se envía al endpoint como `menu`; Inicio se usa por defecto.
-La administración permite seleccionar los menús Feed y configurar su orden.
+más menús. El menú activo cuyo destino es `feed` se envía al endpoint como
+`menu`; Inicio se usa por defecto. La administración permite seleccionar los
+menús Feed; el orden de artículos es por prioridad global en todos los menús.
 El valor y `criterio_filtro` continúan expuestos como metadatos del menú; la
 asignación de artículos se determina por su código estable (`id`).
 El script idempotente
@@ -160,9 +160,9 @@ El script idempotente
 faltan para inicializar el menú actual y crea `usp_feed_menu_listar`; ejecutar
 después de los scripts 001 y 002. Ejecutar también
 `Backend/scripts/006_feed_articulo_menu.sql` después de los scripts 003, 004
-y 005. La migración conserva los artículos existentes en Inicio y su orden
-actual. Los procedimientos quedan disponibles bajo los permisos de ejecución
-ya otorgados al rol `rol_tm_feed_api`.
+y 005. La migración conserva las asignaciones existentes en Inicio. Los
+procedimientos quedan disponibles bajo los permisos de ejecución ya otorgados
+al rol `rol_tm_feed_api`.
 
 ## FrontEnd: Fase 5
 
@@ -192,9 +192,11 @@ npm test -- --watch=false --include="src/app/features/feed/**/*.spec.ts"
 ## Prioridad de publicación de artículos
 
 En la administración del Feed se puede asignar una prioridad numérica a cada
-artículo. Los números menores se muestran primero; si coinciden, se conserva
-el orden por fecha de publicación y luego por id. La paginación por cursor usa
-los mismos campos para no saltar ni repetir artículos entre páginas.
+artículo. Este campo ordena el Feed y el índice de recomendaciones de los
+artículos en todos los menús. Los números menores se muestran primero; si
+coinciden, se conserva el orden por fecha de publicación y luego por id. La
+paginación por cursor usa los mismos campos para no saltar ni repetir artículos
+entre páginas.
 
 Para actualizar una base existente, volver a ejecutar
 `Backend/scripts/004_feed_segmentacion.sql` después de la actualización del

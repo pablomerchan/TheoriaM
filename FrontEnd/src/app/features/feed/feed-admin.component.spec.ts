@@ -129,23 +129,25 @@ describe('FeedAdminComponent', () => {
       contenido: '<p>Contenido</p>',
       estado: 1,
       prioridad: -3,
-      asignaciones: [{ menu_id: 'inicio', orden: 0 }],
+      asignaciones: [{ menu_id: 'inicio', orden: -3 }],
       reglas: null
     });
   });
 
-  it('guarda la asignación y el orden configurados para un menú', () => {
+  it('aplica la prioridad del artículo a todos sus menús', () => {
     const component = fixture.componentInstance;
     component.titulo = 'Artículo de consejos';
     component.contenido = '<p>Contenido</p>';
     component.estado = 1;
+    component.prioridad = -2;
     component.asignaciones = [{ menu_id: 'consejos', orden: 4 }];
 
     component.guardar();
 
     expect(api.crear).toHaveBeenCalledWith(
       expect.objectContaining({
-        asignaciones: [{ menu_id: 'consejos', orden: 4 }]
+        prioridad: -2,
+        asignaciones: [{ menu_id: 'consejos', orden: -2 }]
       })
     );
   });

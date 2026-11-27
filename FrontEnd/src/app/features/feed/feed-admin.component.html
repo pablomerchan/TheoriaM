@@ -147,6 +147,7 @@
           step="1"
         />
         <span class="helper">
+          Controla el orden del Feed y del índice de recomendaciones en todos los menús.
           Los valores menores aparecen primero; en empate, se muestra antes el más reciente.
         </span>
       </label>
@@ -164,20 +165,6 @@
         </label>
         <p *ngIf="!menusFeed.length && !errorMenus" class="helper">
           No hay menús configurados para mostrar artículos.
-        </p>
-        <label *ngFor="let asignacion of asignaciones">
-          Orden en {{ etiquetaMenu(asignacion.menu_id) }}
-          <input
-            type="number"
-            [(ngModel)]="asignacion.orden"
-            min="-2147483648"
-            max="2147483647"
-            step="1"
-          />
-        </label>
-        <p class="helper">
-          Los valores menores aparecen primero. La selección y el orden son independientes para
-          cada menú.
         </p>
       </fieldset>
 
